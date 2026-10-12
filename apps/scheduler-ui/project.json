@@ -20,7 +20,7 @@
             "input": "apps/scheduler-ui/public"
           }
         ],
-        "styles": ["apps/scheduler-ui/src/styles.css"]
+        "styles": ["apps/scheduler-ui/src/styles.scss"]
       },
       "configurations": {
         "production": {

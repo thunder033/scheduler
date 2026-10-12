@@ -10,7 +10,7 @@
 
 ## Test Conventions
 - Each TypeScript file in `src` has a corresponding test file; exceptions are:
-  - test files (`.test.ts`) or test support files (`.harness.ts`, `.test-utils.ts`, or under `test-utils/`)
+  - test files (`.spec.ts`) or test support files (`.harness.ts`, `.test-utils.ts`, or under `test-utils/`)
   - files with no logic that only list values, other config, or exports (i.e. constants)
 - Use factory functions to generate test data instead of raw object definitions, especially for large and/or repeated structures
 - Tests use a common, parameterized `setup` method for preparing each scenario and avoid beforeEach hooks
