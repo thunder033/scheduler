@@ -1,3 +1,33 @@
+## General Coding Conventions
+- Use named constants for literal string and numeric values; avoid magic numbers/values
+  - Check for existing potential relevant constants when writing new code
+
+## Type Conventions
+- Prefer `interface` for object shapes that will be extended
+- Use `type` for unions, intersections, mapped types
+- Never use `any` — use `unknown` and narrow, or `never` for exhaustive checks
+- Export types alongside implementations, not in separate files
+
+## Test Conventions
+- Each TypeScript file in `src` has a corresponding test file; exceptions are:
+  - test files (`.test.ts`) or test support files (`.harness.ts`, `.test-utils.ts`, or under `test-utils/`)
+  - files with no logic that only list values, other config, or exports (i.e. constants)
+- Use factory functions to generate test data instead of raw object definitions, especially for large and/or repeated structures
+- Tests use a common, parameterized `setup` method for preparing each scenario and avoid beforeEach hooks
+  - the setup method usually returns an object with test fixtures and data to use in the scenario
+- Tests focus on the behavior of the module under test
+  - Focus on asserting how the module responds to interactions with its public interface
+  - Avoid asserting against hard-coded properties or values
+- Tests drive behavior through harnesses, not screen or fireEvent. screen is only for the test scene itself, such as an "outside" button or a test-only state reader.
+
+## Development  Flow
+- NEVER use git stash or other commands that touch the index without asking.
+- When using the Bash tool, ALWAYS give an explanation before the tool call of what will be done
+- Prefer Read/Write tools over Bash unless there is a specific reason for Bash
+- When given instructions to write code, only write was explicitly asked. Wait for review and further instructions before proceeding.
+- Don't attempt to validate the functionality in the browser after edits, the dev will manually validate functionality in the browser
+- Use the ts-quality skill to check code quality after edits
+
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->
 
