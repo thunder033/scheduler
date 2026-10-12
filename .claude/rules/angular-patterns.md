@@ -12,6 +12,7 @@ paths: ["apps/shop/src/**/*", "packages/shop/**/*"]
 - Do not use ARIA attributes for styling, create a semantic CSS for each state
 - Avoid using absolute pixel values for sizing and position of elements, use REM by default
   - pixel values are OK for border thickness and some edge cases with specific reason
+- For styling Angular Material components, use SASS override mixins
 
 # Component Harnesses
 - Component harnesses describe the behavior of the component semantically, independent of the implementation and platform

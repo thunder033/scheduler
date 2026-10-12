@@ -29,4 +29,10 @@ describe('Dashboard', () => {
 
     expect(await harness.getText()).not.toBe('');
   });
+
+  it('should render the header', async () => {
+    const { harness } = await setup();
+
+    expect(await harness.hasHeader()).toBe(true);
+  });
 });
