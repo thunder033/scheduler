@@ -1,15 +1,43 @@
 import { TestBed } from '@angular/core/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { provideRouter } from '@angular/router';
+import { Store } from '@ngxs/store';
+import {
+  COLOR_SCHEME_BY_PREFERENCE,
+  provideSchedulerUiState,
+  SetThemePreference,
+  THEME_PREFERENCES,
+} from '@org/scheduler-ui/state';
 import { App } from './app';
+import { AppHarness } from './app.harness';
+
+async function setup() {
+  localStorage.clear();
+  await TestBed.configureTestingModule({
+    imports: [App],
+    providers: [provideRouter([]), provideSchedulerUiState()],
+  }).compileComponents();
+
+  const fixture = TestBed.createComponent(App);
+  const harness = await TestbedHarnessEnvironment.harnessForFixture(
+    fixture,
+    AppHarness,
+  );
+
+  return { fixture, harness, store: TestBed.inject(Store) };
+}
 
 describe('App', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [App],
-    }).compileComponents();
-  });
+  it.each(THEME_PREFERENCES)(
+    'should apply the color scheme for the %s theme preference',
+    async (preference) => {
+      const { harness, store } = await setup();
 
-  it('should render title', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-  });
+      store.dispatch(new SetThemePreference(preference));
+
+      expect(await harness.getColorScheme()).toBe(
+        COLOR_SCHEME_BY_PREFERENCE[preference],
+      );
+    },
+  );
 });

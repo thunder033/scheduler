@@ -1,6 +1,7 @@
 import { Provider } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { provideTestState } from '../../test-utils/provide-test-state';
 import { Dashboard } from './dashboard';
 import { DashboardHarness } from './dashboard.harness';
 
@@ -11,7 +12,7 @@ interface SetupOptions {
 async function setup({ providers = [] }: SetupOptions = {}) {
   await TestBed.configureTestingModule({
     imports: [Dashboard],
-    providers,
+    providers: [provideTestState(), ...providers],
   }).compileComponents();
 
   const fixture = TestBed.createComponent(Dashboard);

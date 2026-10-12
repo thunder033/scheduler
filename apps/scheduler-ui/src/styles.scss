@@ -3,6 +3,9 @@
 
 html {
   height: 100%;
+  // Default to the system preference; the app overrides this inline with the
+  // user's theme preference.
+  color-scheme: light dark;
   @include mat.theme(
     (
       color: (
@@ -16,7 +19,6 @@ html {
 }
 
 body {
-  color-scheme: light;
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);

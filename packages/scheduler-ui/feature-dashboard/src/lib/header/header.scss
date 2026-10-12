@@ -7,4 +7,15 @@
       container-text-color: var(--mat-sys-on-primary),
     )
   );
+
+  @include mat.icon-button-overrides(
+    (
+      icon-color: var(--mat-sys-on-primary),
+      state-layer-color: var(--mat-sys-on-primary),
+    )
+  );
+}
+
+.spacer {
+  flex: 1 1 auto;
 }

@@ -1,0 +1,15 @@
+<button mat-icon-button [matMenuTriggerFor]="themeMenu" [attr.aria-label]="label">
+  <mat-icon>contrast</mat-icon>
+</button>
+
+<mat-menu #themeMenu="matMenu">
+  @for (option of options; track option.value) {
+    <button
+      mat-menu-item
+      [class.selected]="option.value === preference()"
+      (click)="select(option.value)"
+    >
+      {{ option.label }}
+    </button>
+  }
+</mat-menu>

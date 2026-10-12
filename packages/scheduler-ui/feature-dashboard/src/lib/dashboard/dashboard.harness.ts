@@ -4,7 +4,8 @@ import { HeaderHarness } from '../header/header.harness';
 export class DashboardHarness extends ComponentHarness {
   static hostSelector = 'lib-dashboard';
 
-  private readonly header = this.locatorForOptional(HeaderHarness);
+  header = this.locatorFor(HeaderHarness);
+  private readonly optionalHeader = this.locatorForOptional(HeaderHarness);
 
   async getText(): Promise<string> {
     const host = await this.host();
@@ -12,6 +13,6 @@ export class DashboardHarness extends ComponentHarness {
   }
 
   async hasHeader(): Promise<boolean> {
-    return (await this.header()) !== null;
+    return (await this.optionalHeader()) !== null;
   }
 }

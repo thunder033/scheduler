@@ -1,5 +1,5 @@
 ---
-paths: ["apps/shop/src/**/*", "packages/shop/**/*"]
+paths: ["apps/shop/src/**/*", "packages/shop/**/*", "apps/*-ui/**/*", "packages/*-ui/**/*"]
 ---
 
 # Component Best Practices
