@@ -4,7 +4,7 @@
   "projectType": "application",
   "prefix": "app",
   "sourceRoot": "apps/scheduler-ui/src",
-  "tags": [],
+  "tags": ["scope:scheduler-ui"],
   "targets": {
     "build": {
       "executor": "@angular/build:application",

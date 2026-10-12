@@ -24,9 +24,11 @@
         "./packages/shop/feature-products/src/index.ts"
       ],
       "@org/shop/shared-ui": ["./packages/shop/shared-ui/src/index.ts"],
-      "@org/scheduler-ui-data": ["./scheduler-ui/data/src/index.ts"],
-      "@org/scheduler-ui-feature-dashboard": [
-        "./scheduler-ui/feature-dashboard/src/index.ts"
+      "@org/scheduler-ui/data": [
+        "./packages/scheduler-ui/data/src/index.ts"
+      ],
+      "@org/scheduler-ui/feature-dashboard": [
+        "./packages/scheduler-ui/feature-dashboard/src/index.ts"
       ]
     }
   },

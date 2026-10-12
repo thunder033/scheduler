@@ -29,6 +29,10 @@ export default [
               onlyDependOnLibsWithTags: ['scope:shop', 'scope:shared'],
             },
             {
+              sourceTag: 'scope:scheduler-ui',
+              onlyDependOnLibsWithTags: ['scope:scheduler-ui', 'scope:shared'],
+            },
+            {
               sourceTag: 'scope:api',
               onlyDependOnLibsWithTags: ['scope:api', 'scope:shared'],
             },
