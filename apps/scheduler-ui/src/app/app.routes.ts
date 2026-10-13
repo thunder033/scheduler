@@ -1,6 +1,6 @@
 import { Route } from '@angular/router';
-
-const DASHBOARD_PATH = 'dashboard';
+import { DASHBOARD_PATH, LOGIN_PATH } from './app.paths';
+import { authGuard } from './auth.guard';
 
 export const appRoutes: Route[] = [
   {
@@ -9,7 +9,13 @@ export const appRoutes: Route[] = [
     pathMatch: 'full',
   },
   {
+    path: LOGIN_PATH,
+    loadChildren: () =>
+      import('@org/scheduler-ui/feature-auth').then((m) => m.featureAuthRoutes),
+  },
+  {
     path: DASHBOARD_PATH,
+    canActivate: [authGuard],
     loadChildren: () =>
       import('@org/scheduler-ui/feature-dashboard').then(
         (m) => m.featureDashboardRoutes,

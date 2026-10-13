@@ -6,7 +6,7 @@ import {
   SetThemePreference,
   THEME_PREFERENCES,
   ThemePreference,
-  ThemeState,
+  LocalUserState,
 } from '@org/scheduler-ui/state';
 import { Store } from '@ngxs/store';
 
@@ -35,7 +35,7 @@ export class ThemeMenu {
   protected readonly label = THEME_MENU_LABEL;
   protected readonly options = THEME_OPTIONS;
   protected readonly preference = this.store.selectSignal(
-    ThemeState.preference,
+    LocalUserState.themePreference,
   );
 
   protected select(preference: ThemePreference): void {

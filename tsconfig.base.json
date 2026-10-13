@@ -28,7 +28,10 @@
       "@org/scheduler-ui/feature-dashboard": [
         "./packages/scheduler-ui/feature-dashboard/src/index.ts"
       ],
-      "@org/scheduler-ui/state": ["./packages/scheduler-ui/state/src/index.ts"]
+      "@org/scheduler-ui/state": ["./packages/scheduler-ui/state/src/index.ts"],
+      "@org/scheduler-ui/feature-auth": [
+        "./packages/scheduler-ui/feature-auth/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]

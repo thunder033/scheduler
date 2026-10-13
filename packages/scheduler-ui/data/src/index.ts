@@ -1,1 +1,2 @@
-export * from './lib/scheduler-ui-data/scheduler-ui-data';
+export * from './lib/auth/auth.service';
+export * from './lib/user/user.service';

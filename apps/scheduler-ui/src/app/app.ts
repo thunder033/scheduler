@@ -2,7 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { Component, effect, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { ThemeState } from '@org/scheduler-ui/state';
+import { LocalUserState } from '@org/scheduler-ui/state';
 
 @Component({
   imports: [RouterModule],
@@ -13,7 +13,7 @@ import { ThemeState } from '@org/scheduler-ui/state';
 export class App {
   private readonly document = inject(DOCUMENT);
   private readonly colorScheme = inject(Store).selectSignal(
-    ThemeState.colorScheme,
+    LocalUserState.themeColorScheme,
   );
 
   protected title = 'scheduler-ui';

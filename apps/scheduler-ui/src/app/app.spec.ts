@@ -3,7 +3,7 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { provideRouter } from '@angular/router';
 import { Store } from '@ngxs/store';
 import {
-  COLOR_SCHEME_BY_PREFERENCE,
+  THEME_COLOR_SCHEME_BY_PREFERENCE,
   provideSchedulerUiState,
   SetThemePreference,
   THEME_PREFERENCES,
@@ -36,7 +36,7 @@ describe('App', () => {
       store.dispatch(new SetThemePreference(preference));
 
       expect(await harness.getColorScheme()).toBe(
-        COLOR_SCHEME_BY_PREFERENCE[preference],
+        THEME_COLOR_SCHEME_BY_PREFERENCE[preference],
       );
     },
   );

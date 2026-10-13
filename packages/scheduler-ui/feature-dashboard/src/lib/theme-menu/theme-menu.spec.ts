@@ -1,7 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
-import { DEFAULT_THEME_PREFERENCE, ThemeState } from '@org/scheduler-ui/state';
+import {
+  DEFAULT_THEME_PREFERENCE,
+  LocalUserState,
+} from '@org/scheduler-ui/state';
 import { provideTestState } from '../../test-utils/provide-test-state';
 import { THEME_LABELS, THEME_OPTIONS, ThemeMenu } from './theme-menu';
 import { ThemeMenuHarness } from './theme-menu.harness';
@@ -46,7 +49,7 @@ describe('ThemeMenu', () => {
       await harness.selectTheme(label);
 
       expect(await harness.getSelectedTheme()).toBe(label);
-      expect(store.selectSnapshot(ThemeState.preference)).toBe(value);
+      expect(store.selectSnapshot(LocalUserState.themePreference)).toBe(value);
     },
   );
 });

@@ -4,9 +4,15 @@ import { withNgxsReduxDevtoolsPlugin } from '@ngxs/devtools-plugin';
 import { withNgxsLoggerPlugin } from '@ngxs/logger-plugin';
 import { withNgxsRouterPlugin } from '@ngxs/router-plugin';
 import { withNgxsStoragePlugin } from '@ngxs/storage-plugin';
-import { ThemeState } from './theme/theme.state';
+import { LOCAL_USER_STATE_NAME } from './local-user/local-user.model';
+import { LocalUserState } from './local-user/local-user.state';
+import { UsersState } from './users/users.state';
 
 export const STORAGE_NAMESPACE = 'scheduler-ui';
+
+export const PERSISTED_STATE_KEYS = [
+  `${LOCAL_USER_STATE_NAME}.themePreference`,
+];
 
 export function provideSchedulerUiState(): EnvironmentProviders {
   const devPlugins = isDevMode()
@@ -14,10 +20,10 @@ export function provideSchedulerUiState(): EnvironmentProviders {
     : [];
 
   return provideStore(
-    [ThemeState],
+    [LocalUserState, UsersState],
     withNgxsRouterPlugin(),
     withNgxsStoragePlugin({
-      keys: [ThemeState],
+      keys: PERSISTED_STATE_KEYS,
       namespace: STORAGE_NAMESPACE,
     }),
     ...devPlugins,

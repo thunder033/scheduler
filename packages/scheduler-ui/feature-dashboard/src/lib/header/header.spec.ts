@@ -1,5 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { Store } from '@ngxs/store';
+import { User, UserRole } from '@org/models';
+import { SetCurrentUser } from '@org/scheduler-ui/state';
 import { provideTestState } from '../../test-utils/provide-test-state';
 import { THEME_OPTIONS } from '../theme-menu/theme-menu';
 import { HEADER_TITLE, Header } from './header';
@@ -17,7 +20,7 @@ async function setup() {
     HeaderHarness,
   );
 
-  return { fixture, harness };
+  return { fixture, harness, store: TestBed.inject(Store) };
 }
 
 describe('Header', () => {
@@ -25,6 +28,21 @@ describe('Header', () => {
     const { harness } = await setup();
 
     expect(await harness.getTitle()).toBe(HEADER_TITLE);
+  });
+
+  it('should display the current user', async () => {
+    const { harness, store } = await setup();
+    const user: User = {
+      id: 'user-1',
+      displayName: 'Test User',
+      contact: [],
+      roles: [UserRole.Member],
+    };
+
+    store.dispatch(new SetCurrentUser(user));
+
+    const currentUserTile = await harness.currentUserTile();
+    expect(await currentUserTile.getDisplayName()).toBe(user.displayName);
   });
 
   it('should let the user choose a theme', async () => {
