@@ -6,6 +6,7 @@ import { withNgxsRouterPlugin } from '@ngxs/router-plugin';
 import { withNgxsStoragePlugin } from '@ngxs/storage-plugin';
 import { LOCAL_USER_STATE_NAME } from './local-user/local-user.model';
 import { LocalUserState } from './local-user/local-user.state';
+import { PlanningState } from './planning/planning.state';
 import { UsersState } from './users/users.state';
 
 export const STORAGE_NAMESPACE = 'scheduler-ui';
@@ -20,7 +21,7 @@ export function provideSchedulerUiState(): EnvironmentProviders {
     : [];
 
   return provideStore(
-    [LocalUserState, UsersState],
+    [LocalUserState, PlanningState, UsersState],
     withNgxsRouterPlugin(),
     withNgxsStoragePlugin({
       keys: PERSISTED_STATE_KEYS,

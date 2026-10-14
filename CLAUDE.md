@@ -17,16 +17,17 @@
   - the setup method usually returns an object with test fixtures and data to use in the scenario
 - Tests focus on the behavior of the module under test
   - Focus on asserting how the module responds to interactions with its public interface
-  - Avoid asserting against hard-coded properties or values
+  - Avoid asserting against hard-coded properties or values, or static text
 - Tests drive behavior through harnesses, not screen or fireEvent. screen is only for the test scene itself, such as an "outside" button or a test-only state reader.
 
 ## Development  Flow
 - NEVER use git stash or other commands that touch the index without asking.
 - When using the Bash tool, ALWAYS give an explanation before the tool call of what will be done
-- Prefer Read/Write tools over Bash unless there is a specific reason for Bash
 - When given instructions to write code, only write was explicitly asked. Wait for review and further instructions before proceeding.
+- Prefer Read/Write tools over Bash unless there is a specific reason for Bash
 - Don't attempt to validate the functionality in the browser after edits, the dev will manually validate functionality in the browser
 - Use the ts-quality skill to check code quality after edits
+- Use `--no-tui` with NX commands 
 
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->

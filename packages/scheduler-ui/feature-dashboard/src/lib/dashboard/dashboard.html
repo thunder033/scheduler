@@ -1,2 +1,4 @@
 <lib-header />
-<p>Dashboard works!</p>
+@if (isCoordinator()) {
+<lib-timeslot-planner />
+}

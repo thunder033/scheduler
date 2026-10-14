@@ -1,0 +1,46 @@
+<mat-card appearance="outlined">
+  <mat-card-content>
+    <div class="summary">
+      <span class="time-range">{{ timeRange() }}</span>
+      <button
+        mat-icon-button
+        type="button"
+        class="edit-toggle"
+        [class.active]="editing()"
+        [attr.aria-label]="editLabel"
+        [attr.aria-pressed]="editing()"
+        (click)="toggleEditing()"
+      >
+        <mat-icon>edit</mat-icon>
+      </button>
+    </div>
+    @if (editing()) {
+    <div
+      class="editor"
+      (mousedown)="$event.stopPropagation()"
+      (touchstart)="$event.stopPropagation()"
+    >
+      <mat-form-field class="start-time" subscriptSizing="dynamic">
+        <mat-label>Start</mat-label>
+        <input
+          matInput
+          type="time"
+          [formField]="timesForm.start"
+          [errorStateMatcher]="errorMatcher"
+        />
+        <mat-error>{{ timesForm.start().errors()[0]?.message }}</mat-error>
+      </mat-form-field>
+      <mat-form-field class="end-time" subscriptSizing="dynamic">
+        <mat-label>End</mat-label>
+        <input
+          matInput
+          type="time"
+          [formField]="timesForm.end"
+          [errorStateMatcher]="errorMatcher"
+        />
+        <mat-error>{{ timesForm.end().errors()[0]?.message }}</mat-error>
+      </mat-form-field>
+    </div>
+    }
+  </mat-card-content>
+</mat-card>

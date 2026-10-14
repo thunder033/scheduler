@@ -2,17 +2,21 @@
 paths: ["apps/shop/src/**/*", "packages/shop/**/*", "apps/*-ui/**/*", "packages/*-ui/**/*"]
 ---
 
+Start with the `angular-developer` skill to determine best practices and appropriate patterns.
+This file augments those standard best practices.
+
 # Component Best Practices
 
 ## Component Structure
 - Self-contained components; prefer reading data from shared services or state instead of inputs
   - Only use inputs where multiple usages of the component may need different configuration depending on their usage context
 
-## Styling and CSS
-- Do not use ARIA attributes for styling, create a semantic CSS for each state
+## Styling and SCSS/CSS
+- Do not use ARIA attributes for styling, create a semantic CSS class for each state
 - Avoid using absolute pixel values for sizing and position of elements, use REM by default
   - pixel values are OK for border thickness and some edge cases with specific reason
 - For styling Angular Material components, use SASS override mixins
+- Create and maintain common utility classes, variables, and mixins in the shared styles folder
 
 # Component Harnesses
 - Component harnesses describe the behavior of the component semantically, independent of the implementation and platform

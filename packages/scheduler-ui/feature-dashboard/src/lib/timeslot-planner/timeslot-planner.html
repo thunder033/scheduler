@@ -1,0 +1,27 @@
+<div class="timeslot-header">
+  <div>
+    <h2 class="title">{{ title }}</h2>
+    <p>{{ description }}</p>
+  </div>
+  <button mat-button>
+    <mat-icon fontIcon="add"></mat-icon>
+    New timeslot
+  </button>
+</div>
+
+<div class="days" cdkDropListGroup>
+  @for (day of days(); track day.dayOfWeek) {
+  <section
+    class="day"
+    cdkDropList
+    [cdkDropListData]="day.dayOfWeek"
+    [cdkDropListSortingDisabled]="true"
+    (cdkDropListDropped)="drop($event)"
+  >
+    <h3 class="day-label">{{ day.label }}</h3>
+    @for (timeslot of day.timeslots; track timeslot.timeslotId) {
+    <lib-timeslot-card cdkDrag [cdkDragData]="timeslot" [timeslot]="timeslot" />
+    }
+  </section>
+  }
+</div>

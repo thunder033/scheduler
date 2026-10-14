@@ -1,9 +1,22 @@
 import { Provider } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { Store } from '@ngxs/store';
+import { ContactMethod, User, UserRole } from '@org/models';
+import { SetCurrentUser } from '@org/scheduler-ui/state';
 import { provideTestState } from '../../test-utils/provide-test-state';
 import { Dashboard } from './dashboard';
 import { DashboardHarness } from './dashboard.harness';
+
+function createUser(overrides: Partial<User> = {}): User {
+  return {
+    id: 'user-1',
+    displayName: 'Test User',
+    contact: [{ method: ContactMethod.Phone, value: '555-0100' }],
+    roles: [UserRole.Member],
+    ...overrides,
+  };
+}
 
 interface SetupOptions {
   providers?: Provider[];
@@ -21,7 +34,7 @@ async function setup({ providers = [] }: SetupOptions = {}) {
     DashboardHarness,
   );
 
-  return { fixture, harness };
+  return { fixture, harness, store: TestBed.inject(Store) };
 }
 
 describe('Dashboard', () => {
@@ -35,5 +48,47 @@ describe('Dashboard', () => {
     const { harness } = await setup();
 
     expect(await harness.hasHeader()).toBe(true);
+  });
+
+  describe('timeslot planner', () => {
+    it('should render for a coordinator', async () => {
+      const { harness, store } = await setup();
+
+      store.dispatch(
+        new SetCurrentUser(createUser({ roles: [UserRole.Coordinator] })),
+      );
+
+      expect(await harness.hasTimeslotPlanner()).toBe(true);
+    });
+
+    it.each([UserRole.Member, UserRole.Prospect])(
+      'should not render for a %s',
+      async (role) => {
+        const { harness, store } = await setup();
+
+        store.dispatch(new SetCurrentUser(createUser({ roles: [role] })));
+
+        expect(await harness.hasTimeslotPlanner()).toBe(false);
+      },
+    );
+
+    it('should not render when there is no current user', async () => {
+      const { harness } = await setup();
+
+      expect(await harness.hasTimeslotPlanner()).toBe(false);
+    });
+
+    it('should stop rendering when the user is no longer a coordinator', async () => {
+      const { harness, store } = await setup();
+      store.dispatch(
+        new SetCurrentUser(createUser({ roles: [UserRole.Coordinator] })),
+      );
+
+      store.dispatch(
+        new SetCurrentUser(createUser({ roles: [UserRole.Member] })),
+      );
+
+      expect(await harness.hasTimeslotPlanner()).toBe(false);
+    });
   });
 });
