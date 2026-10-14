@@ -2,6 +2,6 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'lib-login',
-  templateUrl: './login.html',
+  templateUrl: './login.component.html',
 })
-export class Login {}
+export class LoginComponent {}

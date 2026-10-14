@@ -16,8 +16,8 @@ import {
   stubLayout,
 } from '../../test-utils/layout-stubs';
 import { provideTestState } from '../../test-utils/provide-test-state';
-import { formatTimeRange } from '../timeslot-card/timeslot-card';
-import { DAY_LABELS, TimeslotPlanner } from './timeslot-planner';
+import { formatTimeRange } from '../timeslot-card/timeslot-card.component';
+import { DAY_LABELS, TimeslotPlannerComponent } from './timeslot-planner.component';
 import { TimeslotPlannerHarness } from './timeslot-planner.harness';
 
 const SUNDAY = 7;
@@ -52,7 +52,7 @@ const CARD_HEIGHT = 50;
 const DRAG_START_DISTANCE = 20;
 
 /** Lays the days out as columns, with each day's cards stacked under its label */
-function layOutPlanner(fixture: ComponentFixture<TimeslotPlanner>): void {
+function layOutPlanner(fixture: ComponentFixture<TimeslotPlannerComponent>): void {
   const boxes = new Map<Element, ElementBox>();
   const days = fixture.nativeElement.querySelectorAll(
     '.day',
@@ -73,7 +73,7 @@ function layOutPlanner(fixture: ComponentFixture<TimeslotPlanner>): void {
 }
 
 function findElement(
-  fixture: ComponentFixture<TimeslotPlanner>,
+  fixture: ComponentFixture<TimeslotPlannerComponent>,
   selector: string,
   hasText: string,
 ): Element {
@@ -90,7 +90,7 @@ function findElement(
 
 /** Picks up the timeslot's card with the mouse and holds it, still within its own day */
 function startDraggingTimeslot(
-  fixture: ComponentFixture<TimeslotPlanner>,
+  fixture: ComponentFixture<TimeslotPlannerComponent>,
   timeslot: Timeslot,
 ): void {
   layOutPlanner(fixture);
@@ -113,7 +113,7 @@ function startDraggingTimeslot(
 
 /** Drags the timeslot's card with the mouse onto the column of the day */
 async function dragTimeslotToDay(
-  fixture: ComponentFixture<TimeslotPlanner>,
+  fixture: ComponentFixture<TimeslotPlannerComponent>,
   timeslot: Timeslot,
   dayOfWeek: number,
 ): Promise<void> {
@@ -138,7 +138,7 @@ async function dragTimeslotToDay(
 
 async function setup(drafts: TimeslotDraft[] = []) {
   await TestBed.configureTestingModule({
-    imports: [TimeslotPlanner],
+    imports: [TimeslotPlannerComponent],
     providers: [provideTestState()],
   }).compileComponents();
 
@@ -148,7 +148,7 @@ async function setup(drafts: TimeslotDraft[] = []) {
     created.push(await firstValueFrom(timeslotService.createTimeslot(draft)));
   }
 
-  const fixture = TestBed.createComponent(TimeslotPlanner);
+  const fixture = TestBed.createComponent(TimeslotPlannerComponent);
   const harness = await TestbedHarnessEnvironment.harnessForFixture(
     fixture,
     TimeslotPlannerHarness,
@@ -163,7 +163,7 @@ async function setup(drafts: TimeslotDraft[] = []) {
   };
 }
 
-describe('TimeslotPlanner', () => {
+describe('TimeslotPlannerComponent', () => {
   it('should list every timeslot under the label of its day of week', async () => {
     const { harness, getServiceTimeslots } = await setup([
       createTimeslotDraft(),

@@ -11,10 +11,10 @@ import { vi } from 'vitest';
 import { provideTestState } from '../../test-utils/provide-test-state';
 import {
   DISMISS_LABEL,
-  PlanningFeedback,
+  PlanningFeedbackService,
   SAVING_MESSAGE,
   UNKNOWN_ERROR_MESSAGE,
-} from './planning-feedback';
+} from './planning-feedback.service';
 
 const OPERATION_ERROR_MESSAGE = 'The server could not be reached';
 
@@ -32,7 +32,7 @@ function createTimeslot(overrides: Partial<Timeslot> = {}): Timeslot {
 @Component({ template: '' })
 class FeedbackScene {
   constructor() {
-    inject(PlanningFeedback);
+    inject(PlanningFeedbackService);
   }
 }
 
@@ -64,7 +64,7 @@ async function setup() {
   };
 }
 
-describe('PlanningFeedback', () => {
+describe('PlanningFeedbackService', () => {
   describe('while saving changes', () => {
     it('should show that changes are being saved', async () => {
       const { dispatch, holdUpdates, getSnackBar } = await setup();

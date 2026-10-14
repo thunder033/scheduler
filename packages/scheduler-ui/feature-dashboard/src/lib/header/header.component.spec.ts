@@ -4,17 +4,17 @@ import { Store } from '@ngxs/store';
 import { User, UserRole } from '@org/models';
 import { SetCurrentUser } from '@org/scheduler-ui/state';
 import { provideTestState } from '../../test-utils/provide-test-state';
-import { THEME_OPTIONS } from '../theme-menu/theme-menu';
-import { HEADER_TITLE, Header } from './header';
+import { THEME_OPTIONS } from '../theme-menu/theme-menu.component';
+import { HEADER_TITLE, HeaderComponent } from './header.component';
 import { HeaderHarness } from './header.harness';
 
 async function setup() {
   await TestBed.configureTestingModule({
-    imports: [Header],
+    imports: [HeaderComponent],
     providers: [provideTestState()],
   }).compileComponents();
 
-  const fixture = TestBed.createComponent(Header);
+  const fixture = TestBed.createComponent(HeaderComponent);
   const harness = await TestbedHarnessEnvironment.harnessForFixture(
     fixture,
     HeaderHarness,
@@ -23,7 +23,7 @@ async function setup() {
   return { fixture, harness, store: TestBed.inject(Store) };
 }
 
-describe('Header', () => {
+describe('HeaderComponent', () => {
   it('should display the application title', async () => {
     const { harness } = await setup();
 

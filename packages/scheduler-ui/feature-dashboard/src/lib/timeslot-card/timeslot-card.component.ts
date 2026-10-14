@@ -9,12 +9,12 @@ import {
   untracked,
 } from '@angular/core';
 import { form, FormField, required, validate } from '@angular/forms/signals';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
+import { MatIconButton } from '@angular/material/button';
+import { MatCard, MatCardContent } from '@angular/material/card';
 import { ShowOnDirtyErrorStateMatcher } from '@angular/material/core';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
+import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
+import { MatInput } from '@angular/material/input';
 import { Store } from '@ngxs/store';
 import { Timeslot } from '@org/models';
 import { UpdateTimeslot } from '@org/scheduler-ui/state';
@@ -37,16 +37,19 @@ export function formatTimeRange({
   selector: 'lib-timeslot-card',
   imports: [
     FormField,
-    MatButtonModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
+    MatCard,
+    MatCardContent,
+    MatError,
+    MatFormField,
+    MatIcon,
+    MatIconButton,
+    MatInput,
+    MatLabel,
   ],
-  templateUrl: './timeslot-card.html',
-  styleUrl: './timeslot-card.scss',
+  templateUrl: './timeslot-card.component.html',
+  styleUrl: './timeslot-card.component.scss',
 })
-export class TimeslotCard {
+export class TimeslotCardComponent {
   private readonly store = inject(Store);
 
   readonly timeslot = input.required<Timeslot>();

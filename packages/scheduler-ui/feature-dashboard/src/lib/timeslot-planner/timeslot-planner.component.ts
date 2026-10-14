@@ -5,6 +5,8 @@ import {
   CdkDropListGroup,
 } from '@angular/cdk/drag-drop';
 import { Component, computed, inject } from '@angular/core';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 import { Store } from '@ngxs/store';
 import { Timeslot } from '@org/models';
 import {
@@ -12,12 +14,11 @@ import {
   PlanningState,
   UpdateTimeslot,
 } from '@org/scheduler-ui/state';
-import { TimeslotCard } from '../timeslot-card/timeslot-card';
-import { MatButton } from '@angular/material/button';
-import { MatIcon } from '@angular/material/icon';
+import { TimeslotCardComponent } from '../timeslot-card/timeslot-card.component';
 
 export const TIMESLOT_PLANNER_TITLE = 'Timeslot planner';
-export const TIMESLOT_PLANNER_DESCRIPTION = 'Define available timeslots that recur during each week.';
+export const TIMESLOT_PLANNER_DESCRIPTION =
+  'Define available timeslots that recur during each week.';
 
 /** Keyed by ISO 8601 `Timeslot.dayOfWeek` */
 export const DAY_LABELS: Record<number, string> = {
@@ -61,18 +62,18 @@ function groupByDay(timeslots: Timeslot[]): PlannerDay[] {
     CdkDrag,
     CdkDropList,
     CdkDropListGroup,
-    TimeslotCard,
+    TimeslotCardComponent,
     MatButton,
     MatIcon,
   ],
-  templateUrl: './timeslot-planner.html',
-  styleUrl: './timeslot-planner.scss',
+  templateUrl: './timeslot-planner.component.html',
+  styleUrl: './timeslot-planner.component.scss',
 })
-export class TimeslotPlanner {
+export class TimeslotPlannerComponent {
   private readonly store = inject(Store);
 
   protected readonly title = TIMESLOT_PLANNER_TITLE;
-  protected description = TIMESLOT_PLANNER_DESCRIPTION;
+  protected readonly description =TIMESLOT_PLANNER_DESCRIPTION;
 
   private readonly timeslots = this.store.selectSignal(PlanningState.timeslots);
   protected readonly days = computed(() => groupByDay(this.timeslots()));

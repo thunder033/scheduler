@@ -4,10 +4,10 @@ import { LocalUserState } from '@org/scheduler-ui/state';
 
 @Component({
   selector: 'lib-current-user-tile',
-  templateUrl: './current-user-tile.html',
-  styleUrl: './current-user-tile.scss',
+  templateUrl: './current-user-tile.component.html',
+  styleUrl: './current-user-tile.component.scss',
 })
-export class CurrentUserTile {
+export class CurrentUserTileComponent {
   protected readonly currentUser = inject(Store).selectSignal(
     LocalUserState.currentUser,
   );

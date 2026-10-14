@@ -6,7 +6,7 @@ import { TimeslotDraft } from '@org/scheduler-ui/data';
 import { CreateTimeslot, PlanningState } from '@org/scheduler-ui/state';
 import { firstValueFrom } from 'rxjs';
 import { provideTestState } from '../../test-utils/provide-test-state';
-import { TimeslotCard, formatTimeRange } from './timeslot-card';
+import { TimeslotCardComponent, formatTimeRange } from './timeslot-card.component';
 import { TimeslotCardHarness } from './timeslot-card.harness';
 
 function createTimeslotDraft(
@@ -22,7 +22,7 @@ function createTimeslotDraft(
 
 async function setup(draft: TimeslotDraft = createTimeslotDraft()) {
   await TestBed.configureTestingModule({
-    imports: [TimeslotCard],
+    imports: [TimeslotCardComponent],
     providers: [provideTestState()],
   }).compileComponents();
 
@@ -30,7 +30,7 @@ async function setup(draft: TimeslotDraft = createTimeslotDraft()) {
   await firstValueFrom(store.dispatch(new CreateTimeslot(draft)));
   const timeslot = store.selectSnapshot(PlanningState.timeslots)[0];
 
-  const fixture = TestBed.createComponent(TimeslotCard);
+  const fixture = TestBed.createComponent(TimeslotCardComponent);
   fixture.componentRef.setInput('timeslot', timeslot);
   const harness = await TestbedHarnessEnvironment.harnessForFixture(
     fixture,
@@ -46,7 +46,7 @@ async function setup(draft: TimeslotDraft = createTimeslotDraft()) {
   };
 }
 
-describe('TimeslotCard', () => {
+describe('TimeslotCardComponent', () => {
   it('should display the time range of the timeslot', async () => {
     const { harness, timeslot } = await setup();
 

@@ -5,7 +5,7 @@ import { Store } from '@ngxs/store';
 import { ContactMethod, User, UserRole } from '@org/models';
 import { SetCurrentUser } from '@org/scheduler-ui/state';
 import { provideTestState } from '../../test-utils/provide-test-state';
-import { Dashboard } from './dashboard';
+import { DashboardComponent } from './dashboard.component';
 import { DashboardHarness } from './dashboard.harness';
 
 function createUser(overrides: Partial<User> = {}): User {
@@ -24,11 +24,11 @@ interface SetupOptions {
 
 async function setup({ providers = [] }: SetupOptions = {}) {
   await TestBed.configureTestingModule({
-    imports: [Dashboard],
+    imports: [DashboardComponent],
     providers: [provideTestState(), ...providers],
   }).compileComponents();
 
-  const fixture = TestBed.createComponent(Dashboard);
+  const fixture = TestBed.createComponent(DashboardComponent);
   const harness = await TestbedHarnessEnvironment.harnessForFixture(
     fixture,
     DashboardHarness,
@@ -37,7 +37,7 @@ async function setup({ providers = [] }: SetupOptions = {}) {
   return { fixture, harness, store: TestBed.inject(Store) };
 }
 
-describe('Dashboard', () => {
+describe('DashboardComponent', () => {
   it('should render content', async () => {
     const { harness } = await setup();
 

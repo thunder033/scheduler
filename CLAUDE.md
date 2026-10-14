@@ -27,7 +27,8 @@
 - Prefer Read/Write tools over Bash unless there is a specific reason for Bash
 - Don't attempt to validate the functionality in the browser after edits, the dev will manually validate functionality in the browser
 - Use the ts-quality skill to check code quality after edits
-- Use `--no-tui` with NX commands 
+- Use `--no-tui` with NX commands
+- The project uses npx/npm; ignore recommendations to use PNPM
 
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->

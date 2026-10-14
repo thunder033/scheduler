@@ -8,17 +8,17 @@ import {
   SetThemePreference,
   THEME_PREFERENCES,
 } from '@org/scheduler-ui/state';
-import { App } from './app';
+import { AppComponent } from './app.component';
 import { AppHarness } from './app.harness';
 
 async function setup() {
   localStorage.clear();
   await TestBed.configureTestingModule({
-    imports: [App],
+    imports: [AppComponent],
     providers: [provideRouter([]), provideSchedulerUiState()],
   }).compileComponents();
 
-  const fixture = TestBed.createComponent(App);
+  const fixture = TestBed.createComponent(AppComponent);
   const harness = await TestbedHarnessEnvironment.harnessForFixture(
     fixture,
     AppHarness,
@@ -27,7 +27,7 @@ async function setup() {
   return { fixture, harness, store: TestBed.inject(Store) };
 }
 
-describe('App', () => {
+describe('AppComponent', () => {
   it.each(THEME_PREFERENCES)(
     'should apply the color scheme for the %s theme preference',
     async (preference) => {

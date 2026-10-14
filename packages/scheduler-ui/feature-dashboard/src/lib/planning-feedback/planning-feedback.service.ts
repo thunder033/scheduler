@@ -47,7 +47,7 @@ const API_ACTIONS = [LoadTimeslots, LoadAppointmentsByWeek, ...SAVE_ACTIONS];
 @Injectable({
   providedIn: 'root',
 })
-export class PlanningFeedback {
+export class PlanningFeedbackService {
   private readonly snackBar = inject(MatSnackBar);
   private pendingSaves = 0;
   private savingSnackBar: MatSnackBarRef<unknown> | null = null;

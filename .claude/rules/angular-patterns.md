@@ -2,14 +2,17 @@
 paths: ["apps/shop/src/**/*", "packages/shop/**/*", "apps/*-ui/**/*", "packages/*-ui/**/*"]
 ---
 
-Start with the `angular-developer` skill to determine best practices and appropriate patterns.
+Start with the `angular-developer` skill or angular MCP to determine best practices and appropriate patterns.
 This file augments those standard best practices.
+- From angular MCP, use only the `get_best_practices` and `search_documentation` tools
+- When navigating or searching the workspace, use nx-based tools or MCP since Angular tools (like list_projects) will not be aware of NX 
 
 # Component Best Practices
 
 ## Component Structure
 - Self-contained components; prefer reading data from shared services or state instead of inputs
   - Only use inputs where multiple usages of the component may need different configuration depending on their usage context
+- For material components, import the component directly (ex. MatIcon), unless there is a reason to use the module (ex. MatIconModule)
 
 ## Styling and SCSS/CSS
 - Do not use ARIA attributes for styling, create a semantic CSS class for each state

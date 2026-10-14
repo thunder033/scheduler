@@ -6,16 +6,16 @@ import {
   LocalUserState,
 } from '@org/scheduler-ui/state';
 import { provideTestState } from '../../test-utils/provide-test-state';
-import { THEME_LABELS, THEME_OPTIONS, ThemeMenu } from './theme-menu';
+import { THEME_LABELS, THEME_OPTIONS, ThemeMenuComponent } from './theme-menu.component';
 import { ThemeMenuHarness } from './theme-menu.harness';
 
 async function setup() {
   await TestBed.configureTestingModule({
-    imports: [ThemeMenu],
+    imports: [ThemeMenuComponent],
     providers: [provideTestState()],
   }).compileComponents();
 
-  const fixture = TestBed.createComponent(ThemeMenu);
+  const fixture = TestBed.createComponent(ThemeMenuComponent);
   const harness = await TestbedHarnessEnvironment.harnessForFixture(
     fixture,
     ThemeMenuHarness,
@@ -24,7 +24,7 @@ async function setup() {
   return { fixture, harness, store: TestBed.inject(Store) };
 }
 
-describe('ThemeMenu', () => {
+describe('ThemeMenuComponent', () => {
   it('should offer every theme option', async () => {
     const { harness } = await setup();
 

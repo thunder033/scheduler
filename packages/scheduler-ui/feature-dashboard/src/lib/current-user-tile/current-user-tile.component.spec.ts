@@ -4,7 +4,7 @@ import { Store } from '@ngxs/store';
 import { ContactMethod, User, UserRole } from '@org/models';
 import { SetCurrentUser } from '@org/scheduler-ui/state';
 import { provideTestState } from '../../test-utils/provide-test-state';
-import { CurrentUserTile } from './current-user-tile';
+import { CurrentUserTileComponent } from './current-user-tile.component';
 import { CurrentUserTileHarness } from './current-user-tile.harness';
 
 function createUser(overrides: Partial<User> = {}): User {
@@ -19,11 +19,11 @@ function createUser(overrides: Partial<User> = {}): User {
 
 async function setup() {
   await TestBed.configureTestingModule({
-    imports: [CurrentUserTile],
+    imports: [CurrentUserTileComponent],
     providers: [provideTestState()],
   }).compileComponents();
 
-  const fixture = TestBed.createComponent(CurrentUserTile);
+  const fixture = TestBed.createComponent(CurrentUserTileComponent);
   const harness = await TestbedHarnessEnvironment.harnessForFixture(
     fixture,
     CurrentUserTileHarness,
@@ -32,7 +32,7 @@ async function setup() {
   return { fixture, harness, store: TestBed.inject(Store) };
 }
 
-describe('CurrentUserTile', () => {
+describe('CurrentUserTileComponent', () => {
   it('should display the display name of the current user', async () => {
     const { harness, store } = await setup();
     const user = createUser();

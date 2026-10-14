@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
+import { MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import {
   SetThemePreference,
   THEME_PREFERENCES,
@@ -25,11 +25,11 @@ export const THEME_OPTIONS = THEME_PREFERENCES.map((value) => ({
 
 @Component({
   selector: 'lib-theme-menu',
-  imports: [MatButtonModule, MatIconModule, MatMenuModule],
-  templateUrl: './theme-menu.html',
-  styleUrl: './theme-menu.scss',
+  imports: [MatIconButton, MatIcon, MatMenu, MatMenuItem, MatMenuTrigger],
+  templateUrl: './theme-menu.component.html',
+  styleUrl: './theme-menu.component.scss',
 })
-export class ThemeMenu {
+export class ThemeMenuComponent {
   private readonly store = inject(Store);
 
   protected readonly label = THEME_MENU_LABEL;
