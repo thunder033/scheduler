@@ -1,7 +1,7 @@
-<div class="timeslot-header">
+<div class="flex items-center justify-between mb-4">
   <div>
     <h2 class="title">{{ title }}</h2>
-    <p>{{ description }}</p>
+    <p class="my-2">{{ description }}</p>
   </div>
   <button mat-button>
     <mat-icon fontIcon="add" />
@@ -9,18 +9,27 @@
   </button>
 </div>
 
-<div class="days" cdkDropListGroup>
+<div
+  class="grid grid-cols-1 gap-4 md:grid-cols-[repeat(auto-fit,minmax(12rem,1fr))]"
+  cdkDropListGroup
+>
   @for (day of days(); track day.dayOfWeek) {
   <section
-    class="day"
+    qa-day
+    class="flex min-h-24 flex-col gap-2 rounded-lg p-2 transition-colors duration-150 ease-in-out"
     cdkDropList
     [cdkDropListData]="day.dayOfWeek"
     [cdkDropListSortingDisabled]="true"
     (cdkDropListDropped)="drop($event)"
   >
-    <h3 class="day-label">{{ day.label }}</h3>
+    <h3 qa-day-label>{{ day.label }}</h3>
     @for (timeslot of day.timeslots; track timeslot.timeslotId) {
-    <lib-timeslot-card cdkDrag [cdkDragData]="timeslot" [timeslot]="timeslot" />
+    <lib-timeslot-card
+      class="block cursor-grab"
+      cdkDrag
+      [cdkDragData]="timeslot"
+      [timeslot]="timeslot"
+    />
     }
   </section>
   }

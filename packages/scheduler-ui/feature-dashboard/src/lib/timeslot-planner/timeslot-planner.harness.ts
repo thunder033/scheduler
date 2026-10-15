@@ -1,8 +1,9 @@
 import { ComponentHarness } from '@angular/cdk/testing';
+import { qaSelector } from '../../test-utils/qa-selector';
 import { TimeslotCardHarness } from '../timeslot-card/timeslot-card.harness';
 
-const DAY_SELECTOR = '.day';
-const DAY_LABEL_SELECTOR = '.day-label';
+export const DAY_SELECTOR = qaSelector('day');
+const DAY_LABEL_SELECTOR = qaSelector('day-label');
 const DROP_TARGET_CLASS = 'cdk-drop-list-receiving';
 
 class TimeslotPlannerDayHarness extends ComponentHarness {

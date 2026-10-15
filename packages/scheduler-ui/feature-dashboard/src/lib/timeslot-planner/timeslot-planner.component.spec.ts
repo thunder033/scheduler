@@ -18,7 +18,7 @@ import {
 import { provideTestState } from '../../test-utils/provide-test-state';
 import { formatTimeRange } from '../timeslot-card/timeslot-card.component';
 import { DAY_LABELS, TimeslotPlannerComponent } from './timeslot-planner.component';
-import { TimeslotPlannerHarness } from './timeslot-planner.harness';
+import { DAY_SELECTOR, TimeslotPlannerHarness } from './timeslot-planner.harness';
 
 const SUNDAY = 7;
 
@@ -55,7 +55,7 @@ const DRAG_START_DISTANCE = 20;
 function layOutPlanner(fixture: ComponentFixture<TimeslotPlannerComponent>): void {
   const boxes = new Map<Element, ElementBox>();
   const days = fixture.nativeElement.querySelectorAll(
-    '.day',
+    DAY_SELECTOR,
   ) as NodeListOf<Element>;
   days.forEach((day, dayIndex) => {
     const left = dayIndex * DAY_WIDTH;
@@ -123,7 +123,7 @@ async function dragTimeslotToDay(
     'lib-timeslot-card',
     formatTimeRange(timeslot),
   );
-  const day = findElement(fixture, '.day', DAY_LABELS[dayOfWeek]);
+  const day = findElement(fixture, DAY_SELECTOR, DAY_LABELS[dayOfWeek]);
   const dayBox = day.getBoundingClientRect() as DOMRect;
   const target = getCenter({
     left: dayBox.left,

@@ -68,6 +68,7 @@ function groupByDay(timeslots: Timeslot[]): PlannerDay[] {
   ],
   templateUrl: './timeslot-planner.component.html',
   styleUrl: './timeslot-planner.component.scss',
+  host: { class: 'block p-4' },
 })
 export class TimeslotPlannerComponent {
   private readonly store = inject(Store);

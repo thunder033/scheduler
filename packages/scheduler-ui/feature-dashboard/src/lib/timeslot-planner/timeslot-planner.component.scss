@@ -1,52 +1,12 @@
-@use '../../../../styles/breakpoints';
-
-$day-min-width: 12rem;
-$day-min-height: 6rem;
 $drop-target-highlight: color-mix(
   in srgb,
   var(--mat-sys-primary) 8%,
   transparent
 );
 
-:host {
-  display: block;
-  padding: 1rem;
-}
-
-.timeslot-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.days {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-
-  @media (min-width: breakpoints.$desktop-min-width) {
-    grid-template-columns: repeat(auto-fit, minmax($day-min-width, 1fr));
-  }
-}
-
-.day {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  min-height: $day-min-height;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  transition: background-color 150ms ease-in-out;
-
-  // CDK marks the days that can receive the timeslot being dragged
-  &.cdk-drop-list-receiving {
-    background-color: $drop-target-highlight;
-  }
-}
-
-lib-timeslot-card {
-  display: block;
-  cursor: grab;
+// CDK marks the days that can receive the timeslot being dragged
+.cdk-drop-list-receiving {
+  background-color: $drop-target-highlight;
 }
 
 .cdk-drag-placeholder {

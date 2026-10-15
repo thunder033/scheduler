@@ -2,11 +2,12 @@ import { ComponentHarness } from '@angular/cdk/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
+import { qaSelector } from '../../test-utils/qa-selector';
 
-const TIME_RANGE_SELECTOR = '.time-range';
-const EDIT_TOGGLE_SELECTOR = '.edit-toggle';
-const START_TIME_SELECTOR = '.start-time';
-const END_TIME_SELECTOR = '.end-time';
+const TIME_RANGE_SELECTOR = qaSelector('time-range');
+const EDIT_TOGGLE_SELECTOR = qaSelector('edit-toggle');
+const START_TIME_SELECTOR = qaSelector('start-time');
+const END_TIME_SELECTOR = qaSelector('end-time');
 
 export class TimeslotCardHarness extends ComponentHarness {
   static hostSelector = 'lib-timeslot-card';

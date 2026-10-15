@@ -1,6 +1,7 @@
 import { ComponentHarness } from '@angular/cdk/testing';
+import { qaSelector } from '../../test-utils/qa-selector';
 
-const DISPLAY_NAME_SELECTOR = '.display-name';
+const DISPLAY_NAME_SELECTOR = qaSelector('display-name');
 
 export class CurrentUserTileHarness extends ComponentHarness {
   static hostSelector = 'lib-current-user-tile';

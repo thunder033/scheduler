@@ -1,31 +1,4 @@
-/// Space between the icon and the edge of an icon button, so offsetting by it
-/// moves the button itself, rather than the icon, up against the card padding
-$edit-toggle-inset: 0.5rem;
-
-.summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.edit-toggle {
-  margin-block: -$edit-toggle-inset;
-  margin-inline-end: -$edit-toggle-inset;
-}
-
-.edit-toggle.active {
+button.active {
   background-color: var(--mat-sys-secondary-container);
   color: var(--mat-sys-on-secondary-container);
-}
-
-.editor {
-  margin-top: 0.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding-block-start: 0.5rem;
-}
-
-mat-form-field {
-  flex: 1 1 8rem;
 }

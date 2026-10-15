@@ -10,7 +10,6 @@ import { TimeslotPlannerComponent } from '../timeslot-planner/timeslot-planner.c
   selector: 'lib-dashboard',
   imports: [HeaderComponent, TimeslotPlannerComponent],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent {
   protected readonly isCoordinator = inject(Store).selectSignal(
