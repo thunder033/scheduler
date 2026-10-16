@@ -1,5 +1,3 @@
-import { vi } from 'vitest';
-
 const STUBBED_ANIMATION_NAME = 'stubbed-animation';
 
 /**

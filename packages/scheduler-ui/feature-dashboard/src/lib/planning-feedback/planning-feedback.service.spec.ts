@@ -7,7 +7,6 @@ import { Timeslot } from '@org/models';
 import { TimeslotService } from '@org/scheduler-ui/data';
 import { LoadTimeslots, UpdateTimeslot } from '@org/scheduler-ui/state';
 import { Observable, Subject, throwError } from 'rxjs';
-import { vi } from 'vitest';
 import { provideTestState } from '../../test-utils/provide-test-state';
 import {
   DISMISS_LABEL,
