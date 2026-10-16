@@ -1,4 +1,8 @@
-import { ComponentHarness } from '@angular/cdk/testing';
+import {
+  BaseHarnessFilters,
+  ComponentHarness,
+  HarnessPredicate,
+} from '@angular/cdk/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
@@ -6,6 +10,7 @@ import { qaSelector } from '../../test-utils/qa-selector';
 import {
   EDITOR_COLLAPSE_CLASS,
   EDITOR_EXPAND_CLASS,
+  timeslotCardId,
 } from './timeslot-card.component';
 
 export const CARD_HEADER_SELECTOR = qaSelector('card-header');
@@ -17,8 +22,25 @@ const SAVE_SELECTOR = qaSelector('save');
 const START_TIME_SELECTOR = qaSelector('start-time');
 const END_TIME_SELECTOR = qaSelector('end-time');
 
+export interface TimeslotCardHarnessFilters extends BaseHarnessFilters {
+  timeslotId: string;
+}
+
 export class TimeslotCardHarness extends ComponentHarness {
   static hostSelector = 'lib-timeslot-card';
+
+  /** Finds the card of the timeslot with the id, whose card is the new timeslot's when it is empty */
+  static with(
+    options: TimeslotCardHarnessFilters,
+  ): HarnessPredicate<TimeslotCardHarness> {
+    return new HarnessPredicate(TimeslotCardHarness, options).addOption(
+      'timeslotId',
+      options.timeslotId,
+      async (harness, timeslotId) =>
+        (await (await harness.host()).getAttribute('id')) ===
+        timeslotCardId(timeslotId),
+    );
+  }
 
   private readonly timeRange = this.locatorFor(TIME_RANGE_SELECTOR);
   private readonly editToggle = this.locatorFor(

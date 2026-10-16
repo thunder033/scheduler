@@ -1,3 +1,5 @@
+import { ComponentHarness } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { ComponentFixture } from '@angular/core/testing';
 import { dispatchMouseEvent } from './fake-events';
 
@@ -132,16 +134,25 @@ export interface GripOptions {
   grip?: Element | string;
 }
 
+/** An element, or the harness of the component it is the host of */
+export type DragTarget = Element | ComponentHarness;
+
 export interface DragAndDrop {
   /** Picks up the item with the mouse and holds it, still over its own drop list */
-  pickUp(item: Element, options?: GripOptions): void;
+  pickUp(item: DragTarget, options?: GripOptions): Promise<void>;
 
   /** Drags the item onto the drop list and releases it there, then waits for the app to settle */
   dragTo(
-    item: Element,
-    dropList: Element,
+    item: DragTarget,
+    dropList: DragTarget,
     options?: GripOptions,
   ): Promise<void>;
+}
+
+async function toElement(target: DragTarget): Promise<Element> {
+  return target instanceof Element
+    ? target
+    : TestbedHarnessEnvironment.getNativeElement(await target.host());
 }
 
 /** Lays drop lists out as columns, left to right, with the items in each stacked from the top */
@@ -197,7 +208,8 @@ export function withDragAndDrop(
   });
 
   return {
-    pickUp(item, { grip } = {}) {
+    async pickUp(target, { grip } = {}) {
+      const item = await toElement(target);
       layOut();
       const { left, top } = item.getBoundingClientRect();
 
@@ -211,7 +223,9 @@ export function withDragAndDrop(
       fixture.detectChanges();
     },
 
-    async dragTo(item, dropList, { grip } = {}) {
+    async dragTo(itemTarget, dropListTarget, { grip } = {}) {
+      const item = await toElement(itemTarget);
+      const dropList = await toElement(dropListTarget);
       layOut();
       const { x, y } = getCenter(dropList.getBoundingClientRect());
 

@@ -1,37 +1,55 @@
-<div class="flex items-center justify-between mb-4">
-  <div>
-    <h2 class="title">{{ title }}</h2>
-    <p class="my-2">{{ description }}</p>
-  </div>
-  <button mat-button>
-    <mat-icon fontIcon="add" />
-    New timeslot
-  </button>
-</div>
-
-<div
-  class="grid grid-cols-1 gap-4 md:grid-cols-[repeat(auto-fit,minmax(12rem,1fr))]"
-  cdkDropListGroup
->
-  @for (day of days(); track day.dayOfWeek) {
-    <section
-      qa-day
-      class="flex min-h-24 flex-col gap-2 rounded-lg p-2 transition-colors duration-150 ease-in-out"
-      cdkDropList
-      [cdkDropListData]="day.dayOfWeek"
-      [cdkDropListSortingDisabled]="true"
-      (cdkDropListDropped)="drop($event)"
-    >
-      <h3 qa-day-label class="border-b border-secondary">{{ day.label }}</h3>
-      @for (timeslot of day.timeslots; track timeslot.timeslotId) {
+<div cdkDropListGroup>
+  <div class="relative mb-4 flex items-center justify-between">
+    <div>
+      <h2 class="title">{{ title }}</h2>
+      <p class="my-2">{{ description }}</p>
+    </div>
+    <button mat-button qa-new-timeslot (click)="startCreating()">
+      <mat-icon fontIcon="add" />
+      New timeslot
+    </button>
+    @if (floatingTimeslot(); as timeslot) {
+      <div
+        qa-floating-timeslot
+        class="absolute right-0 top-full z-20 mt-2 w-64"
+        cdkDropList
+        [cdkDropListSortingDisabled]="true"
+        [cdkDropListEnterPredicate]="neverEnter"
+      >
         <lib-timeslot-card
           class="block"
           cdkDrag
-          [cdkDragDisabled]="editingTimeslotId() !== timeslot.timeslotId"
           [cdkDragData]="timeslot"
           [timeslot]="timeslot"
         />
-      }
-    </section>
-  }
+      </div>
+    }
+  </div>
+
+  <div
+    class="grid grid-cols-1 gap-4 md:grid-cols-[repeat(auto-fit,minmax(12rem,1fr))]"
+  >
+    @for (day of days(); track day.dayOfWeek) {
+      <section
+        qa-day
+        [id]="day.elementId"
+        class="flex min-h-24 flex-col gap-2 rounded-lg p-2 transition-colors duration-150 ease-in-out"
+        cdkDropList
+        [cdkDropListData]="day.dayOfWeek"
+        [cdkDropListSortingDisabled]="true"
+        (cdkDropListDropped)="drop($event)"
+      >
+        <h3 qa-day-label class="border-b border-secondary">{{ day.label }}</h3>
+        @for (timeslot of day.timeslots; track timeslot.timeslotId) {
+          <lib-timeslot-card
+            class="block"
+            cdkDrag
+            [cdkDragDisabled]="editingTimeslotId() !== timeslot.timeslotId"
+            [cdkDragData]="timeslot"
+            [timeslot]="timeslot"
+          />
+        }
+      </section>
+    }
+  </div>
 </div>

@@ -11,7 +11,9 @@ import { Store } from '@ngxs/store';
 import { Timeslot } from '@org/models';
 import {
   LoadTimeslots,
+  NEW_TIMESLOT,
   PlanningState,
+  StartEditingTimeslot,
   UpdateEditingTimeslot,
 } from '@org/scheduler-ui/state';
 import { TimeslotCardComponent } from '../timeslot-card/timeslot-card.component';
@@ -37,8 +39,14 @@ export type TimeslotDrop = Pick<
   'item' | 'container' | 'previousContainer'
 >;
 
+/** The id of the element of the day, which is unique among the days */
+export function dayElementId(dayOfWeek: number): string {
+  return `planner-day-${dayOfWeek}`;
+}
+
 interface PlannerDay {
   dayOfWeek: number;
+  elementId: string;
   label: string;
   timeslots: Timeslot[];
 }
@@ -52,6 +60,7 @@ function groupByDay(
     .sort((first, second) => first.dayOfWeek - second.dayOfWeek)
     .map(({ dayOfWeek, label }) => ({
       dayOfWeek,
+      elementId: dayElementId(dayOfWeek),
       label,
       timeslots: timeslots
         .filter((timeslot) => getDayOfWeek(timeslot) === dayOfWeek)
@@ -87,18 +96,34 @@ export class TimeslotPlannerComponent {
   private readonly editingTimeslot = this.store.selectSignal(
     PlanningState.editingTimeslot,
   );
+  private readonly creating = computed(
+    () => this.editingTimeslot()?.timeslotId === NEW_TIMESLOT.timeslotId,
+  );
+  /** A new timeslot floats below the button until it is dragged to a day, which it has none yet */
+  protected readonly floatingTimeslot = computed(() =>
+    this.creating() && !this.editingTimeslot()?.dayOfWeek ? NEW_TIMESLOT : null,
+  );
   /** A timeslot being edited is listed under the day it was moved to, even before that is saved */
   protected readonly days = computed(() => {
     const editing = this.editingTimeslot();
-    return groupByDay(this.timeslots(), (timeslot) =>
+    const timeslots = this.creating()
+      ? [...this.timeslots(), NEW_TIMESLOT]
+      : this.timeslots();
+    return groupByDay(timeslots, (timeslot) =>
       editing?.timeslotId === timeslot.timeslotId
         ? (editing.dayOfWeek ?? timeslot.dayOfWeek)
         : timeslot.dayOfWeek,
     );
   });
+  /** Nothing is dropped back to where the new timeslot floats */
+  protected readonly neverEnter = (): boolean => false;
 
   constructor() {
     this.store.dispatch(new LoadTimeslots());
+  }
+
+  protected startCreating(): void {
+    this.store.dispatch(new StartEditingTimeslot(NEW_TIMESLOT.timeslotId));
   }
 
   /** Moving is part of the edits to the timeslot, which are saved with the rest of them */

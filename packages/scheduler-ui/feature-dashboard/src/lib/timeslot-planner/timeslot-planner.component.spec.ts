@@ -1,22 +1,24 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
 import { Timeslot } from '@org/models';
 import { TimeslotDraft, TimeslotService } from '@org/scheduler-ui/data';
-import { CreateTimeslot } from '@org/scheduler-ui/state';
+import { CreateTimeslot, NEW_TIMESLOT } from '@org/scheduler-ui/state';
 import { firstValueFrom } from 'rxjs';
 import { CommonTest } from '../../test-utils/common-test';
 import { provideTestState } from '../../test-utils/provide-test-state';
-import { formatTimeRange } from '../timeslot-card/timeslot-card.component';
+import {
+  formatTimeRange,
+  NEW_TIMESLOT_LABEL,
+  timeslotCardId,
+} from '../timeslot-card/timeslot-card.component';
 import { CARD_HEADER_SELECTOR } from '../timeslot-card/timeslot-card.harness';
 import {
   DAY_LABELS,
+  dayElementId,
   TimeslotPlannerComponent,
 } from './timeslot-planner.component';
-import {
-  DAY_SELECTOR,
-  TimeslotPlannerHarness,
-} from './timeslot-planner.harness';
+import { TimeslotPlannerHarness } from './timeslot-planner.harness';
 
 const SUNDAY = 7;
 
@@ -43,22 +45,6 @@ function getRanges(timeslots: Timeslot[], dayOfWeek: number): string[] {
 }
 
 type Grip = 'header' | 'body';
-
-function findElement(
-  fixture: ComponentFixture<TimeslotPlannerComponent>,
-  selector: string,
-  hasText: string,
-): Element {
-  const element = [
-    ...(fixture.nativeElement.querySelectorAll(
-      selector,
-    ) as NodeListOf<Element>),
-  ].find((candidate) => candidate.textContent?.includes(hasText));
-  if (!element) {
-    throw new Error(`No ${selector} containing "${hasText}" in the planner`);
-  }
-  return element;
-}
 
 /** Puts the timeslot's card in edit mode, which is what allows it to be dragged */
 async function toggleEditing(
@@ -101,8 +87,8 @@ async function setup(
   );
 
   const dragAndDrop = CommonTest.withDragAndDrop(fixture);
-  const getCard = (timeslot: Timeslot) =>
-    findElement(fixture, 'lib-timeslot-card', formatTimeRange(timeslot));
+  const getCard = ({ timeslotId }: Pick<Timeslot, 'timeslotId'>) =>
+    harness.getTimeslotCard(timeslotId);
   /** Only the card's header drags the card, so grabbing its body does nothing */
   const getGrip = (grip: Grip) =>
     grip === 'header' ? CARD_HEADER_SELECTOR : undefined;
@@ -113,17 +99,28 @@ async function setup(
     store: TestBed.inject(Store),
     getServiceTimeslots: () => firstValueFrom(timeslotService.getTimeslots()),
     /** Picks up the timeslot's card with the mouse and holds it, still within its own day */
-    pickUpTimeslot: (timeslot: Timeslot, grip: Grip = 'header') =>
-      dragAndDrop.pickUp(getCard(timeslot), { grip: getGrip(grip) }),
+    pickUpTimeslot: async (timeslot: Timeslot, grip: Grip = 'header') =>
+      dragAndDrop.pickUp(await getCard(timeslot), { grip: getGrip(grip) }),
+    pickUpNewTimeslot: async () =>
+      dragAndDrop.pickUp(await getCard(NEW_TIMESLOT), {
+        grip: CARD_HEADER_SELECTOR,
+      }),
+    /** Drags the card of the new timeslot with the mouse onto the column of the day */
+    dragNewTimeslotToDay: async (dayOfWeek: number) =>
+      dragAndDrop.dragTo(
+        await getCard(NEW_TIMESLOT),
+        await harness.getDay(dayOfWeek),
+        { grip: CARD_HEADER_SELECTOR },
+      ),
     /** Drags the timeslot's card with the mouse onto the column of the day */
-    dragTimeslotToDay: (
+    dragTimeslotToDay: async (
       timeslot: Timeslot,
       dayOfWeek: number,
       grip: Grip = 'header',
     ) =>
       dragAndDrop.dragTo(
-        getCard(timeslot),
-        findElement(fixture, DAY_SELECTOR, DAY_LABELS[dayOfWeek]),
+        await getCard(timeslot),
+        await harness.getDay(dayOfWeek),
         { grip: getGrip(grip) },
       ),
   };
@@ -267,7 +264,7 @@ describe('TimeslotPlannerComponent', () => {
       ]);
       const [timeslot] = created;
 
-      pickUpTimeslot(timeslot);
+      await pickUpTimeslot(timeslot);
 
       expect(await harness.getDropTargetDayLabels()).toEqual([]);
     });
@@ -309,7 +306,7 @@ describe('TimeslotPlannerComponent', () => {
       await toggleEditing(harness, timeslot);
       expect(await harness.getDropTargetDayLabels()).toEqual([]);
 
-      pickUpTimeslot(timeslot);
+      await pickUpTimeslot(timeslot);
 
       expect(await harness.getDropTargetDayLabels()).toEqual(
         (await harness.getDayLabels()).filter(
@@ -408,6 +405,173 @@ describe('TimeslotPlannerComponent', () => {
       expect(await harness.getTimeRanges(DAY_LABELS[UNSEEDED_DAY])).toEqual([
         formatTimeRange(timeslot),
       ]);
+    });
+  });
+
+  describe('creating a timeslot', () => {
+    const NEW_TIMES = { start: '09:00', end: '10:00' };
+
+    it('should not show a new timeslot until asked to', async () => {
+      const { harness } = await setup();
+
+      expect(await harness.hasFloatingTimeslot()).toBe(false);
+    });
+
+    it('should show a new timeslot floating, without a day', async () => {
+      const { harness } = await setup();
+
+      await harness.startCreatingTimeslot();
+
+      expect(await harness.hasFloatingTimeslot()).toBe(true);
+      for (const label of await harness.getDayLabels()) {
+        expect(await harness.getTimeRanges(label)).not.toContain(
+          NEW_TIMESLOT_LABEL,
+        );
+      }
+    });
+
+    it('should highlight every day as a drop target while dragging the new timeslot', async () => {
+      const { harness, pickUpNewTimeslot } = await setup();
+      await harness.startCreatingTimeslot();
+
+      await pickUpNewTimeslot();
+
+      expect(await harness.getDropTargetDayLabels()).toEqual(
+        await harness.getDayLabels(),
+      );
+    });
+
+    it('should list the new timeslot under the day it is dragged to', async () => {
+      const { harness, dragNewTimeslotToDay } = await setup();
+      await harness.startCreatingTimeslot();
+
+      await dragNewTimeslotToDay(OTHER_UNSEEDED_DAY);
+
+      expect(await harness.hasFloatingTimeslot()).toBe(false);
+      expect(
+        await harness.getTimeRanges(DAY_LABELS[OTHER_UNSEEDED_DAY]),
+      ).toEqual([NEW_TIMESLOT_LABEL]);
+      expect(
+        await harness.isTimeslotEditing(
+          DAY_LABELS[OTHER_UNSEEDED_DAY],
+          NEW_TIMESLOT_LABEL,
+        ),
+      ).toBe(true);
+    });
+
+    it('should not allow saving while the new timeslot has no day', async () => {
+      const { harness } = await setup();
+      await harness.startCreatingTimeslot();
+
+      await harness.setFloatingTimeslotTimes(NEW_TIMES);
+
+      expect(await harness.canSaveFloatingTimeslot()).toBe(false);
+    });
+
+    it('should not allow saving while the new timeslot has no times', async () => {
+      const { harness, dragNewTimeslotToDay } = await setup();
+      await harness.startCreatingTimeslot();
+
+      await dragNewTimeslotToDay(OTHER_UNSEEDED_DAY);
+
+      expect(
+        await harness.canSaveTimeslot(
+          DAY_LABELS[OTHER_UNSEEDED_DAY],
+          NEW_TIMESLOT_LABEL,
+        ),
+      ).toBe(false);
+    });
+
+    it('should keep the times entered before the new timeslot is dragged to a day', async () => {
+      const { harness, dragNewTimeslotToDay } = await setup();
+      await harness.startCreatingTimeslot();
+      await harness.setFloatingTimeslotTimes(NEW_TIMES);
+
+      await dragNewTimeslotToDay(OTHER_UNSEEDED_DAY);
+
+      expect(
+        await harness.canSaveTimeslot(
+          DAY_LABELS[OTHER_UNSEEDED_DAY],
+          NEW_TIMESLOT_LABEL,
+        ),
+      ).toBe(true);
+    });
+
+    it('should allow saving once the new timeslot has a day and times', async () => {
+      const { harness, dragNewTimeslotToDay } = await setup();
+      await harness.startCreatingTimeslot();
+      await dragNewTimeslotToDay(OTHER_UNSEEDED_DAY);
+
+      await harness.setTimeslotTimes(
+        DAY_LABELS[OTHER_UNSEEDED_DAY],
+        NEW_TIMESLOT_LABEL,
+        NEW_TIMES,
+      );
+
+      expect(
+        await harness.canSaveTimeslot(
+          DAY_LABELS[OTHER_UNSEEDED_DAY],
+          NEW_TIMESLOT_LABEL,
+        ),
+      ).toBe(true);
+    });
+
+    it('should not create the timeslot until asked to', async () => {
+      const { harness, dragNewTimeslotToDay, getServiceTimeslots } =
+        await setup();
+      const before = await getServiceTimeslots();
+      await harness.startCreatingTimeslot();
+      await harness.setFloatingTimeslotTimes(NEW_TIMES);
+
+      await dragNewTimeslotToDay(OTHER_UNSEEDED_DAY);
+
+      expect(await getServiceTimeslots()).toEqual(before);
+    });
+
+    it('should create the timeslot on the day with the times when asked to', async () => {
+      const { harness, dragNewTimeslotToDay, getServiceTimeslots } =
+        await setup();
+      await harness.startCreatingTimeslot();
+      await harness.setFloatingTimeslotTimes(NEW_TIMES);
+      await dragNewTimeslotToDay(OTHER_UNSEEDED_DAY);
+
+      await harness.saveTimeslot(
+        DAY_LABELS[OTHER_UNSEEDED_DAY],
+        NEW_TIMESLOT_LABEL,
+      );
+
+      expect(await getServiceTimeslots()).toContainEqual({
+        ...NEW_TIMES,
+        dayOfWeek: OTHER_UNSEEDED_DAY,
+        timeslotId: expect.any(String),
+      });
+      expect(
+        await harness.getTimeRanges(DAY_LABELS[OTHER_UNSEEDED_DAY]),
+      ).toEqual([formatTimeRange(NEW_TIMES)]);
+    });
+
+    it('should stop showing the new timeslot when creating it is cancelled', async () => {
+      const { harness } = await setup();
+      await harness.startCreatingTimeslot();
+
+      await harness.cancelFloatingTimeslot();
+
+      expect(await harness.hasFloatingTimeslot()).toBe(false);
+    });
+
+    it('should stop editing another timeslot when a new one is started', async () => {
+      const { harness, created } = await setup([createTimeslotDraft()]);
+      const [timeslot] = created;
+      await toggleEditing(harness, timeslot);
+
+      await harness.startCreatingTimeslot();
+
+      expect(
+        await harness.isTimeslotEditing(
+          DAY_LABELS[timeslot.dayOfWeek],
+          formatTimeRange(timeslot),
+        ),
+      ).toBe(false);
     });
   });
 });

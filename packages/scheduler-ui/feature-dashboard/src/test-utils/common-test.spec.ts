@@ -141,10 +141,10 @@ describe('CommonTest', () => {
       expect(getItems('first')).toEqual(['two', 'one']);
     });
 
-    it('should hold an item so the other drop lists can receive it', () => {
+    it('should hold an item so the other drop lists can receive it', async () => {
       const { dragAndDrop, getItem, getList } = setup();
 
-      dragAndDrop.pickUp(getItem('one'), { grip: HANDLE_SELECTOR });
+      await dragAndDrop.pickUp(getItem('one'), { grip: HANDLE_SELECTOR });
 
       expect(getList('second').classList).toContain(RECEIVING_CLASS);
       expect(getList('first').classList).not.toContain(RECEIVING_CLASS);

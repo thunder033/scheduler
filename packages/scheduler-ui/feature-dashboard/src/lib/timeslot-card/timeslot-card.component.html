@@ -26,7 +26,7 @@
         [attr.aria-pressed]="editing()"
         (click)="toggleEditing()"
       >
-        <mat-icon>edit</mat-icon>
+        <mat-icon>{{ isNew() ? 'close' : 'edit' }}</mat-icon>
       </button>
     </div>
     @if (editing()) {

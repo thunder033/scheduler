@@ -64,8 +64,8 @@ export class PlanningState {
   }
 
   @Selector()
-  static editingTimeslotId(state: PlanningStateModel): string {
-    return state.editingTimeslot?.timeslotId ?? '';
+  static editingTimeslotId(state: PlanningStateModel): string | null {
+    return state.editingTimeslot?.timeslotId ?? null;
   }
 
   static appointmentsByWeek(week: AppointmentWeek) {

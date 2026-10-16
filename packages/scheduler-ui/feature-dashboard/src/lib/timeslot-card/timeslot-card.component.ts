@@ -20,6 +20,8 @@ import { MatInput } from '@angular/material/input';
 import { Store } from '@ngxs/store';
 import { Timeslot } from '@org/models';
 import {
+  CreateTimeslot,
+  NEW_TIMESLOT,
   PlanningState,
   StartEditingTimeslot,
   StopEditingTimeslot,
@@ -36,9 +38,16 @@ export const EDITOR_EXPAND_CLASS = 'editor-expand';
 export const EDITOR_COLLAPSE_CLASS = 'editor-collapse';
 const HANDLE_WIPE_IN_CLASS = 'handle-wipe-in';
 
+const TIMESLOT_CARD_ID_PREFIX = 'timeslot-card-';
+export const NEW_TIMESLOT_LABEL = 'New timeslot';
 export const EDIT_TIMESLOT_LABEL = 'Edit timeslot';
 export const REQUIRED_TIME_MESSAGE = 'Required';
 export const INVALID_TIME_RANGE_MESSAGE = 'Start must be before end';
+
+/** The id of the element of the card for the timeslot, which is unique among the cards */
+export function timeslotCardId(timeslotId: string): string {
+  return `${TIMESLOT_CARD_ID_PREFIX}${timeslotId}`;
+}
 
 export function formatTimeRange({
   start,
@@ -97,7 +106,7 @@ function playAnimation(
   ],
   templateUrl: './timeslot-card.component.html',
   styleUrl: './timeslot-card.component.scss',
-  host: { '[class.editing]': 'editing()' },
+  host: { '[id]': 'elementId()', '[class.editing]': 'editing()' },
 })
 export class TimeslotCardComponent {
   private readonly store = inject(Store);
@@ -107,8 +116,14 @@ export class TimeslotCardComponent {
   protected readonly editLabel = EDIT_TIMESLOT_LABEL;
   /** Only flags a time once the user has changed it, so untouched fields stay calm */
   protected readonly errorMatcher = new ShowOnDirtyErrorStateMatcher();
+  protected readonly isNew = computed(
+    () => this.timeslot().timeslotId === NEW_TIMESLOT.timeslotId,
+  );
+  protected readonly elementId = computed(() =>
+    timeslotCardId(this.timeslot().timeslotId),
+  );
   protected readonly timeRange = computed(() =>
-    formatTimeRange(this.timeslot()),
+    this.isNew() ? NEW_TIMESLOT_LABEL : formatTimeRange(this.timeslot()),
   );
   private readonly editingTimeslot = this.store.selectSignal(
     PlanningState.editingTimeslot,
@@ -158,7 +173,9 @@ export class TimeslotCardComponent {
       start !== saved.start ||
       end !== saved.end ||
       dayOfWeek !== saved.dayOfWeek;
-    return changed && this.timesForm().valid();
+    // A new timeslot also needs the day it is dragged to
+    const hasDay = dayOfWeek !== NEW_TIMESLOT.dayOfWeek;
+    return changed && hasDay && this.timesForm().valid();
   });
 
   /** Whether the card has rendered, so how it was created isn't animated in as if it just changed */
@@ -220,19 +237,19 @@ export class TimeslotCardComponent {
     }
 
     const { start, end } = this.times();
-    this.store
-      .dispatch(
-        new UpdateTimeslot(this.timeslot().timeslotId, {
+    const { dayOfWeek } = this.currentTimes();
+    const saving = this.isNew()
+      ? new CreateTimeslot({ start, end, dayOfWeek })
+      : new UpdateTimeslot(this.timeslot().timeslotId, {
           start,
           end,
-          dayOfWeek: this.currentTimes().dayOfWeek,
-        }),
-      )
-      .subscribe({
-        complete: () => this.store.dispatch(new StopEditingTimeslot()),
-        // A failed save keeps the editing open, and is reported by the planning feedback
-        error: () => undefined,
-      });
+          dayOfWeek,
+        });
+    this.store.dispatch(saving).subscribe({
+      complete: () => this.store.dispatch(new StopEditingTimeslot()),
+      // A failed save keeps the editing open, and is reported by the planning feedback
+      error: () => undefined,
+    });
   }
 
   private keepDraft(): void {
