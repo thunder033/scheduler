@@ -6,5 +6,5 @@ export interface PlanningStateModel {
   timeslotsById: Record<string, Timeslot>;
   appointmentsById: Record<string, Appointment>;
   /** The timeslot being edited, of which there is at most one at a time */
-  editingTimeslotId: string | null;
+  editingTimeslot: Partial<Timeslot> | null;
 }

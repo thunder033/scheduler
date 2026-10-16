@@ -28,6 +28,7 @@ import {
   StopEditingTimeslot,
   UnconfirmMember,
   UpdateTimeslot,
+  UpdateEditingTimeslot,
 } from './planning.actions';
 import { PLANNING_STATE_NAME, PlanningStateModel } from './planning.model';
 
@@ -45,7 +46,7 @@ function indexBy<T>(
   defaults: {
     timeslotsById: {},
     appointmentsById: {},
-    editingTimeslotId: null,
+    editingTimeslot: null,
   },
 })
 @Injectable()
@@ -58,8 +59,13 @@ export class PlanningState {
   }
 
   @Selector()
-  static editingTimeslotId(state: PlanningStateModel): string | null {
-    return state.editingTimeslotId;
+  static editingTimeslot(state: PlanningStateModel): Partial<Timeslot> | null {
+    return state.editingTimeslot;
+  }
+
+  @Selector()
+  static editingTimeslotId(state: PlanningStateModel): string {
+    return state.editingTimeslot?.timeslotId ?? '';
   }
 
   static appointmentsByWeek(week: AppointmentWeek) {
@@ -129,12 +135,32 @@ export class PlanningState {
     context: PlanningContext,
     { timeslotId }: StartEditingTimeslot,
   ): void {
-    context.patchState({ editingTimeslotId: timeslotId });
+    const { editingTimeslot } = context.getState();
+    context.patchState({
+      // A draft belongs to the timeslot it was entered for
+      editingTimeslot:
+        editingTimeslot?.timeslotId === timeslotId
+          ? editingTimeslot
+          : { timeslotId },
+    });
+  }
+
+  @Action(UpdateEditingTimeslot)
+  updateTimeslotDraft(
+    context: PlanningContext,
+    { timeslotPartial }: UpdateEditingTimeslot,
+  ): void {
+    const { editingTimeslot } = context.getState();
+    if (editingTimeslot) {
+      context.patchState({
+        editingTimeslot: { ...editingTimeslot, ...timeslotPartial },
+      });
+    }
   }
 
   @Action(StopEditingTimeslot)
   stopEditingTimeslot(context: PlanningContext): void {
-    context.patchState({ editingTimeslotId: null });
+    context.patchState({ editingTimeslot: null });
   }
 
   @Action(DeleteTimeslot)
@@ -144,11 +170,11 @@ export class PlanningState {
   ): Observable<void> {
     return this.timeslotService.deleteTimeslot(timeslotId).pipe(
       tap(() => {
-        const { timeslotsById, appointmentsById, editingTimeslotId } =
+        const { timeslotsById, appointmentsById, editingTimeslot } =
           context.getState();
         context.patchState({
-          editingTimeslotId:
-            editingTimeslotId === timeslotId ? null : editingTimeslotId,
+          editingTimeslot:
+            editingTimeslot?.timeslotId === timeslotId ? null : editingTimeslot,
           timeslotsById: indexBy(
             Object.values(timeslotsById).filter(
               (timeslot) => timeslot.timeslotId !== timeslotId,

@@ -11,7 +11,7 @@ import {
   untracked,
 } from '@angular/core';
 import { form, FormField, required, validate } from '@angular/forms/signals';
-import { MatIconButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { ShowOnDirtyErrorStateMatcher } from '@angular/material/core';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
@@ -24,6 +24,7 @@ import {
   StartEditingTimeslot,
   StopEditingTimeslot,
   UpdateTimeslot,
+  UpdateEditingTimeslot,
 } from '@org/scheduler-ui/state';
 
 const TIME_RANGE_SEPARATOR = ' – ';
@@ -84,6 +85,7 @@ function playAnimation(
   imports: [
     CdkDragHandle,
     FormField,
+    MatButton,
     MatCard,
     MatCardContent,
     MatError,
@@ -108,20 +110,28 @@ export class TimeslotCardComponent {
   protected readonly timeRange = computed(() =>
     formatTimeRange(this.timeslot()),
   );
-  private readonly editingTimeslotId = this.store.selectSignal(
-    PlanningState.editingTimeslotId,
+  private readonly editingTimeslot = this.store.selectSignal(
+    PlanningState.editingTimeslot,
   );
+  /** The saved times, with any unsaved changes kept in the state while this timeslot is edited */
+  private readonly currentTimes = computed(() => ({
+    ...this.timeslot(),
+    ...(this.editing() ? this.editingTimeslot() : undefined),
+  }));
   /**
    * Whether the times are being edited, which also lets the card be dragged to another day.
    * This is kept in the state because the card is recreated when it moves to another day.
    */
   protected readonly editing = computed(
-    () => this.editingTimeslotId() === this.timeslot().timeslotId,
+    () => this.editingTimeslot()?.timeslotId === this.timeslot().timeslotId,
   );
 
-  /** The times being edited, which start over whenever the timeslot changes */
+  /**
+   * The times being edited, which start from the changes kept in the state while editing, so they
+   * survive the card being recreated, and start over whenever the timeslot changes
+   */
   private readonly times = linkedSignal(() => {
-    const { start, end } = this.timeslot();
+    const { start, end } = this.currentTimes();
     return { start, end };
   });
   protected readonly timesForm = form(this.times, (path) => {
@@ -139,6 +149,18 @@ export class TimeslotCardComponent {
     );
   });
 
+  /** Whether the times differ from the saved ones, and can be saved since they are valid */
+  protected readonly canSave = computed(() => {
+    const { start, end } = this.times();
+    const saved = this.timeslot();
+    const { dayOfWeek } = this.currentTimes();
+    const changed =
+      start !== saved.start ||
+      end !== saved.end ||
+      dayOfWeek !== saved.dayOfWeek;
+    return changed && this.timesForm().valid();
+  });
+
   /** Whether the card has rendered, so how it was created isn't animated in as if it just changed */
   private hasRendered = false;
 
@@ -146,7 +168,7 @@ export class TimeslotCardComponent {
     afterNextRender(() => {
       this.hasRendered = true;
     });
-    effect(() => this.saveValidChanges());
+    effect(() => this.keepDraft());
     // Times that were never saved don't outlive the editing, however it ends
     effect(() => {
       if (!this.editing()) {
@@ -192,16 +214,34 @@ export class TimeslotCardComponent {
     }
   }
 
-  private saveValidChanges(): void {
-    const { start, end } = this.times();
-    const saved = this.timeslot();
-    const changed = start !== saved.start || end !== saved.end;
+  protected save(): void {
+    if (!this.canSave()) {
+      return;
+    }
 
-    if (changed && this.timesForm().valid()) {
+    const { start, end } = this.times();
+    this.store
+      .dispatch(
+        new UpdateTimeslot(this.timeslot().timeslotId, {
+          start,
+          end,
+          dayOfWeek: this.currentTimes().dayOfWeek,
+        }),
+      )
+      .subscribe({
+        complete: () => this.store.dispatch(new StopEditingTimeslot()),
+        // A failed save keeps the editing open, and is reported by the planning feedback
+        error: () => undefined,
+      });
+  }
+
+  private keepDraft(): void {
+    const { start, end } = this.times();
+    const kept = untracked(this.currentTimes);
+
+    if (this.editing() && (start !== kept.start || end !== kept.end)) {
       untracked(() =>
-        this.store.dispatch(
-          new UpdateTimeslot(saved.timeslotId, { start, end }),
-        ),
+        this.store.dispatch(new UpdateEditingTimeslot({ start, end })),
       );
     }
   }

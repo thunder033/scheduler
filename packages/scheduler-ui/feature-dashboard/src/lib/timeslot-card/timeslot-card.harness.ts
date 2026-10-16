@@ -13,6 +13,7 @@ export const EDITOR_SELECTOR = qaSelector('editor');
 const DRAG_HANDLE_SELECTOR = qaSelector('drag-handle');
 const TIME_RANGE_SELECTOR = qaSelector('time-range');
 const EDIT_TOGGLE_SELECTOR = qaSelector('edit-toggle');
+const SAVE_SELECTOR = qaSelector('save');
 const START_TIME_SELECTOR = qaSelector('start-time');
 const END_TIME_SELECTOR = qaSelector('end-time');
 
@@ -22,6 +23,9 @@ export class TimeslotCardHarness extends ComponentHarness {
   private readonly timeRange = this.locatorFor(TIME_RANGE_SELECTOR);
   private readonly editToggle = this.locatorFor(
     MatButtonHarness.with({ selector: EDIT_TOGGLE_SELECTOR }),
+  );
+  private readonly saveControl = this.locatorFor(
+    MatButtonHarness.with({ selector: SAVE_SELECTOR }),
   );
   private readonly startField = this.locatorFor(
     MatFormFieldHarness.with({ selector: START_TIME_SELECTOR }),
@@ -78,6 +82,15 @@ export class TimeslotCardHarness extends ComponentHarness {
 
   async getEndTime(): Promise<string> {
     return this.getTime(await this.endField());
+  }
+
+  async save(): Promise<void> {
+    const saveControl = await this.saveControl();
+    await saveControl.click();
+  }
+
+  async canSave(): Promise<boolean> {
+    return !(await (await this.saveControl()).isDisabled());
   }
 
   async hasStartTimeError(): Promise<boolean> {

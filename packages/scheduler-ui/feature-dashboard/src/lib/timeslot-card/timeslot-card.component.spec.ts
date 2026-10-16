@@ -18,6 +18,8 @@ import {
 import { EDITOR_SELECTOR, TimeslotCardHarness } from './timeslot-card.harness';
 
 const OTHER_TIMESLOT_ID = 'other-timeslot';
+const OTHER_START = '13:00';
+const OTHER_END = '14:00';
 
 function createTimeslotDraft(
   overrides: Partial<TimeslotDraft> = {},
@@ -59,18 +61,30 @@ async function setup({
     );
   }
 
-  const fixture = TestBed.createComponent(TimeslotCardComponent);
-  fixture.componentRef.setInput('timeslot', timeslot);
-  const harness = await TestbedHarnessEnvironment.harnessForFixture(
-    fixture,
-    TimeslotCardHarness,
-  );
+  const getSavedTimeslot = (): Timeslot =>
+    store.selectSnapshot(PlanningState.timeslots)[0];
+  const createCard = async (cardTimeslot: Timeslot) => {
+    const cardFixture = TestBed.createComponent(TimeslotCardComponent);
+    cardFixture.componentRef.setInput('timeslot', cardTimeslot);
+    const cardHarness = await TestbedHarnessEnvironment.harnessForFixture(
+      cardFixture,
+      TimeslotCardHarness,
+    );
+    return { fixture: cardFixture, harness: cardHarness };
+  };
+  const { fixture, harness } = await createCard(timeslot);
 
   return {
     fixture,
     harness,
     store,
     timeslot,
+    createCard,
+    /** Replaces the card with a new one for the timeslot, as when a card moves to another day */
+    recreateCard: async () => {
+      fixture.destroy();
+      return (await createCard(getSavedTimeslot())).harness;
+    },
     /** The animations of a test that was set up as `animated` */
     getAnimations: (): Animations => {
       if (!animations) {
@@ -78,8 +92,7 @@ async function setup({
       }
       return animations;
     },
-    getSavedTimeslot: (): Timeslot =>
-      store.selectSnapshot(PlanningState.timeslots)[0],
+    getSavedTimeslot,
   };
 }
 
@@ -211,24 +224,131 @@ describe('TimeslotCardComponent', () => {
       expect(await harness.getEndTime()).toBe(timeslot.end);
     });
 
-    it('should save a changed start time without being asked', async () => {
+    it('should not save a changed time until asked to', async () => {
       const { harness, timeslot, getSavedTimeslot } = await setup();
       await harness.toggleEditing();
 
       await harness.setStartTime('08:30');
 
-      expect(getSavedTimeslot()).toEqual({ ...timeslot, start: '08:30' });
-      expect(await harness.hasStartTimeError()).toBe(false);
+      expect(getSavedTimeslot()).toEqual(timeslot);
     });
 
-    it('should save a changed end time without being asked', async () => {
+    it('should save a changed start time when asked to', async () => {
       const { harness, timeslot, getSavedTimeslot } = await setup();
       await harness.toggleEditing();
+      await harness.setStartTime('08:30');
 
+      await harness.save();
+
+      expect(getSavedTimeslot()).toEqual({ ...timeslot, start: '08:30' });
+    });
+
+    it('should save a changed end time when asked to', async () => {
+      const { harness, timeslot, getSavedTimeslot } = await setup();
+      await harness.toggleEditing();
       await harness.setEndTime('11:45');
 
+      await harness.save();
+
       expect(getSavedTimeslot()).toEqual({ ...timeslot, end: '11:45' });
-      expect(await harness.hasEndTimeError()).toBe(false);
+    });
+
+    it('should only allow saving once a time has changed', async () => {
+      const { harness } = await setup();
+      await harness.toggleEditing();
+      expect(await harness.canSave()).toBe(false);
+
+      await harness.setStartTime('08:30');
+
+      expect(await harness.canSave()).toBe(true);
+    });
+
+    it('should stop editing once the changes are saved', async () => {
+      const { harness } = await setup();
+      await harness.toggleEditing();
+      await harness.setStartTime('08:30');
+
+      await harness.save();
+
+      expect(await harness.isEditing()).toBe(false);
+    });
+
+    it('should show the saved times after the changes are saved', async () => {
+      const { fixture, harness, getSavedTimeslot } = await setup();
+      await harness.toggleEditing();
+      await harness.setStartTime('08:30');
+
+      await harness.save();
+      // The planner passes the saved timeslot back to the card
+      fixture.componentRef.setInput('timeslot', getSavedTimeslot());
+
+      expect(await harness.getTimeRange()).toBe(
+        formatTimeRange(getSavedTimeslot()),
+      );
+    });
+
+    describe('when the card is recreated', () => {
+      it('should keep the unsaved times', async () => {
+        const { harness, recreateCard } = await setup();
+        await harness.toggleEditing();
+        await harness.setStartTime('08:30');
+        await harness.setEndTime('09:45');
+
+        const recreated = await recreateCard();
+
+        expect(await recreated.getStartTime()).toBe('08:30');
+        expect(await recreated.getEndTime()).toBe('09:45');
+        expect(await recreated.canSave()).toBe(true);
+      });
+
+      it('should not use the unsaved times for another timeslot that is edited', async () => {
+        const { harness, store, createCard } = await setup();
+        await firstValueFrom(
+          store.dispatch(
+            new CreateTimeslot(
+              createTimeslotDraft({ start: OTHER_START, end: OTHER_END }),
+            ),
+          ),
+        );
+        const other = store
+          .selectSnapshot(PlanningState.timeslots)
+          .find((candidate) => candidate.start === OTHER_START);
+        if (!other) {
+          throw new Error('The other timeslot was not created');
+        }
+        await harness.toggleEditing();
+        await harness.setStartTime('08:30');
+
+        await firstValueFrom(
+          store.dispatch(new StartEditingTimeslot(other.timeslotId)),
+        );
+        const { harness: otherHarness } = await createCard(other);
+
+        expect(await otherHarness.getStartTime()).toBe(OTHER_START);
+        expect(await otherHarness.getEndTime()).toBe(OTHER_END);
+      });
+
+      it('should discard the unsaved times when editing is closed', async () => {
+        const { harness, recreateCard } = await setup();
+        await harness.toggleEditing();
+        await harness.setStartTime('08:30');
+        const recreated = await recreateCard();
+
+        await recreated.toggleEditing();
+        await recreated.toggleEditing();
+
+        expect(await recreated.getStartTime()).not.toBe('08:30');
+      });
+    });
+
+    it('should not allow saving once the times are changed back', async () => {
+      const { harness, timeslot } = await setup();
+      await harness.toggleEditing();
+      await harness.setStartTime('08:30');
+
+      await harness.setStartTime(timeslot.start);
+
+      expect(await harness.canSave()).toBe(false);
     });
 
     describe('with an invalid time range', () => {
@@ -236,16 +356,16 @@ describe('TimeslotCardComponent', () => {
         ['after', '11:00'],
         ['equal to', '10:30'],
       ])(
-        'should show the start time as an error and not save it when it is %s the end',
+        'should show the start time as an error and not allow saving it when it is %s the end',
         async (_relation, start) => {
-          const { harness, timeslot, getSavedTimeslot } = await setup();
+          const { harness } = await setup();
           await harness.toggleEditing();
 
           await harness.setStartTime(start);
 
           expect(await harness.hasStartTimeError()).toBe(true);
           expect(await harness.hasEndTimeError()).toBe(false);
-          expect(getSavedTimeslot()).toEqual(timeslot);
+          expect(await harness.canSave()).toBe(false);
         },
       );
 
@@ -253,28 +373,27 @@ describe('TimeslotCardComponent', () => {
         ['before', '08:00'],
         ['equal to', '09:00'],
       ])(
-        'should show the end time as an error and not save it when it is %s the start',
+        'should show the end time as an error and not allow saving it when it is %s the start',
         async (_relation, end) => {
-          const { harness, timeslot, getSavedTimeslot } = await setup();
+          const { harness } = await setup();
           await harness.toggleEditing();
 
           await harness.setEndTime(end);
 
           expect(await harness.hasEndTimeError()).toBe(true);
           expect(await harness.hasStartTimeError()).toBe(false);
-          expect(getSavedTimeslot()).toEqual(timeslot);
+          expect(await harness.canSave()).toBe(false);
         },
       );
 
-      it('should save and clear the error once the other time makes the range valid', async () => {
+      it('should clear the error and allow saving once the other time makes the range valid', async () => {
         const { harness, timeslot, getSavedTimeslot } = await setup();
         await harness.toggleEditing();
         await harness.setStartTime('11:00');
 
         await harness.setEndTime('12:00');
+        await harness.save();
 
-        expect(await harness.hasStartTimeError()).toBe(false);
-        expect(await harness.hasEndTimeError()).toBe(false);
         expect(getSavedTimeslot()).toEqual({
           ...timeslot,
           start: '11:00',
@@ -282,14 +401,14 @@ describe('TimeslotCardComponent', () => {
         });
       });
 
-      it('should show a cleared time as an error and not save it', async () => {
-        const { harness, timeslot, getSavedTimeslot } = await setup();
+      it('should show a cleared time as an error and not allow saving it', async () => {
+        const { harness } = await setup();
         await harness.toggleEditing();
 
         await harness.setStartTime('');
 
         expect(await harness.hasStartTimeError()).toBe(true);
-        expect(getSavedTimeslot()).toEqual(timeslot);
+        expect(await harness.canSave()).toBe(false);
       });
 
       it('should discard the unsaved times when editing is closed', async () => {

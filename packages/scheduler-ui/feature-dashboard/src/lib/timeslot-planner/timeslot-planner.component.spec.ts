@@ -345,7 +345,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await harness.getTimeRanges(DAY_LABELS[UNSEEDED_DAY])).toEqual([]);
     });
 
-    it('should keep the time of the timeslot when moving it', async () => {
+    it('should not save the new day until asked to', async () => {
       const { dragTimeslotToDay, harness, created, getServiceTimeslots } =
         await setup([createTimeslotDraft()]);
       const [timeslot] = created;
@@ -356,10 +356,44 @@ describe('TimeslotPlannerComponent', () => {
       expect(await harness.getTimeRanges(DAY_LABELS[SUNDAY])).toEqual([
         formatTimeRange(timeslot),
       ]);
+      expect(await getServiceTimeslots()).toContainEqual(timeslot);
+    });
+
+    it('should save the new day and keep the time when asked to', async () => {
+      const { dragTimeslotToDay, harness, created, getServiceTimeslots } =
+        await setup([createTimeslotDraft()]);
+      const [timeslot] = created;
+      await toggleEditing(harness, timeslot);
+      await dragTimeslotToDay(timeslot, SUNDAY);
+
+      await harness.saveTimeslot(DAY_LABELS[SUNDAY], formatTimeRange(timeslot));
+
       expect(await getServiceTimeslots()).toContainEqual({
         ...timeslot,
         dayOfWeek: SUNDAY,
       });
+      expect(await harness.getTimeRanges(DAY_LABELS[SUNDAY])).toEqual([
+        formatTimeRange(timeslot),
+      ]);
+    });
+
+    it('should return the timeslot to its day when editing is closed without saving', async () => {
+      const { dragTimeslotToDay, harness, created } = await setup([
+        createTimeslotDraft(),
+      ]);
+      const [timeslot] = created;
+      await toggleEditing(harness, timeslot);
+      await dragTimeslotToDay(timeslot, SUNDAY);
+
+      await harness.toggleTimeslotEditing(
+        DAY_LABELS[SUNDAY],
+        formatTimeRange(timeslot),
+      );
+
+      expect(await harness.getTimeRanges(DAY_LABELS[UNSEEDED_DAY])).toEqual([
+        formatTimeRange(timeslot),
+      ]);
+      expect(await harness.getTimeRanges(DAY_LABELS[SUNDAY])).toEqual([]);
     });
 
     it('should leave the timeslot where it is when dropped on its own day', async () => {

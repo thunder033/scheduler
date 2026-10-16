@@ -22,6 +22,7 @@ import {
   SetProspect,
   StartEditingTimeslot,
   StopEditingTimeslot,
+  UpdateEditingTimeslot,
   UnconfirmMember,
   UpdateTimeslot,
 } from './planning.actions';
@@ -201,7 +202,7 @@ describe('PlanningState', () => {
     it('should not be editing any timeslot by default', async () => {
       const { store } = await setup();
 
-      expect(store.selectSnapshot(PlanningState.editingTimeslotId)).toBeNull();
+      expect(store.selectSnapshot(PlanningState.editingTimeslot)).toBeNull();
     });
 
     it('should select the timeslot that started being edited', async () => {
@@ -211,9 +212,9 @@ describe('PlanningState', () => {
         store.dispatch(new StartEditingTimeslot(timeslot.timeslotId)),
       );
 
-      expect(store.selectSnapshot(PlanningState.editingTimeslotId)).toBe(
-        timeslot.timeslotId,
-      );
+      expect(
+        store.selectSnapshot(PlanningState.editingTimeslot)?.timeslotId,
+      ).toBe(timeslot.timeslotId);
     });
 
     it('should only edit one timeslot at a time', async () => {
@@ -226,9 +227,9 @@ describe('PlanningState', () => {
         store.dispatch(new StartEditingTimeslot(MISSING_TIMESLOT_ID)),
       );
 
-      expect(store.selectSnapshot(PlanningState.editingTimeslotId)).toBe(
-        MISSING_TIMESLOT_ID,
-      );
+      expect(
+        store.selectSnapshot(PlanningState.editingTimeslot)?.timeslotId,
+      ).toBe(MISSING_TIMESLOT_ID);
     });
 
     it('should stop editing', async () => {
@@ -239,7 +240,7 @@ describe('PlanningState', () => {
 
       await firstValueFrom(store.dispatch(new StopEditingTimeslot()));
 
-      expect(store.selectSnapshot(PlanningState.editingTimeslotId)).toBeNull();
+      expect(store.selectSnapshot(PlanningState.editingTimeslot)).toBeNull();
     });
 
     it('should stop editing a timeslot that is deleted', async () => {
@@ -252,7 +253,7 @@ describe('PlanningState', () => {
         store.dispatch(new DeleteTimeslot(timeslot.timeslotId)),
       );
 
-      expect(store.selectSnapshot(PlanningState.editingTimeslotId)).toBeNull();
+      expect(store.selectSnapshot(PlanningState.editingTimeslot)).toBeNull();
     });
 
     it('should keep editing a timeslot when another one is deleted', async () => {
@@ -271,9 +272,92 @@ describe('PlanningState', () => {
         store.dispatch(new DeleteTimeslot(other?.timeslotId ?? '')),
       );
 
-      expect(store.selectSnapshot(PlanningState.editingTimeslotId)).toBe(
-        timeslot.timeslotId,
+      expect(
+        store.selectSnapshot(PlanningState.editingTimeslot)?.timeslotId,
+      ).toBe(timeslot.timeslotId);
+    });
+  });
+
+  describe('the draft of the timeslot being edited', () => {
+    const DRAFT = { start: '11:00', end: '12:00' };
+
+    async function setupEditing() {
+      const scenario = await setup();
+      await firstValueFrom(
+        scenario.store.dispatch(
+          new StartEditingTimeslot(scenario.timeslot.timeslotId),
+        ),
       );
+      const getDraft = () => {
+        const { start, end } =
+          scenario.store.selectSnapshot(PlanningState.editingTimeslot) ?? {};
+        return { start, end };
+      };
+      return { ...scenario, getDraft };
+    }
+
+    it('should have no draft by default', async () => {
+      const { store } = await setup();
+
+      expect(store.selectSnapshot(PlanningState.editingTimeslot)).toBeNull();
+    });
+
+    it('should keep the draft of the timeslot being edited', async () => {
+      const { store, getDraft } = await setupEditing();
+
+      await firstValueFrom(store.dispatch(new UpdateEditingTimeslot(DRAFT)));
+
+      expect(getDraft()).toEqual(DRAFT);
+    });
+
+    it('should ignore a draft when no timeslot is being edited', async () => {
+      const { store } = await setup();
+
+      await firstValueFrom(store.dispatch(new UpdateEditingTimeslot(DRAFT)));
+
+      expect(store.selectSnapshot(PlanningState.editingTimeslot)).toBeNull();
+    });
+
+    it('should keep the draft when the same timeslot starts being edited again', async () => {
+      const { store, timeslot, getDraft } = await setupEditing();
+      await firstValueFrom(store.dispatch(new UpdateEditingTimeslot(DRAFT)));
+
+      await firstValueFrom(
+        store.dispatch(new StartEditingTimeslot(timeslot.timeslotId)),
+      );
+
+      expect(getDraft()).toEqual(DRAFT);
+    });
+
+    it('should drop the draft when another timeslot starts being edited', async () => {
+      const { store, getDraft } = await setupEditing();
+      await firstValueFrom(store.dispatch(new UpdateEditingTimeslot(DRAFT)));
+
+      await firstValueFrom(
+        store.dispatch(new StartEditingTimeslot(MISSING_TIMESLOT_ID)),
+      );
+
+      expect(getDraft()).toEqual({});
+    });
+
+    it('should drop the draft when editing stops', async () => {
+      const { store, getDraft } = await setupEditing();
+      await firstValueFrom(store.dispatch(new UpdateEditingTimeslot(DRAFT)));
+
+      await firstValueFrom(store.dispatch(new StopEditingTimeslot()));
+
+      expect(getDraft()).toEqual({});
+    });
+
+    it('should drop the draft when its timeslot is deleted', async () => {
+      const { store, timeslot, getDraft } = await setupEditing();
+      await firstValueFrom(store.dispatch(new UpdateEditingTimeslot(DRAFT)));
+
+      await firstValueFrom(
+        store.dispatch(new DeleteTimeslot(timeslot.timeslotId)),
+      );
+
+      expect(getDraft()).toEqual({});
     });
   });
 

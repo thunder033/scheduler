@@ -52,6 +52,14 @@ class TimeslotPlannerDayHarness extends ComponentHarness {
       }
     }
   }
+
+  async save(timeRange: string): Promise<void> {
+    for (const card of await this.cards()) {
+      if ((await card.getTimeRange()) === timeRange) {
+        return card.save();
+      }
+    }
+  }
 }
 
 export class TimeslotPlannerHarness extends ComponentHarness {
@@ -110,6 +118,15 @@ export class TimeslotPlannerHarness extends ComponentHarness {
     for (const day of await this.days()) {
       if ((await day.getLabel()) === dayLabel) {
         return day.toggleEditing(timeRange);
+      }
+    }
+  }
+
+  /** Saves the edits to the timeslot with the time range listed under the day */
+  async saveTimeslot(dayLabel: string, timeRange: string): Promise<void> {
+    for (const day of await this.days()) {
+      if ((await day.getLabel()) === dayLabel) {
+        return day.save(timeRange);
       }
     }
   }

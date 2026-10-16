@@ -12,7 +12,7 @@ import { Timeslot } from '@org/models';
 import {
   LoadTimeslots,
   PlanningState,
-  UpdateTimeslot,
+  UpdateEditingTimeslot,
 } from '@org/scheduler-ui/state';
 import { TimeslotCardComponent } from '../timeslot-card/timeslot-card.component';
 
@@ -43,7 +43,10 @@ interface PlannerDay {
   timeslots: Timeslot[];
 }
 
-function groupByDay(timeslots: Timeslot[]): PlannerDay[] {
+function groupByDay(
+  timeslots: Timeslot[],
+  getDayOfWeek: (timeslot: Timeslot) => number,
+): PlannerDay[] {
   return Object.entries(DAY_LABELS)
     .map(([day, label]) => ({ dayOfWeek: Number(day), label }))
     .sort((first, second) => first.dayOfWeek - second.dayOfWeek)
@@ -51,7 +54,7 @@ function groupByDay(timeslots: Timeslot[]): PlannerDay[] {
       dayOfWeek,
       label,
       timeslots: timeslots
-        .filter((timeslot) => timeslot.dayOfWeek === dayOfWeek)
+        .filter((timeslot) => getDayOfWeek(timeslot) === dayOfWeek)
         .sort((first, second) => first.start.localeCompare(second.start)),
     }));
 }
@@ -81,20 +84,31 @@ export class TimeslotPlannerComponent {
     PlanningState.editingTimeslotId,
   );
   private readonly timeslots = this.store.selectSignal(PlanningState.timeslots);
-  protected readonly days = computed(() => groupByDay(this.timeslots()));
+  private readonly editingTimeslot = this.store.selectSignal(
+    PlanningState.editingTimeslot,
+  );
+  /** A timeslot being edited is listed under the day it was moved to, even before that is saved */
+  protected readonly days = computed(() => {
+    const editing = this.editingTimeslot();
+    return groupByDay(this.timeslots(), (timeslot) =>
+      editing?.timeslotId === timeslot.timeslotId
+        ? (editing.dayOfWeek ?? timeslot.dayOfWeek)
+        : timeslot.dayOfWeek,
+    );
+  });
 
   constructor() {
     this.store.dispatch(new LoadTimeslots());
   }
 
-  /** Timeslots are ordered by start time, so only moves between days change anything */
+  /** Moving is part of the edits to the timeslot, which are saved with the rest of them */
   protected drop({ item, container, previousContainer }: TimeslotDrop): void {
     if (container === previousContainer) {
       return;
     }
 
     this.store.dispatch(
-      new UpdateTimeslot(item.data.timeslotId, { dayOfWeek: container.data }),
+      new UpdateEditingTimeslot({ dayOfWeek: container.data }),
     );
   }
 }

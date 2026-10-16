@@ -1,4 +1,4 @@
-import { Availability } from '@org/models';
+import { Availability, Timeslot } from '@org/models';
 import {
   AppointmentWeek,
   TimeslotChanges,
@@ -20,6 +20,13 @@ export class StartEditingTimeslot {
   static readonly type = '[Planning] Start Editing Timeslot';
 
   constructor(readonly timeslotId: string) {}
+}
+
+/** Keeps unsaved times for the timeslot being edited, and does nothing when none is */
+export class UpdateEditingTimeslot {
+  static readonly type = '[Planning] Update Editing Timeslot';
+
+  constructor(readonly timeslotPartial: Partial<Timeslot>) {}
 }
 
 export class StopEditingTimeslot {

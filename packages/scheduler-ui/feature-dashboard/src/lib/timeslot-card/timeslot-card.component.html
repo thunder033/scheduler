@@ -72,6 +72,17 @@
               />
               <mat-error>{{ timesForm.end().errors()[0]?.message }}</mat-error>
             </mat-form-field>
+            <div class="flex basis-full justify-end">
+              <button
+                mat-flat-button
+                type="button"
+                qa-save
+                [disabled]="!canSave()"
+                (click)="save()"
+              >
+                Save
+              </button>
+            </div>
           </div>
         </div>
       </div>
