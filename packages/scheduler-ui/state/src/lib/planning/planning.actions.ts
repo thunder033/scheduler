@@ -15,6 +15,17 @@ export class LoadAppointmentsByWeek {
   constructor(readonly week: AppointmentWeek) {}
 }
 
+/** Starts editing the timeslot, which stops editing any other */
+export class StartEditingTimeslot {
+  static readonly type = '[Planning] Start Editing Timeslot';
+
+  constructor(readonly timeslotId: string) {}
+}
+
+export class StopEditingTimeslot {
+  static readonly type = '[Planning] Stop Editing Timeslot';
+}
+
 export class CreateTimeslot {
   static readonly type = '[Planning] Create Timeslot';
 

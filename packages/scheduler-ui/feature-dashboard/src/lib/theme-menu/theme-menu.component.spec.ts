@@ -6,7 +6,11 @@ import {
   LocalUserState,
 } from '@org/scheduler-ui/state';
 import { provideTestState } from '../../test-utils/provide-test-state';
-import { THEME_LABELS, THEME_OPTIONS, ThemeMenuComponent } from './theme-menu.component';
+import {
+  THEME_LABELS,
+  THEME_OPTIONS,
+  ThemeMenuComponent,
+} from './theme-menu.component';
 import { ThemeMenuHarness } from './theme-menu.harness';
 
 async function setup() {

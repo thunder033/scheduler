@@ -1,4 +1,119 @@
+@use '@angular/material' as mat;
+
+$editing-min-width: 15rem;
+$editing-shadow: var(--mat-sys-level3);
+$editing-transition-duration: 200ms;
+$editing-transition-easing: ease-in-out;
+
 button.active {
   background-color: var(--mat-sys-secondary-container);
   color: var(--mat-sys-on-secondary-container);
+}
+
+// Centers the card in its column, so it overflows evenly on both sides when it is wider
+:host {
+  display: flex;
+  justify-content: center;
+}
+
+mat-card {
+  flex: 1 1 auto;
+  min-width: 0;
+  transition:
+    min-width $editing-transition-duration $editing-transition-easing,
+    box-shadow $editing-transition-duration $editing-transition-easing;
+}
+
+// While editing, the card widens and lifts above the neighboring cards
+:host(.editing) {
+  position: relative;
+  z-index: 1;
+
+  mat-card {
+    min-width: $editing-min-width;
+
+    @include mat.card-overrides(
+      (
+        outlined-container-elevation: $editing-shadow,
+      )
+    );
+  }
+}
+
+// The editor grows and shrinks in height as the card does in width, so both dimensions move together
+.editor-expander {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.editor-clip {
+  min-height: 0;
+}
+
+// Only clip while animating, so the form fields' focus outlines aren't cut off otherwise
+.editor-expand {
+  animation: editor-expand $editing-transition-duration
+    $editing-transition-easing;
+
+  .editor-clip {
+    overflow: hidden;
+  }
+}
+
+.editor-collapse {
+  animation: editor-collapse $editing-transition-duration
+    $editing-transition-easing forwards;
+
+  .editor-clip {
+    overflow: hidden;
+  }
+}
+
+@keyframes editor-expand {
+  from {
+    grid-template-rows: 0fr;
+  }
+
+  to {
+    grid-template-rows: 1fr;
+  }
+}
+
+@keyframes editor-collapse {
+  from {
+    grid-template-rows: 1fr;
+  }
+
+  to {
+    grid-template-rows: 0fr;
+  }
+}
+
+// The drag handle is wiped in from its left edge, so the title slides over as it is revealed
+.handle-expander {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.handle-clip {
+  min-width: 0;
+}
+
+.handle-wipe-in {
+  animation: handle-wipe-in $editing-transition-duration
+    $editing-transition-easing;
+
+  .handle-clip {
+    overflow: hidden;
+  }
+}
+
+@keyframes handle-wipe-in {
+  from {
+    grid-template-columns: 0fr;
+  }
+
+  to {
+    grid-template-columns: 1fr;
+  }
 }

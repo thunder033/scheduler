@@ -1,5 +1,6 @@
 // You can add global styles to this file, and also import other style files
 @use 'tailwindcss';
+@use '../../../packages/scheduler-ui/styles/material-theme';
 @use '@angular/material' as mat;
 
 html {

@@ -1,7 +1,21 @@
 <mat-card appearance="outlined">
   <mat-card-content>
-    <div class="flex items-center justify-between">
-      <span qa-time-range>{{ timeRange() }}</span>
+    <div
+      qa-card-header
+      cdkDragHandle
+      class="flex items-center justify-between"
+      [class.cursor-grab]="editing()"
+    >
+      <div class="flex items-center">
+        @if (editing()) {
+          <div class="handle-expander" (animate.enter)="wipeInHandle($event)">
+            <div class="handle-clip">
+              <mat-icon qa-drag-handle class="me-2" fontIcon="drag_indicator" />
+            </div>
+          </div>
+        }
+        <span qa-time-range>{{ timeRange() }}</span>
+      </div>
       <button
         mat-icon-button
         type="button"
@@ -16,40 +30,51 @@
       </button>
     </div>
     @if (editing()) {
-    <div
-      class="mt-2 flex flex-wrap gap-4 pt-2"
-      (mousedown)="$event.stopPropagation()"
-      (touchstart)="$event.stopPropagation()"
-    >
-      <mat-form-field
-        qa-start-time
-        class="flex-[1_1_8rem]"
-        subscriptSizing="dynamic"
+      <div
+        class="editor-expander"
+        qa-editor
+        (animate.enter)="expandEditor($event)"
+        (animate.leave)="collapseEditor($event)"
       >
-        <mat-label>Start</mat-label>
-        <input
-          matInput
-          type="time"
-          [formField]="timesForm.start"
-          [errorStateMatcher]="errorMatcher"
-        />
-        <mat-error>{{ timesForm.start().errors()[0]?.message }}</mat-error>
-      </mat-form-field>
-      <mat-form-field
-        qa-end-time
-        class="flex-[1_1_8rem]"
-        subscriptSizing="dynamic"
-      >
-        <mat-label>End</mat-label>
-        <input
-          matInput
-          type="time"
-          [formField]="timesForm.end"
-          [errorStateMatcher]="errorMatcher"
-        />
-        <mat-error>{{ timesForm.end().errors()[0]?.message }}</mat-error>
-      </mat-form-field>
-    </div>
+        <div class="editor-clip">
+          <div
+            class="mt-2 flex flex-wrap gap-4 pt-2"
+            (mousedown)="$event.stopPropagation()"
+            (touchstart)="$event.stopPropagation()"
+          >
+            <mat-form-field
+              qa-start-time
+              class="flex-[1_1_8rem]"
+              subscriptSizing="dynamic"
+            >
+              <mat-label>Start</mat-label>
+              <input
+                matInput
+                type="time"
+                [formField]="timesForm.start"
+                [errorStateMatcher]="errorMatcher"
+              />
+              <mat-error>{{
+                timesForm.start().errors()[0]?.message
+              }}</mat-error>
+            </mat-form-field>
+            <mat-form-field
+              qa-end-time
+              class="flex-[1_1_8rem]"
+              subscriptSizing="dynamic"
+            >
+              <mat-label>End</mat-label>
+              <input
+                matInput
+                type="time"
+                [formField]="timesForm.end"
+                [errorStateMatcher]="errorMatcher"
+              />
+              <mat-error>{{ timesForm.end().errors()[0]?.message }}</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
     }
   </mat-card-content>
 </mat-card>

@@ -7,7 +7,7 @@ export const HEADER_TITLE = 'Scheduler';
 
 @Component({
   selector: 'lib-header',
-  imports: [MatToolbar,CurrentUserTileComponent, ThemeMenuComponent],
+  imports: [MatToolbar, CurrentUserTileComponent, ThemeMenuComponent],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })

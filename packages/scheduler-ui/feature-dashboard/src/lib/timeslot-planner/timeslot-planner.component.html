@@ -14,23 +14,24 @@
   cdkDropListGroup
 >
   @for (day of days(); track day.dayOfWeek) {
-  <section
-    qa-day
-    class="flex min-h-24 flex-col gap-2 rounded-lg p-2 transition-colors duration-150 ease-in-out"
-    cdkDropList
-    [cdkDropListData]="day.dayOfWeek"
-    [cdkDropListSortingDisabled]="true"
-    (cdkDropListDropped)="drop($event)"
-  >
-    <h3 qa-day-label>{{ day.label }}</h3>
-    @for (timeslot of day.timeslots; track timeslot.timeslotId) {
-    <lib-timeslot-card
-      class="block cursor-grab"
-      cdkDrag
-      [cdkDragData]="timeslot"
-      [timeslot]="timeslot"
-    />
-    }
-  </section>
+    <section
+      qa-day
+      class="flex min-h-24 flex-col gap-2 rounded-lg p-2 transition-colors duration-150 ease-in-out"
+      cdkDropList
+      [cdkDropListData]="day.dayOfWeek"
+      [cdkDropListSortingDisabled]="true"
+      (cdkDropListDropped)="drop($event)"
+    >
+      <h3 qa-day-label class="border-b border-secondary">{{ day.label }}</h3>
+      @for (timeslot of day.timeslots; track timeslot.timeslotId) {
+        <lib-timeslot-card
+          class="block"
+          cdkDrag
+          [cdkDragDisabled]="editingTimeslotId() !== timeslot.timeslotId"
+          [cdkDragData]="timeslot"
+          [timeslot]="timeslot"
+        />
+      }
+    </section>
   }
 </div>

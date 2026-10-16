@@ -1,0 +1,48 @@
+// Maps the Angular Material system tokens (--mat-sys-*) onto Tailwind's theme,
+// so utilities follow the Material theme, including light/dark and the user's
+// theme preference. `inline` keeps the var() references, rather than copying
+// the values, which is what lets the tokens switch at runtime.
+
+$color-roles: primary, on-primary, primary-container, on-primary-container,
+  secondary, on-secondary, secondary-container, on-secondary-container,
+  tertiary, on-tertiary, tertiary-container, on-tertiary-container, error,
+  on-error, error-container, on-error-container, background, on-background,
+  surface, on-surface, surface-variant, on-surface-variant, surface-dim,
+  surface-bright, surface-container-lowest, surface-container-low,
+  surface-container, surface-container-high, surface-container-highest,
+  surface-tint, outline, outline-variant, inverse-surface, inverse-on-surface,
+  inverse-primary, shadow, scrim;
+
+$type-scales: display, headline, title, body, label;
+$type-sizes: large, medium, small;
+$corner-sizes: extra-small, small, medium, large, extra-large, full;
+$elevation-levels: 1, 2, 3, 4, 5;
+
+@theme inline {
+  @each $role in $color-roles {
+    --color-#{$role}: var(--mat-sys-#{$role});
+  }
+
+  // text-<scale>-<size> sets the size, line height, tracking and weight together
+  @each $scale in $type-scales {
+    @each $size in $type-sizes {
+      $role: #{$scale}-#{$size};
+      --text-#{$role}: var(--mat-sys-#{$role}-size);
+      --text-#{$role}--line-height: var(--mat-sys-#{$role}-line-height);
+      --text-#{$role}--letter-spacing: var(--mat-sys-#{$role}-tracking);
+      --text-#{$role}--font-weight: var(--mat-sys-#{$role}-weight);
+    }
+  }
+
+  --font-brand: var(--mat-sys-headline-large-font);
+  --font-plain: var(--mat-sys-body-large-font);
+
+  // Named after the Material corner scale, so Tailwind's own rounded-* sizes keep their meaning
+  @each $size in $corner-sizes {
+    --radius-corner-#{$size}: var(--mat-sys-corner-#{$size});
+  }
+
+  @each $level in $elevation-levels {
+    --shadow-level#{$level}: var(--mat-sys-level#{$level});
+  }
+}

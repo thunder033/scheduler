@@ -3,11 +3,21 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
 import { Timeslot } from '@org/models';
 import { TimeslotDraft } from '@org/scheduler-ui/data';
-import { CreateTimeslot, PlanningState } from '@org/scheduler-ui/state';
+import {
+  CreateTimeslot,
+  PlanningState,
+  StartEditingTimeslot,
+} from '@org/scheduler-ui/state';
 import { firstValueFrom } from 'rxjs';
+import { stubCssAnimations } from '../../test-utils/css-animations';
 import { provideTestState } from '../../test-utils/provide-test-state';
-import { TimeslotCardComponent, formatTimeRange } from './timeslot-card.component';
-import { TimeslotCardHarness } from './timeslot-card.harness';
+import {
+  TimeslotCardComponent,
+  formatTimeRange,
+} from './timeslot-card.component';
+import { EDITOR_SELECTOR, TimeslotCardHarness } from './timeslot-card.harness';
+
+const OTHER_TIMESLOT_ID = 'other-timeslot';
 
 function createTimeslotDraft(
   overrides: Partial<TimeslotDraft> = {},
@@ -20,15 +30,34 @@ function createTimeslotDraft(
   };
 }
 
-async function setup(draft: TimeslotDraft = createTimeslotDraft()) {
+interface SetupOptions {
+  draft?: TimeslotDraft;
+  /** Starts editing the timeslot before the card is created, as when a card is recreated on another day */
+  alreadyEditing?: boolean;
+  /** Runs the enter and leave animations, which TestBed disables unless asked */
+  animated?: boolean;
+}
+
+async function setup({
+  draft = createTimeslotDraft(),
+  alreadyEditing = false,
+  animated = false,
+}: SetupOptions = {}) {
   await TestBed.configureTestingModule({
     imports: [TimeslotCardComponent],
     providers: [provideTestState()],
+    animationsEnabled: animated,
   }).compileComponents();
 
   const store = TestBed.inject(Store);
   await firstValueFrom(store.dispatch(new CreateTimeslot(draft)));
   const timeslot = store.selectSnapshot(PlanningState.timeslots)[0];
+
+  if (alreadyEditing) {
+    await firstValueFrom(
+      store.dispatch(new StartEditingTimeslot(timeslot.timeslotId)),
+    );
+  }
 
   const fixture = TestBed.createComponent(TimeslotCardComponent);
   fixture.componentRef.setInput('timeslot', timeslot);
@@ -40,6 +69,7 @@ async function setup(draft: TimeslotDraft = createTimeslotDraft()) {
   return {
     fixture,
     harness,
+    store,
     timeslot,
     getSavedTimeslot: (): Timeslot =>
       store.selectSnapshot(PlanningState.timeslots)[0],
@@ -77,6 +107,115 @@ describe('TimeslotCardComponent', () => {
 
       await harness.toggleEditing();
       expect(await harness.isEditing()).toBe(false);
+    });
+
+    it('should stop editing when another timeslot starts being edited', async () => {
+      const { harness, store } = await setup();
+      await harness.toggleEditing();
+
+      store.dispatch(new StartEditingTimeslot(OTHER_TIMESLOT_ID));
+
+      expect(await harness.isEditing()).toBe(false);
+    });
+
+    it('should discard unsaved times when another timeslot starts being edited', async () => {
+      const { harness, store, timeslot } = await setup();
+      await harness.toggleEditing();
+      await harness.setStartTime('11:00');
+
+      store.dispatch(new StartEditingTimeslot(OTHER_TIMESLOT_ID));
+      await harness.toggleEditing();
+
+      expect(await harness.getStartTime()).toBe(timeslot.start);
+      expect(await harness.hasStartTimeError()).toBe(false);
+    });
+
+    describe('animations', () => {
+      it('should animate the editor in when editing starts', async () => {
+        const restore = stubCssAnimations();
+        try {
+          const { harness } = await setup({ animated: true });
+
+          await harness.toggleEditing();
+
+          expect(await harness.isEditorAnimating()).toBe(true);
+        } finally {
+          restore();
+        }
+      });
+
+      it('should not animate the editor in when the card is created while its timeslot is being edited', async () => {
+        const restore = stubCssAnimations();
+        try {
+          const { harness } = await setup({
+            alreadyEditing: true,
+            animated: true,
+          });
+
+          expect(await harness.isEditing()).toBe(true);
+          expect(await harness.isEditorAnimating()).toBe(false);
+        } finally {
+          restore();
+        }
+      });
+
+      it('should keep animating the editor when something inside it finishes its own animation', async () => {
+        const restore = stubCssAnimations();
+        try {
+          const { fixture, harness } = await setup({ animated: true });
+          await harness.toggleEditing();
+
+          // Material and the CDK animate parts of the form fields, and those events bubble up
+          fixture.nativeElement
+            .querySelector('input')
+            .dispatchEvent(new Event('animationend', { bubbles: true }));
+
+          expect(await harness.isEditorAnimating()).toBe(true);
+        } finally {
+          restore();
+        }
+      });
+
+      it('should stop animating the editor once the editor finishes its animation', async () => {
+        const restore = stubCssAnimations();
+        try {
+          const { fixture, harness } = await setup({ animated: true });
+          await harness.toggleEditing();
+
+          fixture.nativeElement
+            .querySelector(EDITOR_SELECTOR)
+            .dispatchEvent(new Event('animationend', { bubbles: true }));
+
+          expect(await harness.isEditorAnimating()).toBe(false);
+        } finally {
+          restore();
+        }
+      });
+
+      it('should animate the editor out when editing ends', async () => {
+        const restore = stubCssAnimations();
+        try {
+          const { harness } = await setup({ animated: true });
+          await harness.toggleEditing();
+
+          await harness.toggleEditing();
+
+          expect(await harness.isEditorAnimating()).toBe(true);
+        } finally {
+          restore();
+        }
+      });
+    });
+
+    it('should show a drag handle only while editing', async () => {
+      const { harness } = await setup();
+      expect(await harness.hasDragHandle()).toBe(false);
+
+      await harness.toggleEditing();
+      expect(await harness.hasDragHandle()).toBe(true);
+
+      await harness.toggleEditing();
+      expect(await harness.hasDragHandle()).toBe(false);
     });
 
     it('should show the start and end time of the timeslot', async () => {

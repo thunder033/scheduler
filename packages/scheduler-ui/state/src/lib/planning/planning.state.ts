@@ -24,6 +24,8 @@ import {
   RemoveProspect,
   SetAvailability,
   SetProspect,
+  StartEditingTimeslot,
+  StopEditingTimeslot,
   UnconfirmMember,
   UpdateTimeslot,
 } from './planning.actions';
@@ -40,7 +42,11 @@ function indexBy<T>(
 
 @State<PlanningStateModel>({
   name: PLANNING_STATE_NAME,
-  defaults: { timeslotsById: {}, appointmentsById: {} },
+  defaults: {
+    timeslotsById: {},
+    appointmentsById: {},
+    editingTimeslotId: null,
+  },
 })
 @Injectable()
 export class PlanningState {
@@ -49,6 +55,11 @@ export class PlanningState {
   @Selector()
   static timeslots(state: PlanningStateModel): Timeslot[] {
     return Object.values(state.timeslotsById);
+  }
+
+  @Selector()
+  static editingTimeslotId(state: PlanningStateModel): string | null {
+    return state.editingTimeslotId;
   }
 
   static appointmentsByWeek(week: AppointmentWeek) {
@@ -113,6 +124,19 @@ export class PlanningState {
       .pipe(tap((timeslot) => this.upsertTimeslot(context, timeslot)));
   }
 
+  @Action(StartEditingTimeslot)
+  startEditingTimeslot(
+    context: PlanningContext,
+    { timeslotId }: StartEditingTimeslot,
+  ): void {
+    context.patchState({ editingTimeslotId: timeslotId });
+  }
+
+  @Action(StopEditingTimeslot)
+  stopEditingTimeslot(context: PlanningContext): void {
+    context.patchState({ editingTimeslotId: null });
+  }
+
   @Action(DeleteTimeslot)
   deleteTimeslot(
     context: PlanningContext,
@@ -120,8 +144,11 @@ export class PlanningState {
   ): Observable<void> {
     return this.timeslotService.deleteTimeslot(timeslotId).pipe(
       tap(() => {
-        const { timeslotsById, appointmentsById } = context.getState();
+        const { timeslotsById, appointmentsById, editingTimeslotId } =
+          context.getState();
         context.patchState({
+          editingTimeslotId:
+            editingTimeslotId === timeslotId ? null : editingTimeslotId,
           timeslotsById: indexBy(
             Object.values(timeslotsById).filter(
               (timeslot) => timeslot.timeslotId !== timeslotId,

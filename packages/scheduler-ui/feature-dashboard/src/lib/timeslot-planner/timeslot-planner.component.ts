@@ -74,8 +74,12 @@ export class TimeslotPlannerComponent {
   private readonly store = inject(Store);
 
   protected readonly title = TIMESLOT_PLANNER_TITLE;
-  protected readonly description =TIMESLOT_PLANNER_DESCRIPTION;
+  protected readonly description = TIMESLOT_PLANNER_DESCRIPTION;
 
+  /** Only the timeslot being edited can be dragged to another day */
+  protected readonly editingTimeslotId = this.store.selectSignal(
+    PlanningState.editingTimeslotId,
+  );
   private readonly timeslots = this.store.selectSignal(PlanningState.timeslots);
   protected readonly days = computed(() => groupByDay(this.timeslots()));
 

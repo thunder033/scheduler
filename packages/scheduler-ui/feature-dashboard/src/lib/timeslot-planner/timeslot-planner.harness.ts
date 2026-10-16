@@ -26,6 +26,32 @@ class TimeslotPlannerDayHarness extends ComponentHarness {
     const host = await this.host();
     return host.hasClass(DROP_TARGET_CLASS);
   }
+
+  async isEditing(timeRange: string): Promise<boolean> {
+    for (const card of await this.cards()) {
+      if ((await card.getTimeRange()) === timeRange) {
+        return card.isEditing();
+      }
+    }
+    return false;
+  }
+
+  async isEditorAnimating(timeRange: string): Promise<boolean> {
+    for (const card of await this.cards()) {
+      if ((await card.getTimeRange()) === timeRange) {
+        return card.isEditorAnimating();
+      }
+    }
+    return false;
+  }
+
+  async toggleEditing(timeRange: string): Promise<void> {
+    for (const card of await this.cards()) {
+      if ((await card.getTimeRange()) === timeRange) {
+        return card.toggleEditing();
+      }
+    }
+  }
 }
 
 export class TimeslotPlannerHarness extends ComponentHarness {
@@ -48,6 +74,44 @@ export class TimeslotPlannerHarness extends ComponentHarness {
       }
     }
     return dropTargets;
+  }
+
+  /** Whether the timeslot with the time range listed under the day is being edited */
+  async isTimeslotEditing(
+    dayLabel: string,
+    timeRange: string,
+  ): Promise<boolean> {
+    for (const day of await this.days()) {
+      if ((await day.getLabel()) === dayLabel) {
+        return day.isEditing(timeRange);
+      }
+    }
+    return false;
+  }
+
+  /** Whether the editor of the timeslot with the time range listed under the day is animating */
+  async isTimeslotEditorAnimating(
+    dayLabel: string,
+    timeRange: string,
+  ): Promise<boolean> {
+    for (const day of await this.days()) {
+      if ((await day.getLabel()) === dayLabel) {
+        return day.isEditorAnimating(timeRange);
+      }
+    }
+    return false;
+  }
+
+  /** Starts or stops editing the timeslot with the time range listed under the day */
+  async toggleTimeslotEditing(
+    dayLabel: string,
+    timeRange: string,
+  ): Promise<void> {
+    for (const day of await this.days()) {
+      if ((await day.getLabel()) === dayLabel) {
+        return day.toggleEditing(timeRange);
+      }
+    }
   }
 
   /** Time ranges of the timeslots listed under the day, in display order */
