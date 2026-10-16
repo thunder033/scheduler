@@ -9,7 +9,7 @@ import {
   StartEditingTimeslot,
 } from '@org/scheduler-ui/state';
 import { firstValueFrom } from 'rxjs';
-import { stubCssAnimations } from '../../test-utils/css-animations';
+import { Animations, CommonTest } from '../../test-utils/common-test';
 import { provideTestState } from '../../test-utils/provide-test-state';
 import {
   TimeslotCardComponent,
@@ -46,8 +46,8 @@ async function setup({
   await TestBed.configureTestingModule({
     imports: [TimeslotCardComponent],
     providers: [provideTestState()],
-    animationsEnabled: animated,
   }).compileComponents();
+  const animations = animated ? CommonTest.withAnimations() : undefined;
 
   const store = TestBed.inject(Store);
   await firstValueFrom(store.dispatch(new CreateTimeslot(draft)));
@@ -71,6 +71,13 @@ async function setup({
     harness,
     store,
     timeslot,
+    /** The animations of a test that was set up as `animated` */
+    getAnimations: (): Animations => {
+      if (!animations) {
+        throw new Error('The test was not set up with animated: true');
+      }
+      return animations;
+    },
     getSavedTimeslot: (): Timeslot =>
       store.selectSnapshot(PlanningState.timeslots)[0],
   };
@@ -132,78 +139,55 @@ describe('TimeslotCardComponent', () => {
 
     describe('animations', () => {
       it('should animate the editor in when editing starts', async () => {
-        const restore = stubCssAnimations();
-        try {
-          const { harness } = await setup({ animated: true });
+        const { harness } = await setup({ animated: true });
 
-          await harness.toggleEditing();
+        await harness.toggleEditing();
 
-          expect(await harness.isEditorAnimating()).toBe(true);
-        } finally {
-          restore();
-        }
+        expect(await harness.isEditorAnimating()).toBe(true);
       });
 
       it('should not animate the editor in when the card is created while its timeslot is being edited', async () => {
-        const restore = stubCssAnimations();
-        try {
-          const { harness } = await setup({
-            alreadyEditing: true,
-            animated: true,
-          });
+        const { harness } = await setup({
+          alreadyEditing: true,
+          animated: true,
+        });
 
-          expect(await harness.isEditing()).toBe(true);
-          expect(await harness.isEditorAnimating()).toBe(false);
-        } finally {
-          restore();
-        }
+        expect(await harness.isEditing()).toBe(true);
+        expect(await harness.isEditorAnimating()).toBe(false);
       });
 
       it('should keep animating the editor when something inside it finishes its own animation', async () => {
-        const restore = stubCssAnimations();
-        try {
-          const { fixture, harness } = await setup({ animated: true });
-          await harness.toggleEditing();
+        const { fixture, harness, getAnimations } = await setup({
+          animated: true,
+        });
+        await harness.toggleEditing();
 
-          // Material and the CDK animate parts of the form fields, and those events bubble up
-          fixture.nativeElement
-            .querySelector('input')
-            .dispatchEvent(new Event('animationend', { bubbles: true }));
+        // Material and the CDK animate parts of the form fields, and those events bubble up
+        getAnimations().end(fixture.nativeElement.querySelector('input'));
 
-          expect(await harness.isEditorAnimating()).toBe(true);
-        } finally {
-          restore();
-        }
+        expect(await harness.isEditorAnimating()).toBe(true);
       });
 
       it('should stop animating the editor once the editor finishes its animation', async () => {
-        const restore = stubCssAnimations();
-        try {
-          const { fixture, harness } = await setup({ animated: true });
-          await harness.toggleEditing();
+        const { fixture, harness, getAnimations } = await setup({
+          animated: true,
+        });
+        await harness.toggleEditing();
 
-          fixture.nativeElement
-            .querySelector(EDITOR_SELECTOR)
-            .dispatchEvent(new Event('animationend', { bubbles: true }));
+        getAnimations().end(
+          fixture.nativeElement.querySelector(EDITOR_SELECTOR),
+        );
 
-          expect(await harness.isEditorAnimating()).toBe(false);
-        } finally {
-          restore();
-        }
+        expect(await harness.isEditorAnimating()).toBe(false);
       });
 
       it('should animate the editor out when editing ends', async () => {
-        const restore = stubCssAnimations();
-        try {
-          const { harness } = await setup({ animated: true });
-          await harness.toggleEditing();
+        const { harness } = await setup({ animated: true });
+        await harness.toggleEditing();
 
-          await harness.toggleEditing();
+        await harness.toggleEditing();
 
-          expect(await harness.isEditorAnimating()).toBe(true);
-        } finally {
-          restore();
-        }
+        expect(await harness.isEditorAnimating()).toBe(true);
       });
     });
 

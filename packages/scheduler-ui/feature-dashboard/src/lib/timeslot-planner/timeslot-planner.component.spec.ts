@@ -5,17 +5,7 @@ import { Timeslot } from '@org/models';
 import { TimeslotDraft, TimeslotService } from '@org/scheduler-ui/data';
 import { CreateTimeslot } from '@org/scheduler-ui/state';
 import { firstValueFrom } from 'rxjs';
-import {
-  dragElementToDropListViaMouse,
-  startDraggingViaMouse,
-} from '../../test-utils/drag-drop-utils';
-import { stubCssAnimations } from '../../test-utils/css-animations';
-import { dispatchMouseEvent } from '../../test-utils/fake-events';
-import {
-  ElementBox,
-  getCenter,
-  stubLayout,
-} from '../../test-utils/layout-stubs';
+import { CommonTest } from '../../test-utils/common-test';
 import { provideTestState } from '../../test-utils/provide-test-state';
 import { formatTimeRange } from '../timeslot-card/timeslot-card.component';
 import { CARD_HEADER_SELECTOR } from '../timeslot-card/timeslot-card.harness';
@@ -52,35 +42,7 @@ function getRanges(timeslots: Timeslot[], dayOfWeek: number): string[] {
     .map(formatTimeRange);
 }
 
-const DAY_WIDTH = 200;
-const DAY_HEIGHT = 400;
-const DAY_LABEL_HEIGHT = 40;
-const CARD_HEIGHT = 50;
-/** Far enough to get past the distance CDK requires before a drag starts */
-const DRAG_START_DISTANCE = 20;
-
-/** Lays the days out as columns, with each day's cards stacked under its label */
-function layOutPlanner(
-  fixture: ComponentFixture<TimeslotPlannerComponent>,
-): void {
-  const boxes = new Map<Element, ElementBox>();
-  const days = fixture.nativeElement.querySelectorAll(
-    DAY_SELECTOR,
-  ) as NodeListOf<Element>;
-  days.forEach((day, dayIndex) => {
-    const left = dayIndex * DAY_WIDTH;
-    boxes.set(day, { left, top: 0, width: DAY_WIDTH, height: DAY_HEIGHT });
-    day.querySelectorAll('lib-timeslot-card').forEach((card, cardIndex) => {
-      boxes.set(card, {
-        left,
-        top: DAY_LABEL_HEIGHT + cardIndex * CARD_HEIGHT,
-        width: DAY_WIDTH,
-        height: CARD_HEIGHT,
-      });
-    });
-  });
-  stubLayout(boxes);
-}
+type Grip = 'header' | 'body';
 
 function findElement(
   fixture: ComponentFixture<TimeslotPlannerComponent>,
@@ -96,73 +58,6 @@ function findElement(
     throw new Error(`No ${selector} containing "${hasText}" in the planner`);
   }
   return element;
-}
-
-type Grip = 'header' | 'body';
-
-/** The part of the card the mouse grabs, where only the header drags the card */
-function getGrabbedElement(card: Element, grip: Grip): Element {
-  const element =
-    grip === 'header' ? card.querySelector(CARD_HEADER_SELECTOR) : card;
-  if (!element) {
-    throw new Error('No card header in the timeslot card');
-  }
-  return element;
-}
-
-/** Picks up the timeslot's card with the mouse and holds it, still within its own day */
-function startDraggingTimeslot(
-  fixture: ComponentFixture<TimeslotPlannerComponent>,
-  timeslot: Timeslot,
-  grip: Grip = 'header',
-): void {
-  layOutPlanner(fixture);
-  const card = findElement(
-    fixture,
-    'lib-timeslot-card',
-    formatTimeRange(timeslot),
-  );
-  const { left, top } = card.getBoundingClientRect();
-
-  startDraggingViaMouse(fixture, getGrabbedElement(card, grip));
-  dispatchMouseEvent(
-    document,
-    'mousemove',
-    left + DRAG_START_DISTANCE,
-    top + DRAG_START_DISTANCE,
-  );
-  fixture.detectChanges();
-}
-
-/** Drags the timeslot's card with the mouse onto the column of the day */
-async function dragTimeslotToDay(
-  fixture: ComponentFixture<TimeslotPlannerComponent>,
-  timeslot: Timeslot,
-  dayOfWeek: number,
-  grip: Grip = 'header',
-): Promise<void> {
-  layOutPlanner(fixture);
-  const card = findElement(
-    fixture,
-    'lib-timeslot-card',
-    formatTimeRange(timeslot),
-  );
-  const day = findElement(fixture, DAY_SELECTOR, DAY_LABELS[dayOfWeek]);
-  const dayBox = day.getBoundingClientRect() as DOMRect;
-  const target = getCenter({
-    left: dayBox.left,
-    top: dayBox.top,
-    width: dayBox.width,
-    height: dayBox.height,
-  });
-
-  dragElementToDropListViaMouse(
-    fixture,
-    getGrabbedElement(card, grip),
-    target.x,
-    target.y,
-  );
-  await fixture.whenStable();
 }
 
 /** Puts the timeslot's card in edit mode, which is what allows it to be dragged */
@@ -188,8 +83,10 @@ async function setup(
   await TestBed.configureTestingModule({
     imports: [TimeslotPlannerComponent],
     providers: [provideTestState()],
-    animationsEnabled: animated,
   }).compileComponents();
+  if (animated) {
+    CommonTest.withAnimations();
+  }
 
   const timeslotService = TestBed.inject(TimeslotService);
   const created: Timeslot[] = [];
@@ -203,12 +100,32 @@ async function setup(
     TimeslotPlannerHarness,
   );
 
+  const dragAndDrop = CommonTest.withDragAndDrop(fixture);
+  const getCard = (timeslot: Timeslot) =>
+    findElement(fixture, 'lib-timeslot-card', formatTimeRange(timeslot));
+  /** Only the card's header drags the card, so grabbing its body does nothing */
+  const getGrip = (grip: Grip) =>
+    grip === 'header' ? CARD_HEADER_SELECTOR : undefined;
+
   return {
-    fixture,
     harness,
     created,
     store: TestBed.inject(Store),
     getServiceTimeslots: () => firstValueFrom(timeslotService.getTimeslots()),
+    /** Picks up the timeslot's card with the mouse and holds it, still within its own day */
+    pickUpTimeslot: (timeslot: Timeslot, grip: Grip = 'header') =>
+      dragAndDrop.pickUp(getCard(timeslot), { grip: getGrip(grip) }),
+    /** Drags the timeslot's card with the mouse onto the column of the day */
+    dragTimeslotToDay: (
+      timeslot: Timeslot,
+      dayOfWeek: number,
+      grip: Grip = 'header',
+    ) =>
+      dragAndDrop.dragTo(
+        getCard(timeslot),
+        findElement(fixture, DAY_SELECTOR, DAY_LABELS[dayOfWeek]),
+        { grip: getGrip(grip) },
+      ),
   };
 }
 
@@ -294,36 +211,31 @@ describe('TimeslotPlannerComponent', () => {
 
   describe('dragging a timeslot to another day', () => {
     it('should not replay the editing animations for a timeslot that is moved', async () => {
-      const restore = stubCssAnimations();
-      try {
-        const { fixture, harness, created } = await setup(
-          [createTimeslotDraft()],
-          { animated: true },
-        );
-        const [timeslot] = created;
-        await toggleEditing(harness, timeslot);
+      const { dragTimeslotToDay, harness, created } = await setup(
+        [createTimeslotDraft()],
+        { animated: true },
+      );
+      const [timeslot] = created;
+      await toggleEditing(harness, timeslot);
 
-        await dragTimeslotToDay(fixture, timeslot, OTHER_UNSEEDED_DAY);
+      await dragTimeslotToDay(timeslot, OTHER_UNSEEDED_DAY);
 
-        expect(
-          await harness.isTimeslotEditorAnimating(
-            DAY_LABELS[OTHER_UNSEEDED_DAY],
-            formatTimeRange(timeslot),
-          ),
-        ).toBe(false);
-      } finally {
-        restore();
-      }
+      expect(
+        await harness.isTimeslotEditorAnimating(
+          DAY_LABELS[OTHER_UNSEEDED_DAY],
+          formatTimeRange(timeslot),
+        ),
+      ).toBe(false);
     });
 
     it('should keep the timeslot in edit mode after it is moved', async () => {
-      const { fixture, harness, created } = await setup([
+      const { dragTimeslotToDay, harness, created } = await setup([
         createTimeslotDraft(),
       ]);
       const [timeslot] = created;
       await toggleEditing(harness, timeslot);
 
-      await dragTimeslotToDay(fixture, timeslot, OTHER_UNSEEDED_DAY);
+      await dragTimeslotToDay(timeslot, OTHER_UNSEEDED_DAY);
 
       expect(
         await harness.isTimeslotEditing(
@@ -334,12 +246,12 @@ describe('TimeslotPlannerComponent', () => {
     });
 
     it('should not move a timeslot that is not being edited', async () => {
-      const { fixture, harness, created } = await setup([
+      const { dragTimeslotToDay, harness, created } = await setup([
         createTimeslotDraft(),
       ]);
       const [timeslot] = created;
 
-      await dragTimeslotToDay(fixture, timeslot, OTHER_UNSEEDED_DAY);
+      await dragTimeslotToDay(timeslot, OTHER_UNSEEDED_DAY);
 
       expect(await harness.getTimeRanges(DAY_LABELS[UNSEEDED_DAY])).toEqual([
         formatTimeRange(timeslot),
@@ -350,24 +262,24 @@ describe('TimeslotPlannerComponent', () => {
     });
 
     it('should not highlight drop targets for a timeslot that is not being edited', async () => {
-      const { fixture, harness, created } = await setup([
+      const { pickUpTimeslot, harness, created } = await setup([
         createTimeslotDraft(),
       ]);
       const [timeslot] = created;
 
-      startDraggingTimeslot(fixture, timeslot);
+      pickUpTimeslot(timeslot);
 
       expect(await harness.getDropTargetDayLabels()).toEqual([]);
     });
 
     it('should only move a timeslot that is dragged by its header', async () => {
-      const { fixture, harness, created } = await setup([
+      const { dragTimeslotToDay, harness, created } = await setup([
         createTimeslotDraft(),
       ]);
       const [timeslot] = created;
       await toggleEditing(harness, timeslot);
 
-      await dragTimeslotToDay(fixture, timeslot, OTHER_UNSEEDED_DAY, 'body');
+      await dragTimeslotToDay(timeslot, OTHER_UNSEEDED_DAY, 'body');
 
       expect(await harness.getTimeRanges(DAY_LABELS[UNSEEDED_DAY])).toEqual([
         formatTimeRange(timeslot),
@@ -375,14 +287,14 @@ describe('TimeslotPlannerComponent', () => {
     });
 
     it('should not move a timeslot once it is no longer being edited', async () => {
-      const { fixture, harness, created } = await setup([
+      const { dragTimeslotToDay, harness, created } = await setup([
         createTimeslotDraft(),
       ]);
       const [timeslot] = created;
       await toggleEditing(harness, timeslot);
       await toggleEditing(harness, timeslot);
 
-      await dragTimeslotToDay(fixture, timeslot, OTHER_UNSEEDED_DAY);
+      await dragTimeslotToDay(timeslot, OTHER_UNSEEDED_DAY);
 
       expect(await harness.getTimeRanges(DAY_LABELS[UNSEEDED_DAY])).toEqual([
         formatTimeRange(timeslot),
@@ -390,14 +302,14 @@ describe('TimeslotPlannerComponent', () => {
     });
 
     it('should highlight the other days as drop targets while dragging', async () => {
-      const { fixture, harness, created } = await setup([
+      const { pickUpTimeslot, harness, created } = await setup([
         createTimeslotDraft(),
       ]);
       const [timeslot] = created;
       await toggleEditing(harness, timeslot);
       expect(await harness.getDropTargetDayLabels()).toEqual([]);
 
-      startDraggingTimeslot(fixture, timeslot);
+      pickUpTimeslot(timeslot);
 
       expect(await harness.getDropTargetDayLabels()).toEqual(
         (await harness.getDayLabels()).filter(
@@ -407,25 +319,25 @@ describe('TimeslotPlannerComponent', () => {
     });
 
     it('should stop highlighting the days once the timeslot is dropped', async () => {
-      const { fixture, harness, created } = await setup([
+      const { dragTimeslotToDay, harness, created } = await setup([
         createTimeslotDraft(),
       ]);
       const [timeslot] = created;
 
       await toggleEditing(harness, timeslot);
-      await dragTimeslotToDay(fixture, timeslot, OTHER_UNSEEDED_DAY);
+      await dragTimeslotToDay(timeslot, OTHER_UNSEEDED_DAY);
 
       expect(await harness.getDropTargetDayLabels()).toEqual([]);
     });
 
     it('should move the timeslot to the day it is dropped on', async () => {
-      const { fixture, harness, created } = await setup([
+      const { dragTimeslotToDay, harness, created } = await setup([
         createTimeslotDraft(),
       ]);
       const [timeslot] = created;
 
       await toggleEditing(harness, timeslot);
-      await dragTimeslotToDay(fixture, timeslot, OTHER_UNSEEDED_DAY);
+      await dragTimeslotToDay(timeslot, OTHER_UNSEEDED_DAY);
 
       expect(
         await harness.getTimeRanges(DAY_LABELS[OTHER_UNSEEDED_DAY]),
@@ -434,13 +346,12 @@ describe('TimeslotPlannerComponent', () => {
     });
 
     it('should keep the time of the timeslot when moving it', async () => {
-      const { fixture, harness, created, getServiceTimeslots } = await setup([
-        createTimeslotDraft(),
-      ]);
+      const { dragTimeslotToDay, harness, created, getServiceTimeslots } =
+        await setup([createTimeslotDraft()]);
       const [timeslot] = created;
 
       await toggleEditing(harness, timeslot);
-      await dragTimeslotToDay(fixture, timeslot, SUNDAY);
+      await dragTimeslotToDay(timeslot, SUNDAY);
 
       expect(await harness.getTimeRanges(DAY_LABELS[SUNDAY])).toEqual([
         formatTimeRange(timeslot),
@@ -452,13 +363,13 @@ describe('TimeslotPlannerComponent', () => {
     });
 
     it('should leave the timeslot where it is when dropped on its own day', async () => {
-      const { fixture, harness, created } = await setup([
+      const { dragTimeslotToDay, harness, created } = await setup([
         createTimeslotDraft(),
       ]);
       const [timeslot] = created;
 
       await toggleEditing(harness, timeslot);
-      await dragTimeslotToDay(fixture, timeslot, timeslot.dayOfWeek);
+      await dragTimeslotToDay(timeslot, timeslot.dayOfWeek);
 
       expect(await harness.getTimeRanges(DAY_LABELS[UNSEEDED_DAY])).toEqual([
         formatTimeRange(timeslot),
