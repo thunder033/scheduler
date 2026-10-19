@@ -15,12 +15,14 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { ShowOnDirtyErrorStateMatcher } from '@angular/material/core';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { Store } from '@ngxs/store';
 import { Timeslot } from '@org/models';
 import {
   CreateTimeslot,
+  DeleteTimeslot,
   NEW_TIMESLOT,
   PlanningState,
   StartEditingTimeslot,
@@ -28,6 +30,12 @@ import {
   UpdateTimeslot,
   UpdateEditingTimeslot,
 } from '@org/scheduler-ui/state';
+
+import {
+  DeleteTimeslotDialogComponent,
+  DeleteTimeslotDialogData,
+} from '../delete-timeslot-dialog/delete-timeslot-dialog.component';
+import { filter, switchMap } from 'rxjs';
 
 const TIME_RANGE_SEPARATOR = ' – ';
 const TIME_RANGE_ERROR_KIND = 'timeRange';
@@ -41,6 +49,7 @@ const HANDLE_WIPE_IN_CLASS = 'handle-wipe-in';
 const TIMESLOT_CARD_ID_PREFIX = 'timeslot-card-';
 export const NEW_TIMESLOT_LABEL = 'New timeslot';
 export const EDIT_TIMESLOT_LABEL = 'Edit timeslot';
+export const DELETE_TIMESLOT_LABEL = 'Delete timeslot';
 export const REQUIRED_TIME_MESSAGE = 'Required';
 export const INVALID_TIME_RANGE_MESSAGE = 'Start must be before end';
 
@@ -110,10 +119,12 @@ function playAnimation(
 })
 export class TimeslotCardComponent {
   private readonly store = inject(Store);
+  private readonly dialog = inject(MatDialog);
 
   readonly timeslot = input.required<Timeslot>();
 
   protected readonly editLabel = EDIT_TIMESLOT_LABEL;
+  protected readonly deleteLabel = DELETE_TIMESLOT_LABEL;
   /** Only flags a time once the user has changed it, so untouched fields stay calm */
   protected readonly errorMatcher = new ShowOnDirtyErrorStateMatcher();
   protected readonly isNew = computed(
@@ -229,6 +240,21 @@ export class TimeslotCardComponent {
     } else {
       event.animationComplete();
     }
+  }
+
+  /** Deletes the timeslot once the user confirms it, since that can't be undone */
+  protected confirmDelete(): void {
+    this.dialog
+      .open<DeleteTimeslotDialogComponent, DeleteTimeslotDialogData, boolean>(
+        DeleteTimeslotDialogComponent,
+        { data: { timeRange: this.timeRange() } },
+      )
+      .afterClosed()
+      .pipe(
+        filter((confirmed) => !!confirmed),
+        switchMap(() => this.store.dispatch(new DeleteTimeslot(this.timeslot().timeslotId))),
+      )
+      .subscribe({ error: undefined }); // error reported by planning feedback
   }
 
   protected save(): void {

@@ -72,11 +72,24 @@
               />
               <mat-error>{{ timesForm.end().errors()[0]?.message }}</mat-error>
             </mat-form-field>
-            <div class="flex basis-full justify-end">
+            <div class="flex basis-full items-center justify-between">
+              @if (!isNew()) {
+                <button
+                  mat-icon-button
+                  type="button"
+                  qa-delete
+                  class="-ms-2"
+                  [attr.aria-label]="deleteLabel"
+                  (click)="confirmDelete()"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              }
               <button
                 mat-flat-button
                 type="button"
                 qa-save
+                class="ms-auto"
                 [disabled]="!canSave()"
                 (click)="save()"
               >

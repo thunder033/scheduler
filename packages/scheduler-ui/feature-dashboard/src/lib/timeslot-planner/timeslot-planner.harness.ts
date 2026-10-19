@@ -112,6 +112,15 @@ export class TimeslotPlannerDayHarness extends ComponentHarness {
     }
   }
 
+  async delete(timeRange: string): Promise<void> {
+    for (const card of await this.cards()) {
+      if ((await card.getTimeRange()) === timeRange) {
+        await card.requestDelete();
+        return card.confirmDelete();
+      }
+    }
+  }
+
   async canSave(timeRange: string): Promise<boolean> {
     for (const card of await this.cards()) {
       if ((await card.getTimeRange()) === timeRange) {
@@ -251,6 +260,15 @@ export class TimeslotPlannerHarness extends ComponentHarness {
       }
     }
     return [];
+  }
+
+  /** Deletes the timeslot with the time range listed under the day, confirming the deletion */
+  async deleteTimeslot(dayLabel: string, timeRange: string): Promise<void> {
+    for (const day of await this.days()) {
+      if ((await day.getLabel()) === dayLabel) {
+        return day.delete(timeRange);
+      }
+    }
   }
 
   /** Whether the timeslot with the time range listed under the day can be saved */

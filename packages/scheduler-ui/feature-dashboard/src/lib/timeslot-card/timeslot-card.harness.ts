@@ -6,6 +6,7 @@ import {
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
+import { DeleteTimeslotDialogHarness } from '../delete-timeslot-dialog/delete-timeslot-dialog.harness';
 import { qaSelector } from '../../test-utils/qa-selector';
 import {
   EDITOR_COLLAPSE_CLASS,
@@ -19,6 +20,7 @@ const DRAG_HANDLE_SELECTOR = qaSelector('drag-handle');
 const TIME_RANGE_SELECTOR = qaSelector('time-range');
 const EDIT_TOGGLE_SELECTOR = qaSelector('edit-toggle');
 const SAVE_SELECTOR = qaSelector('save');
+const DELETE_SELECTOR = qaSelector('delete');
 const START_TIME_SELECTOR = qaSelector('start-time');
 const END_TIME_SELECTOR = qaSelector('end-time');
 
@@ -49,6 +51,14 @@ export class TimeslotCardHarness extends ComponentHarness {
   private readonly saveControl = this.locatorFor(
     MatButtonHarness.with({ selector: SAVE_SELECTOR }),
   );
+  private readonly optionalDeleteControl = this.locatorForOptional(
+    MatButtonHarness.with({ selector: DELETE_SELECTOR }),
+  );
+  /** The confirmation is shown in an overlay, outside of the card */
+  private readonly optionalDeleteConfirmation =
+    this.documentRootLocatorFactory().locatorForOptional(
+      DeleteTimeslotDialogHarness,
+    );
   private readonly startField = this.locatorFor(
     MatFormFieldHarness.with({ selector: START_TIME_SELECTOR }),
   );
@@ -109,6 +119,28 @@ export class TimeslotCardHarness extends ComponentHarness {
   async save(): Promise<void> {
     const saveControl = await this.saveControl();
     await saveControl.click();
+  }
+
+  /** Whether the timeslot can be deleted, which is not so for one that is not created yet */
+  async canDelete(): Promise<boolean> {
+    return (await this.optionalDeleteControl()) !== null;
+  }
+
+  /** Asks to delete the timeslot, which has to be confirmed */
+  async requestDelete(): Promise<void> {
+    await (await this.optionalDeleteControl())?.click();
+  }
+
+  async isConfirmingDelete(): Promise<boolean> {
+    return (await this.optionalDeleteConfirmation()) !== null;
+  }
+
+  async confirmDelete(): Promise<void> {
+    await (await this.optionalDeleteConfirmation())?.confirm();
+  }
+
+  async cancelDelete(): Promise<void> {
+    await (await this.optionalDeleteConfirmation())?.cancel();
   }
 
   async canSave(): Promise<boolean> {

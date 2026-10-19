@@ -5,6 +5,7 @@ import { Timeslot } from '@org/models';
 import { TimeslotDraft } from '@org/scheduler-ui/data';
 import {
   CreateTimeslot,
+  NEW_TIMESLOT,
   PlanningState,
   StartEditingTimeslot,
 } from '@org/scheduler-ui/state';
@@ -422,6 +423,60 @@ describe('TimeslotCardComponent', () => {
         expect(await harness.getStartTime()).toBe(timeslot.start);
         expect(await harness.hasStartTimeError()).toBe(false);
       });
+    });
+  });
+
+  describe('deleting the timeslot', () => {
+    it('should only offer to delete while editing', async () => {
+      const { harness } = await setup({ alreadyEditing: true });
+      expect(await harness.canDelete()).toBe(true);
+
+      await harness.toggleEditing();
+
+      expect(await harness.canDelete()).toBe(false);
+    });
+
+    it('should not offer to delete a timeslot that is not created yet', async () => {
+      const { store, createCard } = await setup();
+      await firstValueFrom(
+        store.dispatch(new StartEditingTimeslot(NEW_TIMESLOT.timeslotId)),
+      );
+      const { harness } = await createCard(NEW_TIMESLOT);
+
+      expect(await harness.isEditing()).toBe(true);
+      expect(await harness.canDelete()).toBe(false);
+    });
+
+    it('should ask for confirmation without deleting the timeslot', async () => {
+      const { harness, store } = await setup({ alreadyEditing: true });
+
+      await harness.requestDelete();
+
+      expect(await harness.isConfirmingDelete()).toBe(true);
+      expect(store.selectSnapshot(PlanningState.timeslots)).toHaveLength(1);
+    });
+
+    it('should delete the timeslot once it is confirmed', async () => {
+      const { harness, store } = await setup({ alreadyEditing: true });
+      await harness.requestDelete();
+
+      await harness.confirmDelete();
+
+      expect(await harness.isConfirmingDelete()).toBe(false);
+      expect(store.selectSnapshot(PlanningState.timeslots)).toEqual([]);
+    });
+
+    it('should keep the timeslot when the deletion is cancelled', async () => {
+      const { harness, store, timeslot } = await setup({
+        alreadyEditing: true,
+      });
+      await harness.requestDelete();
+
+      await harness.cancelDelete();
+
+      expect(await harness.isConfirmingDelete()).toBe(false);
+      expect(store.selectSnapshot(PlanningState.timeslots)).toEqual([timeslot]);
+      expect(await harness.isEditing()).toBe(true);
     });
   });
 });

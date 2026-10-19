@@ -10,12 +10,10 @@ import { provideTestState } from '../../test-utils/provide-test-state';
 import {
   formatTimeRange,
   NEW_TIMESLOT_LABEL,
-  timeslotCardId,
 } from '../timeslot-card/timeslot-card.component';
 import { CARD_HEADER_SELECTOR } from '../timeslot-card/timeslot-card.harness';
 import {
   DAY_LABELS,
-  dayElementId,
   TimeslotPlannerComponent,
 } from './timeslot-planner.component';
 import { TimeslotPlannerHarness } from './timeslot-planner.harness';
@@ -572,6 +570,26 @@ describe('TimeslotPlannerComponent', () => {
           formatTimeRange(timeslot),
         ),
       ).toBe(false);
+    });
+  });
+
+  describe('deleting a timeslot', () => {
+    it('should remove the timeslot from its day and the service once it is deleted', async () => {
+      const { harness, created, getServiceTimeslots } = await setup([
+        createTimeslotDraft(),
+      ]);
+      const [timeslot] = created;
+      await toggleEditing(harness, timeslot);
+
+      await harness.deleteTimeslot(
+        DAY_LABELS[timeslot.dayOfWeek],
+        formatTimeRange(timeslot),
+      );
+
+      expect(
+        await harness.getTimeRanges(DAY_LABELS[timeslot.dayOfWeek]),
+      ).toEqual([]);
+      expect(await getServiceTimeslots()).not.toContainEqual(timeslot);
     });
   });
 });
