@@ -1,11 +1,10 @@
-import { Provider } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
 import { ContactMethod, User, UserRole } from '@org/models';
 import { SetCurrentUser } from '@org/scheduler-ui/state';
 import { provideTestState } from '../../test-utils/provide-test-state';
-import { DashboardComponent } from './dashboard.component';
+import { DashboardComponent, WELCOME_MESSAGE } from './dashboard.component';
 import { DashboardHarness } from './dashboard.harness';
 
 function createUser(overrides: Partial<User> = {}): User {
@@ -18,14 +17,10 @@ function createUser(overrides: Partial<User> = {}): User {
   };
 }
 
-interface SetupOptions {
-  providers?: Provider[];
-}
-
-async function setup({ providers = [] }: SetupOptions = {}) {
+async function setup() {
   await TestBed.configureTestingModule({
     imports: [DashboardComponent],
-    providers: [provideTestState(), ...providers],
+    providers: [provideTestState()],
   }).compileComponents();
 
   const fixture = TestBed.createComponent(DashboardComponent);
@@ -38,57 +33,20 @@ async function setup({ providers = [] }: SetupOptions = {}) {
 }
 
 describe('DashboardComponent', () => {
-  it('should render content', async () => {
-    const { harness } = await setup();
+  it('should welcome the user by name', async () => {
+    const { harness, store } = await setup();
+    const user = createUser();
 
-    expect(await harness.getText()).not.toBe('');
+    store.dispatch(new SetCurrentUser(user));
+
+    const message = await harness.getWelcomeMessage();
+    expect(message).toContain(WELCOME_MESSAGE);
+    expect(message).toContain(user.displayName);
   });
 
-  it('should render the header', async () => {
+  it('should welcome the user when there is no current user', async () => {
     const { harness } = await setup();
 
-    await expect(harness.header()).resolves.toBeDefined();
-  });
-
-  describe('timeslot planner', () => {
-    it('should render for a coordinator', async () => {
-      const { harness, store } = await setup();
-
-      store.dispatch(
-        new SetCurrentUser(createUser({ roles: [UserRole.Coordinator] })),
-      );
-
-      expect(await harness.hasTimeslotPlanner()).toBe(true);
-    });
-
-    it.each([UserRole.Member, UserRole.Prospect])(
-      'should not render for a %s',
-      async (role) => {
-        const { harness, store } = await setup();
-
-        store.dispatch(new SetCurrentUser(createUser({ roles: [role] })));
-
-        expect(await harness.hasTimeslotPlanner()).toBe(false);
-      },
-    );
-
-    it('should not render when there is no current user', async () => {
-      const { harness } = await setup();
-
-      expect(await harness.hasTimeslotPlanner()).toBe(false);
-    });
-
-    it('should stop rendering when the user is no longer a coordinator', async () => {
-      const { harness, store } = await setup();
-      store.dispatch(
-        new SetCurrentUser(createUser({ roles: [UserRole.Coordinator] })),
-      );
-
-      store.dispatch(
-        new SetCurrentUser(createUser({ roles: [UserRole.Member] })),
-      );
-
-      expect(await harness.hasTimeslotPlanner()).toBe(false);
-    });
+    expect(await harness.getWelcomeMessage()).toContain(WELCOME_MESSAGE);
   });
 });

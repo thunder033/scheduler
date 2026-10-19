@@ -1,22 +1,16 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { UserRole } from '@org/models';
 import { LocalUserState } from '@org/scheduler-ui/state';
-import { HeaderComponent } from '../header/header.component';
-import { PlanningFeedbackService } from '../planning-feedback/planning-feedback.service';
-import { TimeslotPlannerComponent } from '../timeslot-planner/timeslot-planner.component';
+
+export const WELCOME_MESSAGE = 'Welcome';
 
 @Component({
   selector: 'lib-dashboard',
-  imports: [HeaderComponent, TimeslotPlannerComponent],
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent {
-  protected readonly isCoordinator = inject(Store).selectSignal(
-    LocalUserState.hasRole(UserRole.Coordinator),
+  protected readonly welcome = WELCOME_MESSAGE;
+  protected readonly currentUser = inject(Store).selectSignal(
+    LocalUserState.currentUser,
   );
-
-  constructor() {
-    inject(PlanningFeedbackService);
-  }
 }

@@ -1,0 +1,51 @@
+<mat-sidenav-container class="h-full">
+  <mat-sidenav
+    [mode]="mode()"
+    [opened]="isOpen()"
+    (openedChange)="isOpen.set($event)"
+  >
+    <div class="flex h-full flex-col">
+      <header class="flex flex-col gap-2 p-4">
+        <span qa-title class="text-title-large">{{ title }}</span>
+        <lib-current-user-tile />
+      </header>
+
+      <mat-nav-list qa-navigation class="flex-auto">
+        @for (item of navItems(); track item.path) {
+          <a
+            mat-list-item
+            routerLinkActive
+            #link="routerLinkActive"
+            [routerLink]="item.path"
+            [routerLinkActiveOptions]="{ exact: true }"
+            [activated]="link.isActive"
+          >
+            <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+            <span matListItemTitle>{{ item.label }}</span>
+          </a>
+        }
+      </mat-nav-list>
+
+      <footer class="p-2">
+        <lib-theme-menu />
+      </footer>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    @if (!isDesktop()) {
+      <mat-toolbar>
+        <button
+          qa-navigation-toggle
+          mat-icon-button
+          [attr.aria-label]="toggleLabel"
+          (click)="toggle()"
+        >
+          <mat-icon>menu</mat-icon>
+        </button>
+        <span>{{ title }}</span>
+      </mat-toolbar>
+    }
+    <ng-content />
+  </mat-sidenav-content>
+</mat-sidenav-container>

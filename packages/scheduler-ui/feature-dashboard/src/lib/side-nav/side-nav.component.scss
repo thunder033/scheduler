@@ -1,0 +1,52 @@
+@use '@angular/material' as mat;
+
+// A tint of the text color, so the selected item keeps its contrast against the text in any theme
+$selected-item-background: color-mix(
+  in srgb,
+  var(--mat-sys-on-primary) 24%,
+  transparent
+);
+
+:host {
+  @include mat.toolbar-overrides(
+    (
+      container-background-color: var(--mat-sys-primary),
+      container-text-color: var(--mat-sys-on-primary),
+    )
+  );
+
+  @include mat.icon-button-overrides(
+    (
+      icon-color: var(--mat-sys-on-primary),
+      state-layer-color: var(--mat-sys-on-primary),
+    )
+  );
+}
+
+mat-sidenav {
+  @include mat.sidenav-overrides(
+    (
+      container-width: 16rem,
+      container-background-color: var(--mat-sys-primary),
+      container-text-color: var(--mat-sys-on-primary),
+      container-divider-color: transparent,
+      container-elevation-shadow: var(--mat-sys-level2),
+    )
+  );
+
+  @include mat.list-overrides(
+    (
+      list-item-label-text-color: var(--mat-sys-on-primary),
+      list-item-hover-label-text-color: var(--mat-sys-on-primary),
+      list-item-focus-label-text-color: var(--mat-sys-on-primary),
+      list-item-leading-icon-color: var(--mat-sys-on-primary),
+      list-item-hover-leading-icon-color: var(--mat-sys-on-primary),
+      list-item-hover-state-layer-color: var(--mat-sys-on-primary),
+      list-item-focus-state-layer-color: var(--mat-sys-on-primary),
+      active-indicator-color: $selected-item-background,
+    )
+  );
+
+  // Material only casts the shadow when the sidenav floats over the content
+  box-shadow: var(--mat-sys-level2);
+}

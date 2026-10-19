@@ -1,4 +1,6 @@
-<lib-header />
-@if (isCoordinator()) {
-  <lib-timeslot-planner />
-}
+<h2 qa-welcome class="title">
+  {{ welcome }}
+  @if (currentUser(); as user) {
+    , {{ user.displayName }}
+  }
+</h2>
