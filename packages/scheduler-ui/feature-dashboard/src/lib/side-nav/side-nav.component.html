@@ -1,13 +1,26 @@
 <mat-sidenav-container class="h-full">
   <mat-sidenav
+    [class.collapsed]="isCollapsed()"
     [mode]="mode()"
     [opened]="isOpen()"
     (openedChange)="isOpen.set($event)"
   >
-    <div class="flex h-full flex-col">
-      <header class="flex flex-col gap-2 p-4">
-        <span qa-title class="text-title-large">{{ title }}</span>
-        <lib-current-user-tile />
+    <div class="flex h-full flex-col overflow-hidden">
+      <header class="flex items-start justify-between gap-2 p-2">
+        <div class="hide-when-collapsed flex flex-col gap-2 p-2">
+          <span qa-title class="text-title-large">{{ title }}</span>
+          <lib-current-user-tile />
+        </div>
+        @if (isDesktop()) {
+          <button
+            qa-collapse-toggle
+            mat-icon-button
+            [attr.aria-label]="collapseLabel()"
+            (click)="toggleCollapsed()"
+          >
+            <mat-icon>{{ collapseIcon() }}</mat-icon>
+          </button>
+        }
       </header>
 
       <mat-nav-list qa-navigation class="flex-auto">
@@ -19,9 +32,15 @@
             [routerLink]="item.path"
             [routerLinkActiveOptions]="{ exact: true }"
             [activated]="link.isActive"
+            [attr.aria-label]="isCollapsed() ? item.label : null"
+            [matTooltip]="item.label"
+            [matTooltipDisabled]="!isCollapsed()"
+            matTooltipPosition="right"
           >
             <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-            <span matListItemTitle>{{ item.label }}</span>
+            <span matListItemTitle class="hide-when-collapsed">{{
+              item.label
+            }}</span>
           </a>
         }
       </mat-nav-list>

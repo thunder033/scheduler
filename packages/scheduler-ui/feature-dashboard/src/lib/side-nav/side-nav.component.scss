@@ -1,5 +1,17 @@
 @use '@angular/material' as mat;
 
+$expanded-width: 16rem;
+$collapsed-width: 4.5rem;
+// Puts the icon in the middle of the collapsed width, with the list item's own start space
+$collapsed-item-padding: 0.5rem;
+// Animation of the sidebar folding between its widths
+$collapse-duration: 200ms;
+$collapse-easing: cubic-bezier(0.2, 0, 0, 1);
+// Material's own animation of the sidebar sliding in and out over the view, which its
+// `transition` would otherwise replace
+$slide-duration: 400ms;
+$slide-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
+
 // A tint of the text color, so the selected item keeps its contrast against the text in any theme
 $selected-item-background: color-mix(
   in srgb,
@@ -26,7 +38,7 @@ $selected-item-background: color-mix(
 mat-sidenav {
   @include mat.sidenav-overrides(
     (
-      container-width: 16rem,
+      container-width: $expanded-width,
       container-background-color: var(--mat-sys-primary),
       container-text-color: var(--mat-sys-on-primary),
       container-divider-color: transparent,
@@ -47,6 +59,45 @@ mat-sidenav {
     )
   );
 
+  // Folded down to the icons: only they, the collapse control and the theme menu remain
+  &.collapsed {
+    @include mat.sidenav-overrides(
+      (
+        container-width: $collapsed-width,
+      )
+    );
+    @include mat.list-overrides(
+      (
+        list-item-leading-icon-end-space: 0,
+      )
+    );
+
+    a[mat-list-item] {
+      padding: 0 $collapsed-item-padding;
+    }
+
+    .hide-when-collapsed {
+      display: none;
+    }
+
+    header {
+      justify-content: center;
+    }
+
+    footer {
+      display: flex;
+      justify-content: center;
+    }
+  }
+
   // Material only casts the shadow when the sidenav floats over the content
   box-shadow: var(--mat-sys-level2);
+}
+
+// Material's `.mat-drawer-transition .mat-drawer` sets `transition` once it has rendered, which
+// takes precedence over a plain `mat-sidenav` selector
+.mat-drawer-transition mat-sidenav {
+  transition:
+    transform $slide-duration $slide-easing,
+    width $collapse-duration $collapse-easing;
 }

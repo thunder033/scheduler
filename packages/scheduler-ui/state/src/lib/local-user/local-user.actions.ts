@@ -12,3 +12,9 @@ export class SetCurrentUser {
 
   constructor(readonly user: User | null) {}
 }
+
+export class SetSideNavCollapsed {
+  static readonly type = '[Local User] Set Side Nav Collapsed';
+
+  constructor(readonly collapsed: boolean) {}
+}

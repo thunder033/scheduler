@@ -1,9 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { provideStore, Store } from '@ngxs/store';
 import { ContactMethod, User, UserRole } from '@org/models';
-import { SetCurrentUser, SetThemePreference } from './local-user.actions';
+import {
+  SetCurrentUser,
+  SetSideNavCollapsed,
+  SetThemePreference,
+} from './local-user.actions';
 import {
   THEME_COLOR_SCHEME_BY_PREFERENCE,
+  DEFAULT_SIDE_NAV_COLLAPSED,
   DEFAULT_THEME_PREFERENCE,
   THEME_PREFERENCES,
 } from './local-user.model';
@@ -55,6 +60,39 @@ describe('LocalUserState', () => {
         );
       },
     );
+  });
+
+  describe('side nav', () => {
+    it('should default to the default collapsed state', () => {
+      const { store } = setup();
+
+      expect(store.selectSnapshot(LocalUserState.sideNavCollapsed)).toBe(
+        DEFAULT_SIDE_NAV_COLLAPSED,
+      );
+    });
+
+    it.each([true, false])(
+      'should expose the collapsed state once set to %s',
+      (collapsed) => {
+        const { store } = setup();
+        store.dispatch(new SetSideNavCollapsed(!collapsed));
+
+        store.dispatch(new SetSideNavCollapsed(collapsed));
+
+        expect(store.selectSnapshot(LocalUserState.sideNavCollapsed)).toBe(
+          collapsed,
+        );
+      },
+    );
+
+    it('should not affect the theme preference', () => {
+      const { store } = setup();
+      store.dispatch(new SetThemePreference('dark'));
+
+      store.dispatch(new SetSideNavCollapsed(true));
+
+      expect(store.selectSnapshot(LocalUserState.themePreference)).toBe('dark');
+    });
   });
 
   describe('currentUser', () => {

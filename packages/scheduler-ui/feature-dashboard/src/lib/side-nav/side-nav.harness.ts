@@ -5,6 +5,9 @@ import { qaSelector } from '@org/scheduler-ui/test-utils';
 import { CurrentUserTileHarness } from '../current-user-tile/current-user-tile.harness';
 import { ThemeMenuHarness } from '../theme-menu/theme-menu.harness';
 
+const COLLAPSED_CLASS = 'collapsed';
+const MISSING_COLLAPSE_TOGGLE_MESSAGE =
+  'The sidebar can only be collapsed on wide screens';
 const MISSING_TOGGLE_MESSAGE =
   'The navigation toggle is only there on narrow screens';
 
@@ -18,6 +21,11 @@ export class SideNavHarness extends ComponentHarness {
   /** Only there on narrow screens */
   private readonly navigationToggle = this.locatorForOptional(
     qaSelector('navigation-toggle'),
+  );
+
+  /** Only there on wide screens */
+  private readonly collapseToggle = this.locatorForOptional(
+    qaSelector('collapse-toggle'),
   );
 
   /** The labels of the navigation items, in display order */
@@ -39,6 +47,20 @@ export class SideNavHarness extends ComponentHarness {
 
   async isOpen(): Promise<boolean> {
     return (await this.sidenav()).isOpen();
+  }
+
+  async isCollapsed(): Promise<boolean> {
+    return (await (await this.sidenav()).host()).hasClass(COLLAPSED_CLASS);
+  }
+
+  async hasCollapseToggle(): Promise<boolean> {
+    return (await this.collapseToggle()) !== null;
+  }
+
+  async toggleCollapsed(): Promise<void> {
+    const toggle = await this.collapseToggle();
+    assert(toggle, MISSING_COLLAPSE_TOGGLE_MESSAGE);
+    return toggle.click();
   }
 
   async hasNavigationToggle(): Promise<boolean> {

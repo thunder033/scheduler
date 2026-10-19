@@ -7,9 +7,14 @@ import {
   StateContext,
 } from '@ngxs/store';
 import { User, UserRole } from '@org/models';
-import { SetCurrentUser, SetThemePreference } from './local-user.actions';
+import {
+  SetCurrentUser,
+  SetSideNavCollapsed,
+  SetThemePreference,
+} from './local-user.actions';
 import {
   THEME_COLOR_SCHEME_BY_PREFERENCE,
+  DEFAULT_SIDE_NAV_COLLAPSED,
   DEFAULT_THEME_PREFERENCE,
   LOCAL_USER_STATE_NAME,
   ThemePreference,
@@ -18,7 +23,11 @@ import {
 
 @State<LocalUserStateModel>({
   name: LOCAL_USER_STATE_NAME,
-  defaults: { currentUser: null, themePreference: DEFAULT_THEME_PREFERENCE },
+  defaults: {
+    currentUser: null,
+    themePreference: DEFAULT_THEME_PREFERENCE,
+    sideNavCollapsed: DEFAULT_SIDE_NAV_COLLAPSED,
+  },
 })
 @Injectable()
 export class LocalUserState {
@@ -41,6 +50,11 @@ export class LocalUserState {
   }
 
   @Selector()
+  static sideNavCollapsed(state: LocalUserStateModel): boolean {
+    return state.sideNavCollapsed;
+  }
+
+  @Selector()
   static themeColorScheme(state: LocalUserStateModel): string {
     return THEME_COLOR_SCHEME_BY_PREFERENCE[state.themePreference];
   }
@@ -51,6 +65,14 @@ export class LocalUserState {
     { preference }: SetThemePreference,
   ): void {
     context.patchState({ themePreference: preference });
+  }
+
+  @Action(SetSideNavCollapsed)
+  setSideNavCollapsed(
+    context: StateContext<LocalUserStateModel>,
+    { collapsed }: SetSideNavCollapsed,
+  ): void {
+    context.patchState({ sideNavCollapsed: collapsed });
   }
 
   @Action(SetCurrentUser)

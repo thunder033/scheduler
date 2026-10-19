@@ -15,10 +15,11 @@ import {
   MatSidenavContent,
 } from '@angular/material/sidenav';
 import { MatToolbar } from '@angular/material/toolbar';
+import { MatTooltip } from '@angular/material/tooltip';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { UserRole } from '@org/models';
-import { LocalUserState } from '@org/scheduler-ui/state';
+import { LocalUserState, SetSideNavCollapsed } from '@org/scheduler-ui/state';
 import { map } from 'rxjs';
 import { CurrentUserTileComponent } from '../current-user-tile/current-user-tile.component';
 import {
@@ -30,6 +31,11 @@ import { ThemeMenuComponent } from '../theme-menu/theme-menu.component';
 
 export const SIDE_NAV_TITLE = 'Scheduler';
 export const SIDE_NAV_TOGGLE_LABEL = 'Toggle navigation';
+export const SIDE_NAV_COLLAPSE_LABEL = 'Collapse navigation';
+export const SIDE_NAV_EXPAND_LABEL = 'Expand navigation';
+
+const COLLAPSE_ICON = 'chevron_left';
+const EXPAND_ICON = 'chevron_right';
 
 export interface NavItem {
   label: string;
@@ -70,6 +76,7 @@ const SIDENAV_MODE_MOBILE = 'over';
     MatListItemTitle,
     MatIconButton,
     MatIcon,
+    MatTooltip,
     RouterLink,
     RouterLinkActive,
     CurrentUserTileComponent,
@@ -83,7 +90,8 @@ export class SideNavComponent {
   protected readonly title = SIDE_NAV_TITLE;
   protected readonly toggleLabel = SIDE_NAV_TOGGLE_LABEL;
 
-  private readonly currentUser = inject(Store).selectSignal(
+  private readonly store = inject(Store);
+  private readonly currentUser = this.store.selectSignal(
     LocalUserState.currentUser,
   );
   protected readonly navItems = computed(() => {
@@ -102,6 +110,24 @@ export class SideNavComponent {
   );
   /** Open by default on desktop, closed behind the hamburger menu on narrow screens */
   protected readonly isOpen = linkedSignal(() => this.isDesktop());
+
+  /** Whether the user folded the sidebar down to its icons; only applies on desktop */
+  private readonly collapsedByUser = this.store.selectSignal(
+    LocalUserState.sideNavCollapsed,
+  );
+  protected readonly isCollapsed = computed(
+    () => this.isDesktop() && this.collapsedByUser(),
+  );
+  protected readonly collapseLabel = computed(() =>
+    this.isCollapsed() ? SIDE_NAV_EXPAND_LABEL : SIDE_NAV_COLLAPSE_LABEL,
+  );
+  protected readonly collapseIcon = computed(() =>
+    this.isCollapsed() ? EXPAND_ICON : COLLAPSE_ICON,
+  );
+
+  protected toggleCollapsed(): void {
+    this.store.dispatch(new SetSideNavCollapsed(!this.collapsedByUser()));
+  }
 
   protected toggle(): void {
     this.isOpen.update((open) => !open);

@@ -13,6 +13,7 @@ export const STORAGE_NAMESPACE = 'scheduler-ui';
 
 export const PERSISTED_STATE_KEYS = [
   `${LOCAL_USER_STATE_NAME}.themePreference`,
+  `${LOCAL_USER_STATE_NAME}.sideNavCollapsed`,
 ];
 
 export function provideSchedulerUiState(): EnvironmentProviders {
