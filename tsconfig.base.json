@@ -31,6 +31,15 @@
       "@org/scheduler-ui/state": ["./packages/scheduler-ui/state/src/index.ts"],
       "@org/scheduler-ui/feature-auth": [
         "./packages/scheduler-ui/feature-auth/src/index.ts"
+      ],
+      "@org/scheduler-ui/feature-timeslots": [
+        "./packages/scheduler-ui/feature-timeslots/src/index.ts"
+      ],
+      "@org/scheduler-ui/feature-appointments": [
+        "./packages/scheduler-ui/feature-appointments/src/index.ts"
+      ],
+      "@org/scheduler-ui/test-utils": [
+        "./packages/scheduler-ui/test-utils/src/index.ts"
       ]
     }
   },

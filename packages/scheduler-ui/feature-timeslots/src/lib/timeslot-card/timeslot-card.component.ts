@@ -252,7 +252,9 @@ export class TimeslotCardComponent {
       .afterClosed()
       .pipe(
         filter((confirmed) => !!confirmed),
-        switchMap(() => this.store.dispatch(new DeleteTimeslot(this.timeslot().timeslotId))),
+        switchMap(() =>
+          this.store.dispatch(new DeleteTimeslot(this.timeslot().timeslotId)),
+        ),
       )
       .subscribe({ error: undefined }); // error reported by planning feedback
   }

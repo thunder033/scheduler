@@ -16,6 +16,7 @@ import {
   StartEditingTimeslot,
   UpdateEditingTimeslot,
 } from '@org/scheduler-ui/state';
+import { PlanningFeedbackService } from '../planning-feedback/planning-feedback.service';
 import { TimeslotCardComponent } from '../timeslot-card/timeslot-card.component';
 
 export const TIMESLOT_PLANNER_TITLE = 'Timeslot planner';
@@ -119,6 +120,7 @@ export class TimeslotPlannerComponent {
   protected readonly neverEnter = (): boolean => false;
 
   constructor() {
+    inject(PlanningFeedbackService);
     this.store.dispatch(new LoadTimeslots());
   }
 

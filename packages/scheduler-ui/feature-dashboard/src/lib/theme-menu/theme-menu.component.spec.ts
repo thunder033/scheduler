@@ -5,7 +5,7 @@ import {
   DEFAULT_THEME_PREFERENCE,
   LocalUserState,
 } from '@org/scheduler-ui/state';
-import { provideTestState } from '../../test-utils/provide-test-state';
+import { provideTestState } from '@org/scheduler-ui/test-utils';
 import {
   THEME_LABELS,
   THEME_OPTIONS,

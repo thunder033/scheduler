@@ -1,5 +1,5 @@
 import { ComponentHarness } from '@angular/cdk/testing';
-import { qaSelector } from '../../test-utils/qa-selector';
+import { qaSelector } from '@org/scheduler-ui/test-utils';
 
 export class DashboardHarness extends ComponentHarness {
   static hostSelector = 'lib-dashboard';

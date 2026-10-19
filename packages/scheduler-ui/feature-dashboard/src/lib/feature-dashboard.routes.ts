@@ -1,6 +1,4 @@
 import { Routes } from '@angular/router';
-import { AppointmentsComponent } from './appointments/appointments.component';
-import { coordinatorGuard } from './coordinator.guard';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import {
   APPOINTMENTS_PATH,
@@ -8,7 +6,6 @@ import {
   WELCOME_PATH,
 } from './feature-dashboard.paths';
 import { ShellComponent } from './shell/shell.component';
-import { TimeslotPlannerComponent } from './timeslot-planner/timeslot-planner.component';
 
 export const featureDashboardRoutes: Routes = [
   {
@@ -18,10 +15,18 @@ export const featureDashboardRoutes: Routes = [
       { path: WELCOME_PATH, component: DashboardComponent, pathMatch: 'full' },
       {
         path: TIMESLOTS_PATH,
-        component: TimeslotPlannerComponent,
-        canActivate: [coordinatorGuard],
+        loadChildren: () =>
+          import('@org/scheduler-ui/feature-timeslots').then(
+            (m) => m.featureTimeslotsRoutes,
+          ),
       },
-      { path: APPOINTMENTS_PATH, component: AppointmentsComponent },
+      {
+        path: APPOINTMENTS_PATH,
+        loadChildren: () =>
+          import('@org/scheduler-ui/feature-appointments').then(
+            (m) => m.featureAppointmentsRoutes,
+          ),
+      },
     ],
   },
 ];

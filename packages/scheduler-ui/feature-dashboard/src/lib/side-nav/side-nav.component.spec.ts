@@ -3,7 +3,7 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
 import { User, UserRole } from '@org/models';
 import { SetCurrentUser } from '@org/scheduler-ui/state';
-import { provideTestState } from '../../test-utils/provide-test-state';
+import { provideTestState } from '@org/scheduler-ui/test-utils';
 import { THEME_OPTIONS } from '../theme-menu/theme-menu.component';
 import {
   NAV_ITEMS,

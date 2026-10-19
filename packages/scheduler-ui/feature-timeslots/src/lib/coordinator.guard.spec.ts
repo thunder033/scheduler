@@ -8,7 +8,7 @@ import {
 import { Store } from '@ngxs/store';
 import { User, UserRole } from '@org/models';
 import { SetCurrentUser } from '@org/scheduler-ui/state';
-import { provideTestState } from '../test-utils/provide-test-state';
+import { provideTestState } from '@org/scheduler-ui/test-utils';
 import { coordinatorGuard, ROOT_URL } from './coordinator.guard';
 
 function setup(roles?: UserRole[]) {

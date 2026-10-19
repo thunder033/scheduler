@@ -1,6 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { PlanningFeedbackService } from '../planning-feedback/planning-feedback.service';
 import { SideNavComponent } from '../side-nav/side-nav.component';
 
 @Component({
@@ -8,8 +7,4 @@ import { SideNavComponent } from '../side-nav/side-nav.component';
   imports: [SideNavComponent, RouterOutlet],
   templateUrl: './shell.component.html',
 })
-export class ShellComponent {
-  constructor() {
-    inject(PlanningFeedbackService);
-  }
-}
+export class ShellComponent {}

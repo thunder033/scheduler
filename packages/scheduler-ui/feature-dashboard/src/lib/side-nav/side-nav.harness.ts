@@ -1,7 +1,7 @@
 import { ComponentHarness } from '@angular/cdk/testing';
 import { MatNavListItemHarness } from '@angular/material/list/testing';
 import { MatSidenavHarness } from '@angular/material/sidenav/testing';
-import { qaSelector } from '../../test-utils/qa-selector';
+import { qaSelector } from '@org/scheduler-ui/test-utils';
 import { CurrentUserTileHarness } from '../current-user-tile/current-user-tile.harness';
 import { ThemeMenuHarness } from '../theme-menu/theme-menu.harness';
 

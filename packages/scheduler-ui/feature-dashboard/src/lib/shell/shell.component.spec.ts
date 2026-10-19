@@ -1,22 +1,22 @@
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { Store } from '@ngxs/store';
 import { User, UserRole } from '@org/models';
 import { SetCurrentUser } from '@org/scheduler-ui/state';
-import { provideTestState } from '../../test-utils/provide-test-state';
-import { AppointmentsHarness } from '../appointments/appointments.harness';
+import { provideTestState } from '@org/scheduler-ui/test-utils';
 import { DashboardHarness } from '../dashboard/dashboard.harness';
-import { featureDashboardRoutes } from '../feature-dashboard.routes';
 import {
   APPOINTMENTS_PATH,
   TIMESLOTS_PATH,
   WELCOME_PATH,
 } from '../feature-dashboard.paths';
+import { featureDashboardRoutes } from '../feature-dashboard.routes';
 import { NAV_ITEMS } from '../side-nav/side-nav.component';
-import { TimeslotPlannerHarness } from '../timeslot-planner/timeslot-planner.harness';
 import { ShellHarness } from './shell.harness';
+
+const ROOT_URL = '/';
 
 function labelOf(path: string): string {
   const item = NAV_ITEMS.find((navItem) => navItem.path === path);
@@ -39,14 +39,17 @@ async function setup(roles: UserRole[] = [UserRole.Member]) {
 
   const routerHarness = await RouterTestingHarness.create();
   const loader = TestbedHarnessEnvironment.loader(routerHarness.fixture);
+  const router = TestBed.inject(Router);
 
   return {
-    routerHarness,
     loader,
+    router,
     shell: () => loader.getHarness(ShellHarness),
     navigate: async (url: string) => {
       await routerHarness.navigateByUrl(url);
     },
+    /** Lazy-loaded views take a moment to load */
+    settled: () => routerHarness.fixture.whenStable(),
   };
 }
 
@@ -60,37 +63,39 @@ describe('ShellComponent', () => {
     await expect(loader.getHarness(DashboardHarness)).resolves.toBeDefined();
   });
 
-  it('should show the appointments when the user navigates to them', async () => {
-    const { loader, navigate, shell } = await setup();
+  it('should take the user to the appointments from the navigation', async () => {
+    const { navigate, router, settled, shell } = await setup();
     await navigate(`/${WELCOME_PATH}`);
 
     await (
       await (await shell()).sideNav()
     ).navigateTo(labelOf(APPOINTMENTS_PATH));
+    await settled();
 
-    await expect(loader.getHarness(AppointmentsHarness)).resolves.toBeDefined();
+    expect(router.url).toBe(`/${APPOINTMENTS_PATH}`);
   });
 
-  describe('timeslot planner', () => {
-    it('should show when a coordinator navigates to it', async () => {
-      const { loader, navigate, shell } = await setup([UserRole.Coordinator]);
+  describe('timeslots', () => {
+    it('should take a coordinator there from the navigation', async () => {
+      const { navigate, router, settled, shell } = await setup([
+        UserRole.Coordinator,
+      ]);
       await navigate(`/${WELCOME_PATH}`);
 
       await (
         await (await shell()).sideNav()
       ).navigateTo(labelOf(TIMESLOTS_PATH));
+      await settled();
 
-      await expect(
-        loader.getHarness(TimeslotPlannerHarness),
-      ).resolves.toBeDefined();
+      expect(router.url).toBe(`/${TIMESLOTS_PATH}`);
     });
 
-    it('should not be reachable for a member, who is sent to the dashboard', async () => {
-      const { loader, navigate } = await setup([UserRole.Member]);
+    it('should send a member to the dashboard instead', async () => {
+      const { navigate, router } = await setup([UserRole.Member]);
 
       await navigate(`/${TIMESLOTS_PATH}`);
 
-      expect(await loader.hasHarness(TimeslotPlannerHarness)).toBe(false);
+      expect(router.url).toBe(ROOT_URL);
     });
   });
 });

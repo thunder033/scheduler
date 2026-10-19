@@ -10,8 +10,8 @@ import {
   StartEditingTimeslot,
 } from '@org/scheduler-ui/state';
 import { firstValueFrom } from 'rxjs';
-import { Animations, CommonTest } from '../../test-utils/common-test';
-import { provideTestState } from '../../test-utils/provide-test-state';
+import { Animations, CommonTest } from '@org/scheduler-ui/test-utils';
+import { provideTestState } from '@org/scheduler-ui/test-utils';
 import {
   TimeslotCardComponent,
   formatTimeRange,

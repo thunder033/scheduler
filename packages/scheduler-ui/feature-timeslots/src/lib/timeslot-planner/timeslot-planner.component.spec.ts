@@ -5,8 +5,8 @@ import { Timeslot } from '@org/models';
 import { TimeslotDraft, TimeslotService } from '@org/scheduler-ui/data';
 import { CreateTimeslot, NEW_TIMESLOT } from '@org/scheduler-ui/state';
 import { firstValueFrom } from 'rxjs';
-import { CommonTest } from '../../test-utils/common-test';
-import { provideTestState } from '../../test-utils/provide-test-state';
+import { CommonTest } from '@org/scheduler-ui/test-utils';
+import { provideTestState } from '@org/scheduler-ui/test-utils';
 import {
   formatTimeRange,
   NEW_TIMESLOT_LABEL,

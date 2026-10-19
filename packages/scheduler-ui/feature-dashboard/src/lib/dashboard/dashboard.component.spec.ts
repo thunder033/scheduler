@@ -3,7 +3,7 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
 import { ContactMethod, User, UserRole } from '@org/models';
 import { SetCurrentUser } from '@org/scheduler-ui/state';
-import { provideTestState } from '../../test-utils/provide-test-state';
+import { provideTestState } from '@org/scheduler-ui/test-utils';
 import { DashboardComponent, WELCOME_MESSAGE } from './dashboard.component';
 import { DashboardHarness } from './dashboard.harness';
 

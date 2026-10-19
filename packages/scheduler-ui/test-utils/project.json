@@ -1,0 +1,13 @@
+{
+  "name": "scheduler-ui-test-utils",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/scheduler-ui/test-utils/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["scope:scheduler-ui", "type:util"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

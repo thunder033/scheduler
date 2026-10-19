@@ -4,7 +4,7 @@ import {
   HarnessPredicate,
 } from '@angular/cdk/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
-import { qaSelector } from '../../test-utils/qa-selector';
+import { qaSelector } from '@org/scheduler-ui/test-utils';
 import {
   TimeslotCardHarness,
   TimeslotCardHarnessFilters,
