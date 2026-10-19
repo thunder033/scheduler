@@ -13,7 +13,6 @@ export class HeaderHarness extends ComponentHarness {
   private readonly title = this.locatorFor(TITLE_SELECTOR);
 
   async getTitle(): Promise<string> {
-    const title = await this.title();
-    return title.text();
+    return (await this.title()).text();
   }
 }

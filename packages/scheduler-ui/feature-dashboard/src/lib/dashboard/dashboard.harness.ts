@@ -6,22 +6,14 @@ export class DashboardHarness extends ComponentHarness {
   static hostSelector = 'lib-dashboard';
 
   header = this.locatorFor(HeaderHarness);
-  timeslotPlanner = this.locatorFor(TimeslotPlannerHarness);
-  private readonly optionalHeader = this.locatorForOptional(HeaderHarness);
-  private readonly optionalTimeslotPlanner = this.locatorForOptional(
-    TimeslotPlannerHarness,
-  );
+  /** Only there for a coordinator */
+  timeslotPlanner = this.locatorForOptional(TimeslotPlannerHarness);
 
   async getText(): Promise<string> {
-    const host = await this.host();
-    return host.text();
-  }
-
-  async hasHeader(): Promise<boolean> {
-    return (await this.optionalHeader()) !== null;
+    return (await this.host()).text();
   }
 
   async hasTimeslotPlanner(): Promise<boolean> {
-    return (await this.optionalTimeslotPlanner()) !== null;
+    return (await this.timeslotPlanner()) !== null;
   }
 }

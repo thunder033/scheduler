@@ -47,7 +47,7 @@ describe('DashboardComponent', () => {
   it('should render the header', async () => {
     const { harness } = await setup();
 
-    expect(await harness.hasHeader()).toBe(true);
+    await expect(harness.header()).resolves.toBeDefined();
   });
 
   describe('timeslot planner', () => {

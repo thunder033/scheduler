@@ -44,17 +44,6 @@ function getRanges(timeslots: Timeslot[], dayOfWeek: number): string[] {
 
 type Grip = 'header' | 'body';
 
-/** Puts the timeslot's card in edit mode, which is what allows it to be dragged */
-async function toggleEditing(
-  harness: TimeslotPlannerHarness,
-  timeslot: Timeslot,
-): Promise<void> {
-  await harness.toggleTimeslotEditing(
-    DAY_LABELS[timeslot.dayOfWeek],
-    formatTimeRange(timeslot),
-  );
-}
-
 interface SetupOptions {
   /** Runs the enter and leave animations, which TestBed disables unless asked */
   animated?: boolean;
@@ -86,7 +75,8 @@ async function setup(
 
   const dragAndDrop = CommonTest.withDragAndDrop(fixture);
   const getCard = ({ timeslotId }: Pick<Timeslot, 'timeslotId'>) =>
-    harness.getTimeslotCard(timeslotId);
+    harness.getTimeslotCard({ timeslotId });
+  const getDay = (dayOfWeek: number) => harness.getDay({ dayOfWeek });
   /** Only the card's header drags the card, so grabbing its body does nothing */
   const getGrip = (grip: Grip) =>
     grip === 'header' ? CARD_HEADER_SELECTOR : undefined;
@@ -96,6 +86,15 @@ async function setup(
     created,
     store: TestBed.inject(Store),
     getServiceTimeslots: () => firstValueFrom(timeslotService.getTimeslots()),
+    /** Time ranges of the timeslots listed under the day, in display order */
+    getTimeRanges: async (dayOfWeek: number) =>
+      (await getDay(dayOfWeek)).getTimeRanges(),
+    /** The card listed under the day with the time range, which is a label for a new timeslot */
+    getListedCard: async (dayOfWeek: number, timeRange: string) =>
+      (await getDay(dayOfWeek)).getTimeslotCard({ timeRange }),
+    /** Puts the timeslot's card in edit mode, which is what allows it to be dragged */
+    toggleEditing: async (timeslot: Timeslot) =>
+      (await getCard(timeslot)).toggleEditing(),
     /** Picks up the timeslot's card with the mouse and holds it, still within its own day */
     pickUpTimeslot: async (timeslot: Timeslot, grip: Grip = 'header') =>
       dragAndDrop.pickUp(await getCard(timeslot), { grip: getGrip(grip) }),
@@ -105,34 +104,30 @@ async function setup(
       }),
     /** Drags the card of the new timeslot with the mouse onto the column of the day */
     dragNewTimeslotToDay: async (dayOfWeek: number) =>
-      dragAndDrop.dragTo(
-        await getCard(NEW_TIMESLOT),
-        await harness.getDay(dayOfWeek),
-        { grip: CARD_HEADER_SELECTOR },
-      ),
+      dragAndDrop.dragTo(await getCard(NEW_TIMESLOT), await getDay(dayOfWeek), {
+        grip: CARD_HEADER_SELECTOR,
+      }),
     /** Drags the timeslot's card with the mouse onto the column of the day */
     dragTimeslotToDay: async (
       timeslot: Timeslot,
       dayOfWeek: number,
       grip: Grip = 'header',
     ) =>
-      dragAndDrop.dragTo(
-        await getCard(timeslot),
-        await harness.getDay(dayOfWeek),
-        { grip: getGrip(grip) },
-      ),
+      dragAndDrop.dragTo(await getCard(timeslot), await getDay(dayOfWeek), {
+        grip: getGrip(grip),
+      }),
   };
 }
 
 describe('TimeslotPlannerComponent', () => {
   it('should list every timeslot under the label of its day of week', async () => {
-    const { harness, getServiceTimeslots } = await setup([
+    const { getTimeRanges, getServiceTimeslots } = await setup([
       createTimeslotDraft(),
     ]);
     const timeslots = await getServiceTimeslots();
 
     for (const { dayOfWeek } of timeslots) {
-      expect(await harness.getTimeRanges(DAY_LABELS[dayOfWeek])).toEqual(
+      expect(await getTimeRanges(dayOfWeek)).toEqual(
         getRanges(timeslots, dayOfWeek),
       );
     }
@@ -150,31 +145,29 @@ describe('TimeslotPlannerComponent', () => {
   });
 
   it('should list days without timeslots as empty', async () => {
-    const { harness } = await setup();
+    const { getTimeRanges } = await setup();
 
-    expect(await harness.getTimeRanges(DAY_LABELS[OTHER_UNSEEDED_DAY])).toEqual(
-      [],
-    );
+    expect(await getTimeRanges(OTHER_UNSEEDED_DAY)).toEqual([]);
   });
 
   it('should order the timeslots within a day by start time', async () => {
     const later = createTimeslotDraft({ start: '15:00', end: '16:00' });
     const earlier = createTimeslotDraft({ start: '08:00', end: '09:00' });
-    const { harness } = await setup([later, earlier]);
+    const { getTimeRanges } = await setup([later, earlier]);
 
-    expect(await harness.getTimeRanges(DAY_LABELS[UNSEEDED_DAY])).toEqual([
+    expect(await getTimeRanges(UNSEEDED_DAY)).toEqual([
       formatTimeRange(earlier),
       formatTimeRange(later),
     ]);
   });
 
   it('should list timeslots created after it was rendered', async () => {
-    const { harness, store } = await setup();
+    const { getTimeRanges, store } = await setup();
     const draft = createTimeslotDraft();
 
     store.dispatch(new CreateTimeslot(draft));
 
-    expect(await harness.getTimeRanges(DAY_LABELS[draft.dayOfWeek])).toEqual([
+    expect(await getTimeRanges(draft.dayOfWeek)).toEqual([
       formatTimeRange(draft),
     ]);
   });
@@ -183,77 +176,71 @@ describe('TimeslotPlannerComponent', () => {
     it('should only let one timeslot be edited at a time', async () => {
       const first = createTimeslotDraft({ start: '08:00', end: '09:00' });
       const second = createTimeslotDraft({ start: '10:00', end: '11:00' });
-      const { harness, created } = await setup([first, second]);
+      const { getListedCard, toggleEditing, created } = await setup([
+        first,
+        second,
+      ]);
       const [firstTimeslot, secondTimeslot] = created;
-      await toggleEditing(harness, firstTimeslot);
+      await toggleEditing(firstTimeslot);
 
-      await toggleEditing(harness, secondTimeslot);
+      await toggleEditing(secondTimeslot);
 
-      expect(
-        await harness.isTimeslotEditing(
-          DAY_LABELS[firstTimeslot.dayOfWeek],
-          formatTimeRange(firstTimeslot),
-        ),
-      ).toBe(false);
-      expect(
-        await harness.isTimeslotEditing(
-          DAY_LABELS[secondTimeslot.dayOfWeek],
-          formatTimeRange(secondTimeslot),
-        ),
-      ).toBe(true);
+      const firstCard = await getListedCard(
+        firstTimeslot.dayOfWeek,
+        formatTimeRange(firstTimeslot),
+      );
+      const secondCard = await getListedCard(
+        secondTimeslot.dayOfWeek,
+        formatTimeRange(secondTimeslot),
+      );
+      expect(await firstCard.isEditing()).toBe(false);
+      expect(await secondCard.isEditing()).toBe(true);
     });
   });
 
   describe('dragging a timeslot to another day', () => {
     it('should not replay the editing animations for a timeslot that is moved', async () => {
-      const { dragTimeslotToDay, harness, created } = await setup(
-        [createTimeslotDraft()],
-        { animated: true },
-      );
+      const { dragTimeslotToDay, getListedCard, toggleEditing, created } =
+        await setup([createTimeslotDraft()], { animated: true });
       const [timeslot] = created;
-      await toggleEditing(harness, timeslot);
+      await toggleEditing(timeslot);
 
       await dragTimeslotToDay(timeslot, OTHER_UNSEEDED_DAY);
 
-      expect(
-        await harness.isTimeslotEditorAnimating(
-          DAY_LABELS[OTHER_UNSEEDED_DAY],
-          formatTimeRange(timeslot),
-        ),
-      ).toBe(false);
+      const card = await getListedCard(
+        OTHER_UNSEEDED_DAY,
+        formatTimeRange(timeslot),
+      );
+      expect(await card.isEditorAnimating()).toBe(false);
     });
 
     it('should keep the timeslot in edit mode after it is moved', async () => {
-      const { dragTimeslotToDay, harness, created } = await setup([
-        createTimeslotDraft(),
-      ]);
+      const { dragTimeslotToDay, getListedCard, toggleEditing, created } =
+        await setup([createTimeslotDraft()]);
       const [timeslot] = created;
-      await toggleEditing(harness, timeslot);
+      await toggleEditing(timeslot);
 
       await dragTimeslotToDay(timeslot, OTHER_UNSEEDED_DAY);
 
-      expect(
-        await harness.isTimeslotEditing(
-          DAY_LABELS[OTHER_UNSEEDED_DAY],
-          formatTimeRange(timeslot),
-        ),
-      ).toBe(true);
+      const card = await getListedCard(
+        OTHER_UNSEEDED_DAY,
+        formatTimeRange(timeslot),
+      );
+      expect(await card.isEditing()).toBe(true);
     });
 
     it('should not move a timeslot that is not being edited', async () => {
-      const { dragTimeslotToDay, harness, created } = await setup([
+      const { dragTimeslotToDay, getTimeRanges, created } = await setup([
         createTimeslotDraft(),
       ]);
       const [timeslot] = created;
 
       await dragTimeslotToDay(timeslot, OTHER_UNSEEDED_DAY);
 
-      expect(await harness.getTimeRanges(DAY_LABELS[UNSEEDED_DAY])).toEqual([
+      expect(await getTimeRanges(UNSEEDED_DAY)).toEqual([
         formatTimeRange(timeslot),
       ]);
-      expect(
-        await harness.getTimeRanges(DAY_LABELS[OTHER_UNSEEDED_DAY]),
-      ).toEqual([]);
+      expect(await getTimeRanges(OTHER_UNSEEDED_DAY)).toEqual([]);
     });
 
     it('should not highlight drop targets for a timeslot that is not being edited', async () => {
@@ -268,40 +255,38 @@ describe('TimeslotPlannerComponent', () => {
     });
 
     it('should only move a timeslot that is dragged by its header', async () => {
-      const { dragTimeslotToDay, harness, created } = await setup([
-        createTimeslotDraft(),
-      ]);
+      const { dragTimeslotToDay, getTimeRanges, toggleEditing, created } =
+        await setup([createTimeslotDraft()]);
       const [timeslot] = created;
-      await toggleEditing(harness, timeslot);
+      await toggleEditing(timeslot);
 
       await dragTimeslotToDay(timeslot, OTHER_UNSEEDED_DAY, 'body');
 
-      expect(await harness.getTimeRanges(DAY_LABELS[UNSEEDED_DAY])).toEqual([
+      expect(await getTimeRanges(UNSEEDED_DAY)).toEqual([
         formatTimeRange(timeslot),
       ]);
     });
 
     it('should not move a timeslot once it is no longer being edited', async () => {
-      const { dragTimeslotToDay, harness, created } = await setup([
-        createTimeslotDraft(),
-      ]);
+      const { dragTimeslotToDay, getTimeRanges, toggleEditing, created } =
+        await setup([createTimeslotDraft()]);
       const [timeslot] = created;
-      await toggleEditing(harness, timeslot);
-      await toggleEditing(harness, timeslot);
+      await toggleEditing(timeslot);
+      await toggleEditing(timeslot);
 
       await dragTimeslotToDay(timeslot, OTHER_UNSEEDED_DAY);
 
-      expect(await harness.getTimeRanges(DAY_LABELS[UNSEEDED_DAY])).toEqual([
+      expect(await getTimeRanges(UNSEEDED_DAY)).toEqual([
         formatTimeRange(timeslot),
       ]);
     });
 
     it('should highlight the other days as drop targets while dragging', async () => {
-      const { pickUpTimeslot, harness, created } = await setup([
+      const { pickUpTimeslot, toggleEditing, harness, created } = await setup([
         createTimeslotDraft(),
       ]);
       const [timeslot] = created;
-      await toggleEditing(harness, timeslot);
+      await toggleEditing(timeslot);
       expect(await harness.getDropTargetDayLabels()).toEqual([]);
 
       await pickUpTimeslot(timeslot);
@@ -314,93 +299,100 @@ describe('TimeslotPlannerComponent', () => {
     });
 
     it('should stop highlighting the days once the timeslot is dropped', async () => {
-      const { dragTimeslotToDay, harness, created } = await setup([
-        createTimeslotDraft(),
-      ]);
+      const { dragTimeslotToDay, toggleEditing, harness, created } =
+        await setup([createTimeslotDraft()]);
       const [timeslot] = created;
 
-      await toggleEditing(harness, timeslot);
+      await toggleEditing(timeslot);
       await dragTimeslotToDay(timeslot, OTHER_UNSEEDED_DAY);
 
       expect(await harness.getDropTargetDayLabels()).toEqual([]);
     });
 
     it('should move the timeslot to the day it is dropped on', async () => {
-      const { dragTimeslotToDay, harness, created } = await setup([
-        createTimeslotDraft(),
-      ]);
-      const [timeslot] = created;
-
-      await toggleEditing(harness, timeslot);
-      await dragTimeslotToDay(timeslot, OTHER_UNSEEDED_DAY);
-
-      expect(
-        await harness.getTimeRanges(DAY_LABELS[OTHER_UNSEEDED_DAY]),
-      ).toEqual([formatTimeRange(timeslot)]);
-      expect(await harness.getTimeRanges(DAY_LABELS[UNSEEDED_DAY])).toEqual([]);
-    });
-
-    it('should not save the new day until asked to', async () => {
-      const { dragTimeslotToDay, harness, created, getServiceTimeslots } =
+      const { dragTimeslotToDay, getTimeRanges, toggleEditing, created } =
         await setup([createTimeslotDraft()]);
       const [timeslot] = created;
 
-      await toggleEditing(harness, timeslot);
-      await dragTimeslotToDay(timeslot, SUNDAY);
+      await toggleEditing(timeslot);
+      await dragTimeslotToDay(timeslot, OTHER_UNSEEDED_DAY);
 
-      expect(await harness.getTimeRanges(DAY_LABELS[SUNDAY])).toEqual([
+      expect(await getTimeRanges(OTHER_UNSEEDED_DAY)).toEqual([
         formatTimeRange(timeslot),
       ]);
+      expect(await getTimeRanges(UNSEEDED_DAY)).toEqual([]);
+    });
+
+    it('should not save the new day until asked to', async () => {
+      const {
+        dragTimeslotToDay,
+        getTimeRanges,
+        toggleEditing,
+        created,
+        getServiceTimeslots,
+      } = await setup([createTimeslotDraft()]);
+      const [timeslot] = created;
+
+      await toggleEditing(timeslot);
+      await dragTimeslotToDay(timeslot, SUNDAY);
+
+      expect(await getTimeRanges(SUNDAY)).toEqual([formatTimeRange(timeslot)]);
       expect(await getServiceTimeslots()).toContainEqual(timeslot);
     });
 
     it('should save the new day and keep the time when asked to', async () => {
-      const { dragTimeslotToDay, harness, created, getServiceTimeslots } =
-        await setup([createTimeslotDraft()]);
+      const {
+        dragTimeslotToDay,
+        getListedCard,
+        getTimeRanges,
+        toggleEditing,
+        created,
+        getServiceTimeslots,
+      } = await setup([createTimeslotDraft()]);
       const [timeslot] = created;
-      await toggleEditing(harness, timeslot);
+      await toggleEditing(timeslot);
       await dragTimeslotToDay(timeslot, SUNDAY);
 
-      await harness.saveTimeslot(DAY_LABELS[SUNDAY], formatTimeRange(timeslot));
+      await (await getListedCard(SUNDAY, formatTimeRange(timeslot))).save();
 
       expect(await getServiceTimeslots()).toContainEqual({
         ...timeslot,
         dayOfWeek: SUNDAY,
       });
-      expect(await harness.getTimeRanges(DAY_LABELS[SUNDAY])).toEqual([
-        formatTimeRange(timeslot),
-      ]);
+      expect(await getTimeRanges(SUNDAY)).toEqual([formatTimeRange(timeslot)]);
     });
 
     it('should return the timeslot to its day when editing is closed without saving', async () => {
-      const { dragTimeslotToDay, harness, created } = await setup([
-        createTimeslotDraft(),
-      ]);
+      const {
+        dragTimeslotToDay,
+        getListedCard,
+        getTimeRanges,
+        toggleEditing,
+        created,
+      } = await setup([createTimeslotDraft()]);
       const [timeslot] = created;
-      await toggleEditing(harness, timeslot);
+      await toggleEditing(timeslot);
       await dragTimeslotToDay(timeslot, SUNDAY);
 
-      await harness.toggleTimeslotEditing(
-        DAY_LABELS[SUNDAY],
-        formatTimeRange(timeslot),
-      );
+      await (
+        await getListedCard(SUNDAY, formatTimeRange(timeslot))
+      ).toggleEditing();
 
-      expect(await harness.getTimeRanges(DAY_LABELS[UNSEEDED_DAY])).toEqual([
+      expect(await getTimeRanges(UNSEEDED_DAY)).toEqual([
         formatTimeRange(timeslot),
       ]);
-      expect(await harness.getTimeRanges(DAY_LABELS[SUNDAY])).toEqual([]);
+      expect(await getTimeRanges(SUNDAY)).toEqual([]);
     });
 
     it('should leave the timeslot where it is when dropped on its own day', async () => {
-      const { dragTimeslotToDay, harness, created } = await setup([
-        createTimeslotDraft(),
-      ]);
+      const { dragTimeslotToDay, getTimeRanges, toggleEditing, created } =
+        await setup([createTimeslotDraft()]);
       const [timeslot] = created;
 
-      await toggleEditing(harness, timeslot);
+      await toggleEditing(timeslot);
       await dragTimeslotToDay(timeslot, timeslot.dayOfWeek);
 
-      expect(await harness.getTimeRanges(DAY_LABELS[UNSEEDED_DAY])).toEqual([
+      expect(await getTimeRanges(UNSEEDED_DAY)).toEqual([
         formatTimeRange(timeslot),
       ]);
     });
@@ -421,10 +413,8 @@ describe('TimeslotPlannerComponent', () => {
       await harness.startCreatingTimeslot();
 
       expect(await harness.hasFloatingTimeslot()).toBe(true);
-      for (const label of await harness.getDayLabels()) {
-        expect(await harness.getTimeRanges(label)).not.toContain(
-          NEW_TIMESLOT_LABEL,
-        );
+      for (const day of await harness.getDays()) {
+        expect(await day.getTimeRanges()).not.toContain(NEW_TIMESLOT_LABEL);
       }
     });
 
@@ -440,86 +430,67 @@ describe('TimeslotPlannerComponent', () => {
     });
 
     it('should list the new timeslot under the day it is dragged to', async () => {
-      const { harness, dragNewTimeslotToDay } = await setup();
+      const { harness, getListedCard, getTimeRanges, dragNewTimeslotToDay } =
+        await setup();
       await harness.startCreatingTimeslot();
 
       await dragNewTimeslotToDay(OTHER_UNSEEDED_DAY);
 
       expect(await harness.hasFloatingTimeslot()).toBe(false);
-      expect(
-        await harness.getTimeRanges(DAY_LABELS[OTHER_UNSEEDED_DAY]),
-      ).toEqual([NEW_TIMESLOT_LABEL]);
-      expect(
-        await harness.isTimeslotEditing(
-          DAY_LABELS[OTHER_UNSEEDED_DAY],
-          NEW_TIMESLOT_LABEL,
-        ),
-      ).toBe(true);
+      expect(await getTimeRanges(OTHER_UNSEEDED_DAY)).toEqual([
+        NEW_TIMESLOT_LABEL,
+      ]);
+      const card = await getListedCard(OTHER_UNSEEDED_DAY, NEW_TIMESLOT_LABEL);
+      expect(await card.isEditing()).toBe(true);
     });
 
     it('should not allow saving while the new timeslot has no day', async () => {
       const { harness } = await setup();
-      await harness.startCreatingTimeslot();
+      const floatingTimeslot = await harness.startCreatingTimeslot();
 
-      await harness.setFloatingTimeslotTimes(NEW_TIMES);
+      await floatingTimeslot.setTimes(NEW_TIMES);
 
-      expect(await harness.canSaveFloatingTimeslot()).toBe(false);
+      expect(await floatingTimeslot.canSave()).toBe(false);
     });
 
     it('should not allow saving while the new timeslot has no times', async () => {
-      const { harness, dragNewTimeslotToDay } = await setup();
+      const { harness, getListedCard, dragNewTimeslotToDay } = await setup();
       await harness.startCreatingTimeslot();
 
       await dragNewTimeslotToDay(OTHER_UNSEEDED_DAY);
 
-      expect(
-        await harness.canSaveTimeslot(
-          DAY_LABELS[OTHER_UNSEEDED_DAY],
-          NEW_TIMESLOT_LABEL,
-        ),
-      ).toBe(false);
+      const card = await getListedCard(OTHER_UNSEEDED_DAY, NEW_TIMESLOT_LABEL);
+      expect(await card.canSave()).toBe(false);
     });
 
     it('should keep the times entered before the new timeslot is dragged to a day', async () => {
-      const { harness, dragNewTimeslotToDay } = await setup();
-      await harness.startCreatingTimeslot();
-      await harness.setFloatingTimeslotTimes(NEW_TIMES);
+      const { harness, getListedCard, dragNewTimeslotToDay } = await setup();
+      const floatingTimeslot = await harness.startCreatingTimeslot();
+      await floatingTimeslot.setTimes(NEW_TIMES);
 
       await dragNewTimeslotToDay(OTHER_UNSEEDED_DAY);
 
-      expect(
-        await harness.canSaveTimeslot(
-          DAY_LABELS[OTHER_UNSEEDED_DAY],
-          NEW_TIMESLOT_LABEL,
-        ),
-      ).toBe(true);
+      const card = await getListedCard(OTHER_UNSEEDED_DAY, NEW_TIMESLOT_LABEL);
+      expect(await card.canSave()).toBe(true);
     });
 
     it('should allow saving once the new timeslot has a day and times', async () => {
-      const { harness, dragNewTimeslotToDay } = await setup();
+      const { harness, getListedCard, dragNewTimeslotToDay } = await setup();
       await harness.startCreatingTimeslot();
       await dragNewTimeslotToDay(OTHER_UNSEEDED_DAY);
+      const card = await getListedCard(OTHER_UNSEEDED_DAY, NEW_TIMESLOT_LABEL);
 
-      await harness.setTimeslotTimes(
-        DAY_LABELS[OTHER_UNSEEDED_DAY],
-        NEW_TIMESLOT_LABEL,
-        NEW_TIMES,
-      );
+      await card.setTimes(NEW_TIMES);
 
-      expect(
-        await harness.canSaveTimeslot(
-          DAY_LABELS[OTHER_UNSEEDED_DAY],
-          NEW_TIMESLOT_LABEL,
-        ),
-      ).toBe(true);
+      expect(await card.canSave()).toBe(true);
     });
 
     it('should not create the timeslot until asked to', async () => {
       const { harness, dragNewTimeslotToDay, getServiceTimeslots } =
         await setup();
       const before = await getServiceTimeslots();
-      await harness.startCreatingTimeslot();
-      await harness.setFloatingTimeslotTimes(NEW_TIMES);
+      const floatingTimeslot = await harness.startCreatingTimeslot();
+      await floatingTimeslot.setTimes(NEW_TIMES);
 
       await dragNewTimeslotToDay(OTHER_UNSEEDED_DAY);
 
@@ -527,68 +498,74 @@ describe('TimeslotPlannerComponent', () => {
     });
 
     it('should create the timeslot on the day with the times when asked to', async () => {
-      const { harness, dragNewTimeslotToDay, getServiceTimeslots } =
-        await setup();
-      await harness.startCreatingTimeslot();
-      await harness.setFloatingTimeslotTimes(NEW_TIMES);
+      const {
+        harness,
+        getListedCard,
+        getTimeRanges,
+        dragNewTimeslotToDay,
+        getServiceTimeslots,
+      } = await setup();
+      const floatingTimeslot = await harness.startCreatingTimeslot();
+      await floatingTimeslot.setTimes(NEW_TIMES);
       await dragNewTimeslotToDay(OTHER_UNSEEDED_DAY);
 
-      await harness.saveTimeslot(
-        DAY_LABELS[OTHER_UNSEEDED_DAY],
-        NEW_TIMESLOT_LABEL,
-      );
+      await (
+        await getListedCard(OTHER_UNSEEDED_DAY, NEW_TIMESLOT_LABEL)
+      ).save();
 
       expect(await getServiceTimeslots()).toContainEqual({
         ...NEW_TIMES,
         dayOfWeek: OTHER_UNSEEDED_DAY,
         timeslotId: expect.any(String),
       });
-      expect(
-        await harness.getTimeRanges(DAY_LABELS[OTHER_UNSEEDED_DAY]),
-      ).toEqual([formatTimeRange(NEW_TIMES)]);
+      expect(await getTimeRanges(OTHER_UNSEEDED_DAY)).toEqual([
+        formatTimeRange(NEW_TIMES),
+      ]);
     });
 
     it('should stop showing the new timeslot when creating it is cancelled', async () => {
       const { harness } = await setup();
-      await harness.startCreatingTimeslot();
+      const floatingTimeslot = await harness.startCreatingTimeslot();
 
-      await harness.cancelFloatingTimeslot();
+      await floatingTimeslot.toggleEditing();
 
       expect(await harness.hasFloatingTimeslot()).toBe(false);
     });
 
     it('should stop editing another timeslot when a new one is started', async () => {
-      const { harness, created } = await setup([createTimeslotDraft()]);
+      const { harness, getListedCard, toggleEditing, created } = await setup([
+        createTimeslotDraft(),
+      ]);
       const [timeslot] = created;
-      await toggleEditing(harness, timeslot);
+      await toggleEditing(timeslot);
 
       await harness.startCreatingTimeslot();
 
-      expect(
-        await harness.isTimeslotEditing(
-          DAY_LABELS[timeslot.dayOfWeek],
-          formatTimeRange(timeslot),
-        ),
-      ).toBe(false);
+      const card = await getListedCard(
+        timeslot.dayOfWeek,
+        formatTimeRange(timeslot),
+      );
+      expect(await card.isEditing()).toBe(false);
     });
   });
 
   describe('deleting a timeslot', () => {
     it('should remove the timeslot from its day and the service once it is deleted', async () => {
-      const { harness, created, getServiceTimeslots } = await setup([
-        createTimeslotDraft(),
-      ]);
+      const {
+        getListedCard,
+        getTimeRanges,
+        toggleEditing,
+        created,
+        getServiceTimeslots,
+      } = await setup([createTimeslotDraft()]);
       const [timeslot] = created;
-      await toggleEditing(harness, timeslot);
+      await toggleEditing(timeslot);
 
-      await harness.deleteTimeslot(
-        DAY_LABELS[timeslot.dayOfWeek],
-        formatTimeRange(timeslot),
-      );
+      await (
+        await getListedCard(timeslot.dayOfWeek, formatTimeRange(timeslot))
+      ).delete();
 
-      expect(
-        await harness.getTimeRanges(DAY_LABELS[timeslot.dayOfWeek]),
-      ).toEqual([]);
+      expect(await getTimeRanges(timeslot.dayOfWeek)).toEqual([]);
       expect(await getServiceTimeslots()).not.toContainEqual(timeslot);
     });
   });
