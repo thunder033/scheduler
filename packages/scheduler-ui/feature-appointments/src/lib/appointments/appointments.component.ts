@@ -9,6 +9,7 @@ import { AppointmentWeek } from '@org/scheduler-ui/data';
 import {
   LoadAppointmentsByWeek,
   LoadTimeslots,
+  LoadUsers,
   PlanningState,
 } from '@org/scheduler-ui/state';
 import {
@@ -110,6 +111,8 @@ export class AppointmentsComponent {
 
   constructor() {
     this.store.dispatch(new LoadTimeslots());
+    // The availability of the other members is shown with their names
+    this.store.dispatch(new LoadUsers());
     // Availability is added to the appointment of the viewed week, so these have to be known
     effect(() => this.store.dispatch(new LoadAppointmentsByWeek(this.week())));
   }

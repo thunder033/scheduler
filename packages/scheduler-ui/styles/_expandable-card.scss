@@ -2,6 +2,36 @@
 // together do so at the same pace. Components use the variables; the classes are in the global styles.
 $expand-duration: 200ms;
 $expand-easing: ease-in-out;
+$expanded-min-width: 15rem;
+$expanded-shadow: var(--mat-sys-level3);
+
+// For the styles of a card that widens when it is expanded, and lifts above the cards beside it.
+// `$card` is the element that widens, which is within the host, to at least `$min-width`. The host
+// centers it in its column, so it overflows evenly on both sides when it is wider. The shadow of
+// the card is its own to style.
+@mixin widening-card($card, $min-width: $expanded-min-width) {
+  :host {
+    display: flex;
+    justify-content: center;
+  }
+
+  #{$card} {
+    flex: 1 1 auto;
+    min-width: 0;
+    transition:
+      min-width $expand-duration $expand-easing,
+      box-shadow $expand-duration $expand-easing;
+  }
+
+  :host(.expanded) {
+    position: relative;
+    z-index: 1;
+
+    #{$card} {
+      min-width: $min-width;
+    }
+  }
+}
 
 // The content of a card grows and shrinks in height. Put `content-expander` on the content, with
 // `content-clip` inside it; the `content-expand` and `content-collapse` classes are added to the

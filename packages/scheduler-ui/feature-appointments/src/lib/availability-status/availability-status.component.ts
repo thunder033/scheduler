@@ -5,6 +5,7 @@ import { AvailabilityDotComponent } from '../availability-dot/availability-dot.c
 export const AVAILABILITY_STATUS_LABELS: Record<AvailabilityStatus, string> = {
   [AvailabilityStatus.Available]: 'Available',
   [AvailabilityStatus.IfNeeded]: 'If needed',
+  [AvailabilityStatus.Unavailable]: 'Unavailable',
 };
 
 /** An availability status as its label with the dot in its color, which is how it is shown everywhere */

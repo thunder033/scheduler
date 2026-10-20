@@ -1,43 +1,21 @@
 @use '@angular/material' as mat;
 @use '../../../../styles/expandable-card';
 
-$editing-min-width: 15rem;
-$editing-shadow: var(--mat-sys-level3);
-
 button.active {
   background-color: var(--mat-sys-secondary-container);
   color: var(--mat-sys-on-secondary-container);
 }
 
-// Centers the card in its column, so it overflows evenly on both sides when it is wider
-:host {
-  display: flex;
-  justify-content: center;
-}
-
-mat-card {
-  flex: 1 1 auto;
-  min-width: 0;
-  transition:
-    min-width expandable-card.$expand-duration expandable-card.$expand-easing,
-    box-shadow expandable-card.$expand-duration expandable-card.$expand-easing;
-}
-
 // While editing, the card widens and lifts above the neighboring cards. The content grows in height
 // as the card does in width (see the shared styles of the expandable cards), so both dimensions move together
-:host(.expanded) {
-  position: relative;
-  z-index: 1;
+@include expandable-card.widening-card(mat-card);
 
-  mat-card {
-    min-width: $editing-min-width;
-
-    @include mat.card-overrides(
-      (
-        outlined-container-elevation: $editing-shadow,
-      )
-    );
-  }
+:host(.expanded) mat-card {
+  @include mat.card-overrides(
+    (
+      outlined-container-elevation: expandable-card.$expanded-shadow,
+    )
+  );
 }
 
 // The drag handle is wiped in from its left edge, so the title slides over as it is revealed

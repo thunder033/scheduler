@@ -5,5 +5,6 @@ export * from './lib/local-user/local-user.state';
 export * from './lib/planning/planning.actions';
 export * from './lib/planning/planning.model';
 export * from './lib/planning/planning.state';
+export * from './lib/users/users.actions';
 export * from './lib/users/users.model';
 export * from './lib/users/users.state';

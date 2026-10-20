@@ -11,6 +11,7 @@ export const AVAILABILITY_STATUS_COLOR_CLASSES: Record<
 > = {
   [AvailabilityStatus.Available]: 'bg-availability-available',
   [AvailabilityStatus.IfNeeded]: 'bg-availability-if-needed',
+  [AvailabilityStatus.Unavailable]: 'bg-availability-unavailable',
 };
 
 /** A dot in the color of an availability status, which is always shown next to the status' label */

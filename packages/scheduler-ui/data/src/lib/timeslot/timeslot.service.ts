@@ -105,6 +105,7 @@ export function createSeedAppointments(now = new Date()): Appointment[] {
       ...thisWeek,
       availabilities: [
         { memberId: MEMBER.id, status: AvailabilityStatus.IfNeeded },
+        { memberId: COORDINATOR.id, status: AvailabilityStatus.Unavailable },
       ],
       confirmedUserIds: [],
       prospectId: PROSPECT.id,

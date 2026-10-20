@@ -20,6 +20,7 @@ import { OpenTimeslotCardHarness } from './open-timeslot-card.harness';
 
 /** A year long past, so its weeks have none of the appointments that are seeded around today */
 const PAST_YEAR = 2001;
+const AVAILABILITY_SELECT_MESSAGE = 'The availability options should be shown';
 
 function createWeek(overrides: Partial<AppointmentWeek> = {}): AppointmentWeek {
   return { year: PAST_YEAR, week: 43, ...overrides };
@@ -148,39 +149,6 @@ describe('OpenTimeslotCardComponent', () => {
     expect(await harness.hasAddAvailability()).toBe(false);
   });
 
-  it('should offer every availability status as an option', async () => {
-    const { harness } = await setup();
-    await harness.startAddingAvailability();
-
-    expect(await harness.getAvailabilityOptions()).toEqual(
-      Object.values(AvailabilityStatus).map(
-        (status) => AVAILABILITY_STATUS_LABELS[status],
-      ),
-    );
-  });
-
-  it('should show a dot for the status of each availability option', async () => {
-    const { harness } = await setup();
-    await harness.startAddingAvailability();
-
-    expect(await harness.getAvailabilityOptionStatuses()).toEqual(
-      Object.values(AvailabilityStatus),
-    );
-  });
-
-  it('should show the dot of the selected status in the select', async () => {
-    const { harness } = await setup();
-    await harness.startAddingAvailability();
-
-    await harness.selectAvailability(
-      AVAILABILITY_STATUS_LABELS[AvailabilityStatus.IfNeeded],
-    );
-
-    expect(await harness.getSelectedAvailabilityStatus()).toBe(
-      AvailabilityStatus.IfNeeded,
-    );
-  });
-
   it('should bring back the control to add availability after saving', async () => {
     const { harness } = await setup();
     await harness.startAddingAvailability();
@@ -193,7 +161,9 @@ describe('OpenTimeslotCardComponent', () => {
   it('should create the appointment for the timeslot in the week when there is none', async () => {
     const { harness, timeslot, week, user, getAppointments } = await setup();
     await harness.startAddingAvailability();
-    await harness.selectAvailability(
+    const select = await harness.availabilitySelect();
+    assert(select, AVAILABILITY_SELECT_MESSAGE);
+    await select.selectOption(
       AVAILABILITY_STATUS_LABELS[AvailabilityStatus.IfNeeded],
     );
 
@@ -249,7 +219,9 @@ describe('OpenTimeslotCardComponent', () => {
     await harness.startAddingAvailability();
     await harness.saveAvailability();
     await harness.startAddingAvailability();
-    await harness.selectAvailability(
+    const select = await harness.availabilitySelect();
+    assert(select, AVAILABILITY_SELECT_MESSAGE);
+    await select.selectOption(
       AVAILABILITY_STATUS_LABELS[AvailabilityStatus.IfNeeded],
     );
 

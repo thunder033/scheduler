@@ -3,8 +3,10 @@
 
 $available: light-dark(#2e7d32, #66bb6a);
 $if-needed: light-dark(#b8860b, #ffd54f);
+$unavailable: light-dark(#757575, #9e9e9e);
 
 @theme {
   --color-availability-available: #{$available};
   --color-availability-if-needed: #{$if-needed};
+  --color-availability-unavailable: #{$unavailable};
 }

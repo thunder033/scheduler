@@ -11,6 +11,7 @@ export interface Timeslot {
 export enum AvailabilityStatus {
   Available = 'available',
   IfNeeded = 'if-needed',
+  Unavailable = 'unavailable',
 }
 
 export interface Availability {

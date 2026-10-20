@@ -5,10 +5,15 @@ import { Store } from '@ngxs/store';
 import { AvailabilityStatus, User, UserRole } from '@org/models';
 import {
   AppointmentWeek,
+  SEED_USERS,
   TimeslotDraft,
   TimeslotService,
 } from '@org/scheduler-ui/data';
-import { PlanningState, SetCurrentUser } from '@org/scheduler-ui/state';
+import {
+  PlanningState,
+  SetCurrentUser,
+  UsersState,
+} from '@org/scheduler-ui/state';
 import { provideTestState } from '@org/scheduler-ui/test-utils';
 import {
   addWeeks,
@@ -311,7 +316,9 @@ describe('AppointmentsComponent', () => {
       timeRange: formatTimeRange(timeslot),
     });
     await openCard.startAddingAvailability();
-    await openCard.selectAvailability(
+    const select = await openCard.availabilitySelect();
+    assert(select, 'The availability options should be shown');
+    await select.selectOption(
       AVAILABILITY_STATUS_LABELS[AvailabilityStatus.IfNeeded],
     );
 
@@ -321,9 +328,50 @@ describe('AppointmentsComponent', () => {
     const [appointmentCard] = await day.getAppointmentCards({
       timeRange: formatTimeRange(timeslot),
     });
-    const availability = await appointmentCard.availabilityStatus();
-    assert(availability, 'The availability should be shown');
-    expect(await availability.getStatus()).toBe(AvailabilityStatus.IfNeeded);
+    const availability = await appointmentCard.availabilitySelect();
+    expect(await availability.getSelectedStatus()).toBe(
+      AvailabilityStatus.IfNeeded,
+    );
+  });
+
+  it('should load the users, to name the members whose availability is shown', async () => {
+    const { harness } = await setup();
+
+    await harness.getWeekTitle();
+
+    expect(
+      Object.keys(TestBed.inject(Store).selectSnapshot(UsersState.usersById)),
+    ).toEqual(SEED_USERS.map(({ id }) => id));
+  });
+
+  it('should save a status chosen on the appointment, and show it on the appointment', async () => {
+    const { harness, timeslot, signIn, getLoadedAppointments } = await setup();
+    const week = toWeek(DEFAULT_TODAY);
+    const user = createUser();
+    await signIn(user);
+    const day = (await harness.getDays())[timeslot.dayOfWeek - 1];
+    const [openCard] = await day.getOpenTimeslotCards({
+      timeRange: formatTimeRange(timeslot),
+    });
+    await openCard.startAddingAvailability();
+    await openCard.saveAvailability();
+    const [appointmentCard] = await day.getAppointmentCards({
+      timeRange: formatTimeRange(timeslot),
+    });
+    const availability = await appointmentCard.availabilitySelect();
+
+    await availability.selectOption(
+      AVAILABILITY_STATUS_LABELS[AvailabilityStatus.Unavailable],
+    );
+
+    expect(await availability.getSelectedStatus()).toBe(
+      AvailabilityStatus.Unavailable,
+    );
+    expect(
+      getLoadedAppointments(week).flatMap(({ availabilities }) =>
+        availabilities.filter(({ memberId }) => memberId === user.id),
+      ),
+    ).toEqual([{ memberId: user.id, status: AvailabilityStatus.Unavailable }]);
   });
 
   it('should return to the same week after navigating forward and back', async () => {

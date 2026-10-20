@@ -1,6 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { provideStore, Store } from '@ngxs/store';
 import { ContactMethod, User, UserRole } from '@org/models';
+import { UserService } from '@org/scheduler-ui/data';
+import { firstValueFrom } from 'rxjs';
+import { LoadUsers } from './users.actions';
 import { USERS_STATE_NAME } from './users.model';
 import { UsersState } from './users.state';
 
@@ -32,6 +35,55 @@ function setup(users: User[] = []) {
 }
 
 describe('UsersState', () => {
+  describe('LoadUsers', () => {
+    it('should load the users of the service', async () => {
+      const { store } = setup();
+      const created = await firstValueFrom(
+        TestBed.inject(UserService).createUser({
+          displayName: 'Created User',
+          contact: [],
+          roles: [UserRole.Member],
+        }),
+      );
+      const serviceUsers = await firstValueFrom(
+        TestBed.inject(UserService).getUsers(),
+      );
+
+      await firstValueFrom(store.dispatch(new LoadUsers()));
+
+      expect(store.selectSnapshot(UsersState.usersById)).toEqual(
+        Object.fromEntries(serviceUsers.map((user) => [user.id, user])),
+      );
+      expect(store.selectSnapshot(UsersState.userById(created.id))).toEqual(
+        created,
+      );
+    });
+
+    it('should replace the users that were loaded before', async () => {
+      const stale = createUser({ id: 'stale-user' });
+      const { store } = setup([stale]);
+
+      await firstValueFrom(store.dispatch(new LoadUsers()));
+
+      expect(store.selectSnapshot(UsersState.userById(stale.id))).toBeNull();
+    });
+  });
+
+  describe('usersById', () => {
+    it('should select the users by their ids', () => {
+      const users = [
+        createUser({ id: 'user-1' }),
+        createUser({ id: 'user-2' }),
+      ];
+      const { store } = setup(users);
+
+      expect(store.selectSnapshot(UsersState.usersById)).toEqual({
+        'user-1': users[0],
+        'user-2': users[1],
+      });
+    });
+  });
+
   describe('userById', () => {
     it('should select the user with the given id', () => {
       const user = createUser({ id: 'user-1' });

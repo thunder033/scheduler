@@ -1,33 +1,34 @@
-<div class="flex flex-col items-center gap-2">
-  <span qa-time-range class="font-bold">{{ timeRange() }}</span>
-  @if (status(); as status) {
-    <div class="flex items-center gap-2">
-      <lib-availability-status [status]="status" />
+<div
+  class="card flex flex-col items-start gap-2 rounded-lg border-1 border-solid border-outline-variant p-2 bg-surface"
+>
+  <header class="flex w-full justify-between p-1 pr-0">
+    <span qa-time-range class="font-bold">{{ timeRange() }}</span>
+
+    @if (isCoordinator()) {
       <button
         mat-icon-button
         type="button"
-        qa-edit-availability
+        qa-edit-appointment
+        class="-my-2 -ms-2"
         [class.active]="expanded()"
-        [attr.aria-label]="editAvailabilityLabel"
+        [attr.aria-label]="editLabel"
         [attr.aria-pressed]="expanded()"
         (click)="toggleEditing()"
       >
         <mat-icon>edit</mat-icon>
       </button>
-    </div>
-  } @else {
-    <button
-      mat-flat-button
-      type="button"
-      qa-add-availability
-      [attr.aria-pressed]="expanded()"
-      (click)="toggleEditing()"
-    >
-      {{ addAvailabilityLabel }}
-    </button>
-  }
+    }
+  </header>
+  <lib-availability-select
+    class="w-full"
+    [compact]="true"
+    [value]="chosen()"
+    [placeholder]="placeholder"
+    [disabled]="!canChange()"
+    (valueChange)="choose($event)"
+  />
   @if (expanded()) {
-    <!-- The availability is changed here, which is yet to be built -->
+    <!-- What a coordinator edits is yet to be built -->
     <div
       class="content-expander w-full"
       qa-expandable-content
@@ -36,5 +37,20 @@
     >
       <div class="content-clip"></div>
     </div>
+  }
+  @if (others().length) {
+    <ul
+      qa-other-availabilities
+      class="m-0 flex w-full list-none flex-col gap-1 p-0"
+    >
+      @for (other of others(); track other.memberId) {
+        <li>
+          <lib-member-availability
+            [name]="other.name"
+            [status]="other.status"
+          />
+        </li>
+      }
+    </ul>
   }
 </div>

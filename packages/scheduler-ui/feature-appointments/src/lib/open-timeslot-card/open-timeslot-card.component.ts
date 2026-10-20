@@ -1,12 +1,6 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
-import {
-  MatOption,
-  MatSelect,
-  MatSelectTrigger,
-} from '@angular/material/select';
 import { Store } from '@ngxs/store';
 import { Appointment, AvailabilityStatus, Timeslot } from '@org/models';
 import { AppointmentWeek } from '@org/scheduler-ui/data';
@@ -17,16 +11,17 @@ import {
   SetAvailability,
 } from '@org/scheduler-ui/state';
 import { firstValueFrom } from 'rxjs';
-import { AvailabilityStatusComponent } from '../availability-status/availability-status.component';
+import {
+  AvailabilitySelectComponent,
+  DEFAULT_AVAILABILITY_STATUS,
+} from '../availability-select/availability-select.component';
 
 export const ADD_AVAILABILITY_LABEL = 'Add availability';
-export const AVAILABILITY_LABEL = 'Availability';
 export const SAVE_AVAILABILITY_LABEL = 'Save';
 const APPOINTMENT_NOT_CREATED_MESSAGE =
   'The appointment was not found after creating it';
 
 const TIME_RANGE_SEPARATOR = ' – ';
-const DEFAULT_AVAILABILITY_STATUS = AvailabilityStatus.Available;
 
 export function formatTimeRange({
   start,
@@ -38,16 +33,7 @@ export function formatTimeRange({
 /** A timeslot of a week, which the current user can add their availability for */
 @Component({
   selector: 'lib-open-timeslot-card',
-  imports: [
-    AvailabilityStatusComponent,
-    FormField,
-    MatButton,
-    MatFormField,
-    MatLabel,
-    MatOption,
-    MatSelect,
-    MatSelectTrigger,
-  ],
+  imports: [AvailabilitySelectComponent, FormField, MatButton],
   templateUrl: './open-timeslot-card.component.html',
   styleUrl: './open-timeslot-card.component.scss',
   host: {
@@ -62,9 +48,7 @@ export class OpenTimeslotCardComponent {
   readonly week = input.required<AppointmentWeek>();
 
   protected readonly addAvailabilityLabel = ADD_AVAILABILITY_LABEL;
-  protected readonly availabilityLabel = AVAILABILITY_LABEL;
   protected readonly saveLabel = SAVE_AVAILABILITY_LABEL;
-  protected readonly statuses = Object.values(AvailabilityStatus);
   protected readonly timeRange = computed(() =>
     formatTimeRange(this.timeslot()),
   );
@@ -75,13 +59,10 @@ export class OpenTimeslotCardComponent {
   private readonly currentUser = this.store.selectSignal(
     LocalUserState.currentUser,
   );
-  private readonly availability = signal({
-    status: DEFAULT_AVAILABILITY_STATUS,
-  });
+  private readonly availability = signal<{
+    status: AvailabilityStatus | null;
+  }>({ status: DEFAULT_AVAILABILITY_STATUS });
   protected readonly availabilityForm = form(this.availability);
-  protected readonly selectedStatus = computed(() =>
-    this.availabilityForm.status().value(),
-  );
   /** Availability is for the current user, and is saved once at a time */
   protected readonly canSave = computed(
     () => this.currentUser() !== null && !this.saving(),
@@ -105,7 +86,7 @@ export class OpenTimeslotCardComponent {
         this.store.dispatch(
           new SetAvailability(appointmentId, {
             memberId: user.id,
-            status: this.availability().status,
+            status: this.availability().status ?? DEFAULT_AVAILABILITY_STATUS,
           }),
         ),
       );

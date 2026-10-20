@@ -1,0 +1,13 @@
+@use '@angular/material' as mat;
+
+$compact-field-height: 2.5rem;
+$compact-field-padding: 0.5rem;
+
+:host(.compact) {
+  @include mat.form-field-overrides(
+    (
+      container-height: $compact-field-height,
+      container-vertical-padding: $compact-field-padding,
+    )
+  );
+}

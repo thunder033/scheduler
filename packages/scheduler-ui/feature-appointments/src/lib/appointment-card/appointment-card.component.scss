@@ -1,5 +1,16 @@
-@use '../../../../styles/buttons';
+@use '../../../../styles/expandable-card';
 
-:host {
-  @include buttons.slightly-rounded-filled-buttons;
+// Wide enough for the controls a coordinator edits the appointment with
+$expanded-min-width: 19rem;
+
+// While expanded, the card widens to fit the controls and lifts above the cards beside it
+@include expandable-card.widening-card('.card', $expanded-min-width);
+
+// The card rests above the page, and lifts higher while it is expanded
+.card {
+  box-shadow: var(--mat-sys-level1);
+}
+
+:host(.expanded) .card {
+  box-shadow: expandable-card.$expanded-shadow;
 }
