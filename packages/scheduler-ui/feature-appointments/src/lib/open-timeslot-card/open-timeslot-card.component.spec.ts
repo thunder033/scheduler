@@ -1,0 +1,261 @@
+import { TestBed } from '@angular/core/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { Store } from '@ngxs/store';
+import { Availability, AvailabilityStatus, User, UserRole } from '@org/models';
+import { AppointmentWeek, TimeslotService } from '@org/scheduler-ui/data';
+import {
+  CreateAppointment,
+  PlanningState,
+  SetAvailability,
+  SetCurrentUser,
+} from '@org/scheduler-ui/state';
+import { provideTestState } from '@org/scheduler-ui/test-utils';
+import { firstValueFrom } from 'rxjs';
+import {
+  AVAILABILITY_STATUS_LABELS,
+  formatTimeRange,
+  OpenTimeslotCardComponent,
+} from './open-timeslot-card.component';
+import { OpenTimeslotCardHarness } from './open-timeslot-card.harness';
+
+function createWeek(overrides: Partial<AppointmentWeek> = {}): AppointmentWeek {
+  return { year: 2026, week: 43, ...overrides };
+}
+
+function createUser(overrides: Partial<User> = {}): User {
+  return {
+    id: 'member-1',
+    displayName: 'Member One',
+    contact: [],
+    roles: [UserRole.Member],
+    ...overrides,
+  };
+}
+
+function createAvailability(
+  overrides: Partial<Availability> = {},
+): Availability {
+  return {
+    memberId: 'other-member',
+    status: AvailabilityStatus.Available,
+    ...overrides,
+  };
+}
+
+interface SetupOptions {
+  week?: AppointmentWeek;
+  /** The user signed in, who the availability is for */
+  user?: User | null;
+}
+
+async function setup({
+  week = createWeek(),
+  user = createUser(),
+}: SetupOptions = {}) {
+  await TestBed.configureTestingModule({
+    imports: [OpenTimeslotCardComponent],
+    providers: [provideTestState()],
+  }).compileComponents();
+
+  const store = TestBed.inject(Store);
+  if (user) {
+    await firstValueFrom(store.dispatch(new SetCurrentUser(user)));
+  }
+
+  const timeslot = await firstValueFrom(
+    TestBed.inject(TimeslotService).createTimeslot({
+      start: '09:00',
+      end: '10:30',
+      dayOfWeek: 1,
+    }),
+  );
+
+  const fixture = TestBed.createComponent(OpenTimeslotCardComponent);
+  fixture.componentRef.setInput('timeslot', timeslot);
+  fixture.componentRef.setInput('week', week);
+  const harness = await TestbedHarnessEnvironment.harnessForFixture(
+    fixture,
+    OpenTimeslotCardHarness,
+  );
+
+  return {
+    fixture,
+    harness,
+    timeslot,
+    week,
+    user,
+    getAppointments: (forWeek = week) =>
+      store.selectSnapshot(PlanningState.appointmentsByWeek(forWeek)),
+    /** Creates an appointment for the timeslot in the week, with the availabilities */
+    createAppointment: async (
+      forWeek = week,
+      availabilities: Availability[] = [],
+    ) => {
+      await firstValueFrom(
+        store.dispatch(new CreateAppointment(timeslot.timeslotId, forWeek)),
+      );
+      const [appointment] = store.selectSnapshot(
+        PlanningState.appointmentsByWeek(forWeek),
+      );
+      for (const availability of availabilities) {
+        await firstValueFrom(
+          store.dispatch(
+            new SetAvailability(appointment.appointmentId, availability),
+          ),
+        );
+      }
+    },
+  };
+}
+
+describe('OpenTimeslotCardComponent', () => {
+  it('should display the time range of the timeslot', async () => {
+    const { harness, timeslot } = await setup();
+
+    expect(await harness.getTimeRange()).toBe(formatTimeRange(timeslot));
+  });
+
+  it('should display the new time range when the timeslot changes', async () => {
+    const { fixture, harness } = await setup();
+    const changed = {
+      timeslotId: 'timeslot-2',
+      start: '14:00',
+      end: '15:00',
+      dayOfWeek: 2,
+    };
+
+    fixture.componentRef.setInput('timeslot', changed);
+
+    expect(await harness.getTimeRange()).toBe(formatTimeRange(changed));
+  });
+
+  it('should offer adding availability before it is started', async () => {
+    const { harness } = await setup();
+
+    expect(await harness.hasAddAvailability()).toBe(true);
+    expect(await harness.isAddingAvailability()).toBe(false);
+  });
+
+  it('should replace the control to add availability with the options when started', async () => {
+    const { harness } = await setup();
+
+    await harness.startAddingAvailability();
+
+    expect(await harness.isAddingAvailability()).toBe(true);
+    expect(await harness.hasAddAvailability()).toBe(false);
+  });
+
+  it('should offer every availability status as an option', async () => {
+    const { harness } = await setup();
+    await harness.startAddingAvailability();
+
+    expect(await harness.getAvailabilityOptions()).toEqual(
+      Object.values(AvailabilityStatus).map(
+        (status) => AVAILABILITY_STATUS_LABELS[status],
+      ),
+    );
+  });
+
+  it('should bring back the control to add availability after saving', async () => {
+    const { harness } = await setup();
+    await harness.startAddingAvailability();
+
+    await harness.saveAvailability();
+
+    expect(await harness.hasAddAvailability()).toBe(true);
+  });
+
+  it('should create the appointment for the timeslot in the week when there is none', async () => {
+    const { harness, timeslot, week, user, getAppointments } = await setup();
+    await harness.startAddingAvailability();
+    await harness.selectAvailability(
+      AVAILABILITY_STATUS_LABELS[AvailabilityStatus.IfNeeded],
+    );
+
+    await harness.saveAvailability();
+
+    expect(getAppointments()).toEqual([
+      expect.objectContaining({
+        timeslotId: timeslot.timeslotId,
+        year: week.year,
+        week: week.week,
+        availabilities: [
+          { memberId: user?.id, status: AvailabilityStatus.IfNeeded },
+        ],
+      }),
+    ]);
+  });
+
+  it('should save the availability that was selected first when no other is chosen', async () => {
+    const { harness, user, getAppointments } = await setup();
+    const [firstStatus] = Object.values(AvailabilityStatus);
+    await harness.startAddingAvailability();
+
+    await harness.saveAvailability();
+
+    expect(getAppointments()[0].availabilities).toEqual([
+      { memberId: user?.id, status: firstStatus },
+    ]);
+  });
+
+  it('should add to the appointment of the timeslot in the week when there is one', async () => {
+    const other = createAvailability();
+    const { harness, user, createAppointment, getAppointments } = await setup();
+    await createAppointment(undefined, [other]);
+    const [existing] = getAppointments();
+    await harness.startAddingAvailability();
+
+    await harness.saveAvailability();
+
+    const appointments = getAppointments();
+    expect(appointments).toHaveLength(1);
+    expect(appointments[0].appointmentId).toBe(existing.appointmentId);
+    expect(appointments[0].availabilities).toEqual(
+      expect.arrayContaining([
+        other,
+        expect.objectContaining({ memberId: user?.id }),
+      ]),
+    );
+    expect(appointments[0].availabilities).toHaveLength(2);
+  });
+
+  it('should replace the availability of the user when they save it again', async () => {
+    const { harness, getAppointments } = await setup();
+    await harness.startAddingAvailability();
+    await harness.saveAvailability();
+    await harness.startAddingAvailability();
+    await harness.selectAvailability(
+      AVAILABILITY_STATUS_LABELS[AvailabilityStatus.IfNeeded],
+    );
+
+    await harness.saveAvailability();
+
+    const [appointment] = getAppointments();
+    expect(getAppointments()).toHaveLength(1);
+    expect(appointment.availabilities).toEqual([
+      expect.objectContaining({ status: AvailabilityStatus.IfNeeded }),
+    ]);
+  });
+
+  it('should leave the appointments of other weeks alone', async () => {
+    const otherWeek = createWeek({ week: 44 });
+    const { harness, createAppointment, getAppointments } = await setup();
+    await createAppointment(otherWeek);
+    await harness.startAddingAvailability();
+
+    await harness.saveAvailability();
+
+    expect(getAppointments()).toHaveLength(1);
+    expect(getAppointments(otherWeek)).toEqual([
+      expect.objectContaining({ availabilities: [] }),
+    ]);
+  });
+
+  it('should not allow saving availability without a user', async () => {
+    const { harness, getAppointments } = await setup({ user: null });
+    await harness.startAddingAvailability();
+
+    expect(await harness.canSaveAvailability()).toBe(false);
+    expect(getAppointments()).toEqual([]);
+  });
+});

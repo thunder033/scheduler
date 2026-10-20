@@ -1,1 +1,41 @@
-<h2 qa-title class="title">{{ title }}</h2>
+<div class="m-4">
+  <h2>{{ title }}</h2>
+  <p class="my-2">{{ description }}</p>
+</div>
+<header class="mb-4 py-2 flex items-center justify-center gap-2 border-b">
+  <button
+    qa-previous-week
+    mat-icon-button
+    [attr.aria-label]="previousLabel"
+    (click)="previousWeek()"
+  >
+    <mat-icon>chevron_left</mat-icon>
+  </button>
+  <h3 qa-week-title class="font-bold">{{ weekTitle() }}</h3>
+  <button
+    qa-next-week
+    mat-icon-button
+    [attr.aria-label]="nextLabel"
+    (click)="nextWeek()"
+  >
+    <mat-icon>chevron_right</mat-icon>
+  </button>
+</header>
+
+<div class="day-grid">
+  @for (day of days(); track day.date.getTime()) {
+    <section qa-day class="day-column" [class.today]="day.isToday">
+      <h3 class="day-column-label">
+        <span qa-day-name class="block text-xl">{{
+          day.date | date: dayNameFormat
+        }}</span>
+        <span qa-day-date class="block text-lg">{{
+          day.date | date: dayDateFormat
+        }}</span>
+      </h3>
+      @for (timeslot of day.timeslots; track timeslot.timeslotId) {
+        <lib-open-timeslot-card [timeslot]="timeslot" [week]="week()" />
+      }
+    </section>
+  }
+</div>

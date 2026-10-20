@@ -1,5 +1,14 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { Component, computed, inject, linkedSignal } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  computed,
+  DestroyRef,
+  ElementRef,
+  inject,
+  linkedSignal,
+  viewChild,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -124,6 +133,24 @@ export class SideNavComponent {
   protected readonly collapseIcon = computed(() =>
     this.isCollapsed() ? EXPAND_ICON : COLLAPSE_ICON,
   );
+
+  private readonly container = viewChild.required(MatSidenavContainer);
+  private readonly sidenav = viewChild.required(MatSidenav, {
+    read: ElementRef,
+  });
+
+  constructor() {
+    const destroyRef = inject(DestroyRef);
+    afterNextRender(() => {
+      // The content's margin only follows the sidebar's width when told to, so it is told on each
+      // step of the width animation
+      const observer = new ResizeObserver(() =>
+        this.container().updateContentMargins(),
+      );
+      observer.observe(this.sidenav().nativeElement);
+      destroyRef.onDestroy(() => observer.disconnect());
+    });
+  }
 
   protected toggleCollapsed(): void {
     this.store.dispatch(new SetSideNavCollapsed(!this.collapsedByUser()));

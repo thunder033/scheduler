@@ -19,7 +19,14 @@ $selected-item-background: color-mix(
   transparent
 );
 
-:host {
+$on-primary-icon-button: (
+  icon-color: var(--mat-sys-on-primary),
+  state-layer-color: var(--mat-sys-on-primary),
+);
+
+// Scoped to the elements on the primary color, since the host also holds the projected content,
+// which would otherwise inherit the tokens
+mat-toolbar {
   @include mat.toolbar-overrides(
     (
       container-background-color: var(--mat-sys-primary),
@@ -27,15 +34,12 @@ $selected-item-background: color-mix(
     )
   );
 
-  @include mat.icon-button-overrides(
-    (
-      icon-color: var(--mat-sys-on-primary),
-      state-layer-color: var(--mat-sys-on-primary),
-    )
-  );
+  @include mat.icon-button-overrides($on-primary-icon-button);
 }
 
 mat-sidenav {
+  @include mat.icon-button-overrides($on-primary-icon-button);
+
   @include mat.sidenav-overrides(
     (
       container-width: $expanded-width,

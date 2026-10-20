@@ -1,0 +1,31 @@
+<div class="flex flex-col items-center gap-2">
+  <span qa-time-range class="font-bold">{{ timeRange() }}</span>
+  @if (adding()) {
+    <mat-form-field qa-availability class="w-full" subscriptSizing="dynamic">
+      <mat-label>{{ availabilityLabel }}</mat-label>
+      <mat-select [formField]="availabilityForm.status">
+        @for (status of statuses; track status) {
+          <mat-option [value]="status">{{ statusLabels[status] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <button
+      qa-save-availability
+      mat-flat-button
+      type="button"
+      [disabled]="!canSave()"
+      (click)="save()"
+    >
+      {{ saveLabel }}
+    </button>
+  } @else {
+    <button
+      qa-add-availability
+      mat-flat-button
+      type="button"
+      (click)="startAdding()"
+    >
+      {{ addAvailabilityLabel }}
+    </button>
+  }
+</div>

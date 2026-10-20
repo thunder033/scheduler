@@ -1,4 +1,5 @@
 import './lib/get-animations-polyfill';
+import './lib/resize-observer-polyfill';
 
 export * from './lib/animations';
 export * from './lib/common-test';

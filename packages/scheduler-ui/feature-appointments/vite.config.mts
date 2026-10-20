@@ -20,6 +20,13 @@ export default defineConfig(() => ({
     environment: 'jsdom',
     include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     setupFiles: ['src/test-setup.ts'],
+    server: {
+      deps: {
+        // Material's option harnesses build their queries with their own copy of the CDK's
+        // `HarnessPredicate` unless both are loaded the same way, which makes the queries empty
+        inline: [/@angular\/(cdk|material)/],
+      },
+    },
     reporters: ['default'],
     coverage: {
       reportsDirectory:

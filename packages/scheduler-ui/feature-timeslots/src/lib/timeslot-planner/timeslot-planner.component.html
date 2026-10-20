@@ -26,20 +26,18 @@
     }
   </div>
 
-  <div
-    class="grid grid-cols-1 gap-4 md:grid-cols-[repeat(auto-fit,minmax(12rem,1fr))]"
-  >
+  <div class="day-grid">
     @for (day of days(); track day.dayOfWeek) {
       <section
         qa-day
         [id]="day.elementId"
-        class="flex min-h-24 flex-col gap-2 rounded-lg p-2 transition-colors duration-150 ease-in-out"
+        class="day-column"
         cdkDropList
         [cdkDropListData]="day.dayOfWeek"
         [cdkDropListSortingDisabled]="true"
         (cdkDropListDropped)="drop($event)"
       >
-        <h3 qa-day-label class="border-b border-secondary">{{ day.label }}</h3>
+        <h3 qa-day-label class="day-column-label">{{ day.label }}</h3>
         @for (timeslot of day.timeslots; track timeslot.timeslotId) {
           <lib-timeslot-card
             class="block"
