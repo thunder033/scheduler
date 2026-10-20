@@ -11,8 +11,8 @@ import {
 } from '@org/scheduler-ui/state';
 import { provideTestState } from '@org/scheduler-ui/test-utils';
 import { firstValueFrom } from 'rxjs';
+import { AVAILABILITY_STATUS_LABELS } from '../availability-status/availability-status.component';
 import {
-  AVAILABILITY_STATUS_LABELS,
   formatTimeRange,
   OpenTimeslotCardComponent,
 } from './open-timeslot-card.component';
@@ -153,6 +153,28 @@ describe('OpenTimeslotCardComponent', () => {
       Object.values(AvailabilityStatus).map(
         (status) => AVAILABILITY_STATUS_LABELS[status],
       ),
+    );
+  });
+
+  it('should show a dot for the status of each availability option', async () => {
+    const { harness } = await setup();
+    await harness.startAddingAvailability();
+
+    expect(await harness.getAvailabilityOptionStatuses()).toEqual(
+      Object.values(AvailabilityStatus),
+    );
+  });
+
+  it('should show the dot of the selected status in the select', async () => {
+    const { harness } = await setup();
+    await harness.startAddingAvailability();
+
+    await harness.selectAvailability(
+      AVAILABILITY_STATUS_LABELS[AvailabilityStatus.IfNeeded],
+    );
+
+    expect(await harness.getSelectedAvailabilityStatus()).toBe(
+      AvailabilityStatus.IfNeeded,
     );
   });
 

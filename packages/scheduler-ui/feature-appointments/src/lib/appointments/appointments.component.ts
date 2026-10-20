@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatIcon } from '@angular/material/icon';
 import { Store } from '@ngxs/store';
 import { Timeslot } from '@org/models';
@@ -21,6 +22,8 @@ import {
   startOfISOWeek,
   subWeeks,
 } from 'date-fns';
+import { switchMap } from 'rxjs';
+import { AppointmentCardComponent } from '../appointment-card/appointment-card.component';
 import { OpenTimeslotCardComponent } from '../open-timeslot-card/open-timeslot-card.component';
 
 export const PREVIOUS_WEEK_LABEL = 'Previous week';
@@ -50,7 +53,13 @@ function timeslotsOnDay(timeslots: Timeslot[], dayOfWeek: number): Timeslot[] {
 
 @Component({
   selector: 'lib-appointments',
-  imports: [DatePipe, MatIconButton, MatIcon, OpenTimeslotCardComponent],
+  imports: [
+    AppointmentCardComponent,
+    DatePipe,
+    MatIconButton,
+    MatIcon,
+    OpenTimeslotCardComponent,
+  ],
   templateUrl: './appointments.component.html',
   host: { class: 'block p-4' },
 })
@@ -75,11 +84,27 @@ export class AppointmentsComponent {
     week: getISOWeek(this.viewedDate()),
   }));
   private readonly timeslots = this.store.selectSignal(PlanningState.timeslots);
+  private readonly appointments = toSignal(
+    toObservable(this.week).pipe(
+      switchMap((week) =>
+        this.store.select(PlanningState.appointmentsByWeek(week)),
+      ),
+    ),
+    { initialValue: [] },
+  );
+  /** Each timeslot is shown with the appointment it has in the week, if it has one */
   protected readonly days = computed(() =>
     weekDays(this.viewedDate()).map((date) => ({
       date,
       isToday: isToday(date),
-      timeslots: timeslotsOnDay(this.timeslots(), getISODay(date)),
+      slots: timeslotsOnDay(this.timeslots(), getISODay(date)).map(
+        (timeslot) => ({
+          timeslot,
+          appointment: this.appointments().find(
+            ({ timeslotId }) => timeslotId === timeslot.timeslotId,
+          ),
+        }),
+      ),
     })),
   );
 

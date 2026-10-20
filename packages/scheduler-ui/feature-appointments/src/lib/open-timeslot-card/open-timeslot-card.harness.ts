@@ -5,8 +5,11 @@ import {
 } from '@angular/cdk/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
+import { AvailabilityStatus } from '@org/models';
 import { qaSelector } from '@org/scheduler-ui/test-utils';
+import { AvailabilityDotHarness } from '../availability-dot/availability-dot.harness';
 
+const IS_CONNECTED_PROPERTY = 'isConnected';
 const NOT_ADDING_MESSAGE = 'No availability is being added';
 const ALREADY_ADDING_MESSAGE = 'Availability is already being added';
 const ADDING_NOT_STARTED_MESSAGE =
@@ -41,6 +44,10 @@ export class OpenTimeslotCardHarness extends ComponentHarness {
   /** Only there while availability is being added */
   private readonly availabilitySelect =
     this.locatorForOptional(MatSelectHarness);
+  /** Only there while availability is being added, in the select, as the options are in an overlay */
+  private readonly selectedAvailabilityDot = this.locatorForOptional(
+    AvailabilityDotHarness,
+  );
   private readonly saveControl = this.locatorForOptional(
     MatButtonHarness.with({ selector: qaSelector('save-availability') }),
   );
@@ -80,6 +87,30 @@ export class OpenTimeslotCardHarness extends ComponentHarness {
     return labels;
   }
 
+  /** The statuses the dots of the availability options stand for, in display order */
+  async getAvailabilityOptionStatuses(): Promise<AvailabilityStatus[]> {
+    const select = await this.availabilitySelect();
+    assert(select, NOT_ADDING_MESSAGE);
+
+    await select.open();
+    const options = await select.getOptions();
+    const statuses = await Promise.all(
+      options.map(async (option) =>
+        (await option.getHarness(AvailabilityDotHarness)).getStatus(),
+      ),
+    );
+    await select.close();
+    return statuses;
+  }
+
+  /** The status the dot of the availability option that is selected stands for */
+  async getSelectedAvailabilityStatus(): Promise<AvailabilityStatus> {
+    const dot = await this.selectedAvailabilityDot();
+    assert(dot, NOT_ADDING_MESSAGE);
+
+    return dot.getStatus();
+  }
+
   /** The label of the availability option that is selected */
   async getSelectedAvailability(): Promise<string> {
     const select = await this.availabilitySelect();
@@ -102,12 +133,22 @@ export class OpenTimeslotCardHarness extends ComponentHarness {
     return !(await control.isDisabled());
   }
 
-  /** Saves the selected availability, which brings back the control that starts adding */
+  /**
+   * Saves the selected availability, which brings back the control that starts adding, unless
+   * the card is replaced by the appointment's, which is created by the first save
+   */
   async saveAvailability(): Promise<void> {
     const control = await this.saveControl();
     assert(control, NOT_ADDING_MESSAGE);
     await control.click();
 
-    assert(!(await this.availabilitySelect()), SAVE_KEPT_ADDING_MESSAGE);
+    // A card that was replaced is removed with its host, and its subtree stays in the detached host
+    const replaced = !(await (
+      await this.host()
+    ).getProperty(IS_CONNECTED_PROPERTY));
+    assert(
+      replaced || !(await this.availabilitySelect()),
+      SAVE_KEPT_ADDING_MESSAGE,
+    );
   }
 }

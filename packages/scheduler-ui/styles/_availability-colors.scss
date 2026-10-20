@@ -1,0 +1,10 @@
+// The colors that stand for the availability statuses wherever they are shown. They follow
+// the color scheme, and are used as `availability-<status>` colors, such as `bg-availability-available`.
+
+$available: light-dark(#2e7d32, #66bb6a);
+$if-needed: light-dark(#b8860b, #ffd54f);
+
+@theme {
+  --color-availability-available: #{$available};
+  --color-availability-if-needed: #{$if-needed};
+}

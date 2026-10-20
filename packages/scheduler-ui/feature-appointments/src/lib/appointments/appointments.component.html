@@ -33,8 +33,15 @@
           day.date | date: dayDateFormat
         }}</span>
       </h3>
-      @for (timeslot of day.timeslots; track timeslot.timeslotId) {
-        <lib-open-timeslot-card [timeslot]="timeslot" [week]="week()" />
+      @for (slot of day.slots; track slot.timeslot.timeslotId) {
+        @if (slot.appointment; as appointment) {
+          <lib-appointment-card
+            [timeslot]="slot.timeslot"
+            [appointment]="appointment"
+          />
+        } @else {
+          <lib-open-timeslot-card [timeslot]="slot.timeslot" [week]="week()" />
+        }
       }
     </section>
   }

@@ -1,6 +1,10 @@
 import { ComponentHarness } from '@angular/cdk/testing';
 import { qaSelector } from '@org/scheduler-ui/test-utils';
 import {
+  AppointmentCardHarness,
+  AppointmentCardHarnessFilters,
+} from '../appointment-card/appointment-card.harness';
+import {
   OpenTimeslotCardHarness,
   OpenTimeslotCardHarnessFilters,
 } from '../open-timeslot-card/open-timeslot-card.harness';
@@ -35,9 +39,22 @@ export class AppointmentsDayHarness extends ComponentHarness {
     return this.locatorForAll(OpenTimeslotCardHarness.with(filters))();
   }
 
+  /** The appointments listed under the day, in display order */
+  async getAppointmentCards(
+    filters: AppointmentCardHarnessFilters = {},
+  ): Promise<AppointmentCardHarness[]> {
+    return this.locatorForAll(AppointmentCardHarness.with(filters))();
+  }
+
   /** Time ranges of the open timeslots listed under the day, in display order */
   async getTimeRanges(): Promise<string[]> {
     const cards = await this.getOpenTimeslotCards();
+    return Promise.all(cards.map((card) => card.getTimeRange()));
+  }
+
+  /** Time ranges of the appointments listed under the day, in display order */
+  async getAppointmentTimeRanges(): Promise<string[]> {
+    const cards = await this.getAppointmentCards();
     return Promise.all(cards.map((card) => card.getTimeRange()));
   }
 }
