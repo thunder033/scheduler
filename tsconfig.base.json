@@ -40,6 +40,9 @@
       ],
       "@org/scheduler-ui/test-utils": [
         "./packages/scheduler-ui/test-utils/src/index.ts"
+      ],
+      "@org/scheduler-ui/core-ui": [
+        "./packages/scheduler-ui/core-ui/src/index.ts"
       ]
     }
   },
