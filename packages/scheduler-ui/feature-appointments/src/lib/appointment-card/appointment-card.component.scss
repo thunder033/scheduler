@@ -1,0 +1,5 @@
+@use '../../../../styles/buttons';
+
+:host {
+  @include buttons.slightly-rounded-filled-buttons;
+}

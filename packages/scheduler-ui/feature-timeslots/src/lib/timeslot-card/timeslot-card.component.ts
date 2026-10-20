@@ -1,6 +1,5 @@
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
 import {
-  afterNextRender,
   AnimationCallbackEvent,
   Component,
   computed,
@@ -20,6 +19,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { Store } from '@ngxs/store';
 import { Timeslot } from '@org/models';
+import { ExpandableCard } from '@org/scheduler-ui/core-ui';
 import {
   CreateTimeslot,
   DeleteTimeslot,
@@ -39,11 +39,8 @@ import { filter, switchMap } from 'rxjs';
 
 const TIME_RANGE_SEPARATOR = ' – ';
 const TIME_RANGE_ERROR_KIND = 'timeRange';
-const NO_ANIMATION_NAME = 'none';
 
-/** Classes that play the matching keyframes in the component styles */
-export const EDITOR_EXPAND_CLASS = 'editor-expand';
-export const EDITOR_COLLAPSE_CLASS = 'editor-collapse';
+/** Class that plays the matching keyframes in the component styles */
 const HANDLE_WIPE_IN_CLASS = 'handle-wipe-in';
 
 const TIMESLOT_CARD_ID_PREFIX = 'timeslot-card-';
@@ -65,39 +62,6 @@ export function formatTimeRange({
   return `${start}${TIME_RANGE_SEPARATOR}${end}`;
 }
 
-/**
- * Plays the animation the class applies to the element, then reports it complete.
- * Finishes right away when the class results in no animation.
- */
-function playAnimation(
-  { target, animationComplete }: AnimationCallbackEvent,
-  animationClass: string,
-  { keepClass = false }: { keepClass?: boolean } = {},
-): void {
-  target.classList.add(animationClass);
-
-  const { animationName } = getComputedStyle(target);
-  if (!animationName || animationName === NO_ANIMATION_NAME) {
-    target.classList.remove(animationClass);
-    animationComplete();
-    return;
-  }
-
-  const finishOnAnimationEnd = (event: Event) => {
-    // Animations of descendants bubble up too, such as those Material and the CDK put on inputs
-    if (event.target !== target) {
-      return;
-    }
-
-    target.removeEventListener('animationend', finishOnAnimationEnd);
-    if (!keepClass) {
-      target.classList.remove(animationClass);
-    }
-    animationComplete();
-  };
-  target.addEventListener('animationend', finishOnAnimationEnd);
-}
-
 @Component({
   selector: 'lib-timeslot-card',
   imports: [
@@ -115,9 +79,9 @@ function playAnimation(
   ],
   templateUrl: './timeslot-card.component.html',
   styleUrl: './timeslot-card.component.scss',
-  host: { '[id]': 'elementId()', '[class.editing]': 'editing()' },
+  host: { '[id]': 'elementId()' },
 })
-export class TimeslotCardComponent {
+export class TimeslotCardComponent extends ExpandableCard {
   private readonly store = inject(Store);
   private readonly dialog = inject(MatDialog);
 
@@ -151,6 +115,8 @@ export class TimeslotCardComponent {
   protected readonly editing = computed(
     () => this.editingTimeslot()?.timeslotId === this.timeslot().timeslotId,
   );
+  /** The card expands for the editing */
+  readonly expanded = this.editing;
 
   /**
    * The times being edited, which start from the changes kept in the state while editing, so they
@@ -189,13 +155,8 @@ export class TimeslotCardComponent {
     return changed && hasDay && this.timesForm().valid();
   });
 
-  /** Whether the card has rendered, so how it was created isn't animated in as if it just changed */
-  private hasRendered = false;
-
   constructor() {
-    afterNextRender(() => {
-      this.hasRendered = true;
-    });
+    super();
     effect(() => this.keepDraft());
     // Times that were never saved don't outlive the editing, however it ends
     effect(() => {
@@ -213,33 +174,8 @@ export class TimeslotCardComponent {
     );
   }
 
-  protected expandEditor(event: AnimationCallbackEvent): void {
-    this.playIfRendered(event, EDITOR_EXPAND_CLASS);
-  }
-
   protected wipeInHandle(event: AnimationCallbackEvent): void {
     this.playIfRendered(event, HANDLE_WIPE_IN_CLASS);
-  }
-
-  protected collapseEditor(event: AnimationCallbackEvent): void {
-    // Still editing means the card itself is going away, such as when it moves to another day
-    if (this.editing()) {
-      event.animationComplete();
-      return;
-    }
-    playAnimation(event, EDITOR_COLLAPSE_CLASS, { keepClass: true });
-  }
-
-  /** A card created while its timeslot is being edited shows the editing as it is, without animating in */
-  private playIfRendered(
-    event: AnimationCallbackEvent,
-    animationClass: string,
-  ): void {
-    if (this.hasRendered) {
-      playAnimation(event, animationClass);
-    } else {
-      event.animationComplete();
-    }
   }
 
   /** Deletes the timeslot once the user confirms it, since that can't be undone */

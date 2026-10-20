@@ -18,8 +18,11 @@ import {
 } from './open-timeslot-card.component';
 import { OpenTimeslotCardHarness } from './open-timeslot-card.harness';
 
+/** A year long past, so its weeks have none of the appointments that are seeded around today */
+const PAST_YEAR = 2001;
+
 function createWeek(overrides: Partial<AppointmentWeek> = {}): AppointmentWeek {
-  return { year: 2026, week: 43, ...overrides };
+  return { year: PAST_YEAR, week: 43, ...overrides };
 }
 
 function createUser(overrides: Partial<User> = {}): User {

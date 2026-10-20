@@ -1,21 +1,13 @@
-import {
-  BaseHarnessFilters,
-  ComponentHarness,
-  HarnessPredicate,
-} from '@angular/cdk/testing';
+import { BaseHarnessFilters, HarnessPredicate } from '@angular/cdk/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
+import { ExpandableCardHarness } from '@org/scheduler-ui/core-ui/testing';
 import { DeleteTimeslotDialogHarness } from '../delete-timeslot-dialog/delete-timeslot-dialog.harness';
 import { qaSelector } from '@org/scheduler-ui/test-utils';
-import {
-  EDITOR_COLLAPSE_CLASS,
-  EDITOR_EXPAND_CLASS,
-  timeslotCardId,
-} from './timeslot-card.component';
+import { timeslotCardId } from './timeslot-card.component';
 
 export const CARD_HEADER_SELECTOR = qaSelector('card-header');
-export const EDITOR_SELECTOR = qaSelector('editor');
 const IS_CONNECTED_PROPERTY = 'isConnected';
 const NOT_EDITING_MESSAGE = 'The timeslot is not being edited';
 const CANNOT_DELETE_MESSAGE =
@@ -44,7 +36,7 @@ export interface TimeslotCardHarnessFilters extends BaseHarnessFilters {
   timeRange?: string | RegExp;
 }
 
-export class TimeslotCardHarness extends ComponentHarness {
+export class TimeslotCardHarness extends ExpandableCardHarness {
   static hostSelector = 'lib-timeslot-card';
 
   static with(
@@ -68,7 +60,6 @@ export class TimeslotCardHarness extends ComponentHarness {
     MatButtonHarness.with({ selector: qaSelector('edit-toggle') }),
   );
   // The rest is only there while the timeslot is being edited
-  private readonly editor = this.locatorForOptional(EDITOR_SELECTOR);
   /** Goes as soon as the editing stops, whereas the editor collapses first */
   private readonly dragHandle = this.locatorForOptional(
     qaSelector('drag-handle'),
@@ -114,13 +105,6 @@ export class TimeslotCardHarness extends ComponentHarness {
 
   async hasDragHandle(): Promise<boolean> {
     return (await this.dragHandle()) !== null;
-  }
-
-  /** Whether the editor is playing its expand or collapse animation */
-  async isEditorAnimating(): Promise<boolean> {
-    const animationClasses = `.${EDITOR_EXPAND_CLASS}, .${EDITOR_COLLAPSE_CLASS}`;
-    const editor = await this.editor();
-    return (await editor?.matchesSelector(animationClasses)) ?? false;
   }
 
   async setStartTime(time: string): Promise<void> {

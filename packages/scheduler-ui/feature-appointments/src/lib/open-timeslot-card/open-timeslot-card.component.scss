@@ -1,12 +1,5 @@
-@use '@angular/material' as mat;
-
-// Material's buttons are fully rounded; this one is only slightly
-$button-corner-radius: 0.25rem;
+@use '../../../../styles/buttons';
 
 :host {
-  @include mat.button-overrides(
-    (
-      filled-container-shape: $button-corner-radius,
-    )
-  );
+  @include buttons.slightly-rounded-filled-buttons;
 }

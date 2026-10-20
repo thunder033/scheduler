@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
 import { Timeslot } from '@org/models';
+import { EXPANDABLE_CONTENT_SELECTOR } from '@org/scheduler-ui/core-ui/testing';
 import { TimeslotDraft } from '@org/scheduler-ui/data';
 import {
   CreateTimeslot,
@@ -16,7 +17,7 @@ import {
   TimeslotCardComponent,
   formatTimeRange,
 } from './timeslot-card.component';
-import { EDITOR_SELECTOR, TimeslotCardHarness } from './timeslot-card.harness';
+import { TimeslotCardHarness } from './timeslot-card.harness';
 
 const OTHER_TIMESLOT_ID = 'other-timeslot';
 const OTHER_START = '13:00';
@@ -157,7 +158,7 @@ describe('TimeslotCardComponent', () => {
 
         await harness.toggleEditing();
 
-        expect(await harness.isEditorAnimating()).toBe(true);
+        expect(await harness.isContentAnimating()).toBe(true);
       });
 
       it('should not animate the editor in when the card is created while its timeslot is being edited', async () => {
@@ -167,7 +168,7 @@ describe('TimeslotCardComponent', () => {
         });
 
         expect(await harness.isEditing()).toBe(true);
-        expect(await harness.isEditorAnimating()).toBe(false);
+        expect(await harness.isContentAnimating()).toBe(false);
       });
 
       it('should keep animating the editor when something inside it finishes its own animation', async () => {
@@ -179,7 +180,7 @@ describe('TimeslotCardComponent', () => {
         // Material and the CDK animate parts of the form fields, and those events bubble up
         getAnimations().end(fixture.nativeElement.querySelector('input'));
 
-        expect(await harness.isEditorAnimating()).toBe(true);
+        expect(await harness.isContentAnimating()).toBe(true);
       });
 
       it('should stop animating the editor once the editor finishes its animation', async () => {
@@ -189,10 +190,10 @@ describe('TimeslotCardComponent', () => {
         await harness.toggleEditing();
 
         getAnimations().end(
-          fixture.nativeElement.querySelector(EDITOR_SELECTOR),
+          fixture.nativeElement.querySelector(EXPANDABLE_CONTENT_SELECTOR),
         );
 
-        expect(await harness.isEditorAnimating()).toBe(false);
+        expect(await harness.isContentAnimating()).toBe(false);
       });
 
       it('should animate the editor out when editing ends', async () => {
@@ -201,7 +202,7 @@ describe('TimeslotCardComponent', () => {
 
         await harness.toggleEditing();
 
-        expect(await harness.isEditorAnimating()).toBe(true);
+        expect(await harness.isContentAnimating()).toBe(true);
       });
     });
 

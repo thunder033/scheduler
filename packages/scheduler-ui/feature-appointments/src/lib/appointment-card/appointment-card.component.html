@@ -1,6 +1,40 @@
 <div class="flex flex-col items-center gap-2">
   <span qa-time-range class="font-bold">{{ timeRange() }}</span>
   @if (status(); as status) {
-    <lib-availability-status [status]="status" />
+    <div class="flex items-center gap-2">
+      <lib-availability-status [status]="status" />
+      <button
+        mat-icon-button
+        type="button"
+        qa-edit-availability
+        [class.active]="expanded()"
+        [attr.aria-label]="editAvailabilityLabel"
+        [attr.aria-pressed]="expanded()"
+        (click)="toggleEditing()"
+      >
+        <mat-icon>edit</mat-icon>
+      </button>
+    </div>
+  } @else {
+    <button
+      mat-flat-button
+      type="button"
+      qa-add-availability
+      [attr.aria-pressed]="expanded()"
+      (click)="toggleEditing()"
+    >
+      {{ addAvailabilityLabel }}
+    </button>
+  }
+  @if (expanded()) {
+    <!-- The availability is changed here, which is yet to be built -->
+    <div
+      class="content-expander w-full"
+      qa-expandable-content
+      (animate.enter)="expandContent($event)"
+      (animate.leave)="collapseContent($event)"
+    >
+      <div class="content-clip"></div>
+    </div>
   }
 </div>

@@ -1,14 +1,20 @@
 import { TestBed } from '@angular/core/testing';
 import { Availability, AvailabilityStatus } from '@org/models';
+import { addWeeks, getISOWeek, getISOWeekYear } from 'date-fns';
 import { firstValueFrom } from 'rxjs';
+import { SEED_USERS } from '../user/user.service';
 import {
   AppointmentWeek,
+  SEED_TIMESLOTS,
   TimeslotDraft,
   TimeslotService,
   appointmentNotFoundMessage,
+  createSeedAppointments,
   timeslotNotFoundMessage,
 } from './timeslot.service';
 
+/** A year long past, so its weeks have none of the appointments that are seeded around today */
+const PAST_YEAR = 2001;
 const MISSING_TIMESLOT_ID = 'missing-timeslot';
 const MISSING_APPOINTMENT_ID = 'missing-appointment';
 
@@ -26,7 +32,7 @@ function createTimeslotDraft(
 function createAppointmentWeek(
   overrides: Partial<AppointmentWeek> = {},
 ): AppointmentWeek {
-  return { year: 2026, week: 42, ...overrides };
+  return { year: PAST_YEAR, week: 42, ...overrides };
 }
 
 function createAvailability(
@@ -459,6 +465,80 @@ describe('TimeslotService', () => {
           service.setProspect(MISSING_APPOINTMENT_ID, 'prospect-1'),
         ),
       ).rejects.toThrow(appointmentNotFoundMessage(MISSING_APPOINTMENT_ID));
+    });
+  });
+
+  describe('seed data', () => {
+    const TODAY = new Date(2026, 9, 19);
+
+    afterEach(() => vi.useRealTimers());
+
+    it('should give every seeded timeslot its own id', () => {
+      const ids = SEED_TIMESLOTS.map(({ timeslotId }) => timeslotId);
+
+      expect(new Set(ids).size).toBe(ids.length);
+    });
+
+    it('should seed appointments only for seeded timeslots', () => {
+      const timeslotIds = SEED_TIMESLOTS.map(({ timeslotId }) => timeslotId);
+
+      for (const appointment of createSeedAppointments(TODAY)) {
+        expect(timeslotIds).toContain(appointment.timeslotId);
+      }
+    });
+
+    it('should seed availabilities and confirmations only for seeded users', () => {
+      const userIds = SEED_USERS.map(({ id }) => id);
+
+      for (const appointment of createSeedAppointments(TODAY)) {
+        const referenced = [
+          ...appointment.availabilities.map(({ memberId }) => memberId),
+          ...appointment.confirmedUserIds,
+          ...(appointment.prospectId ? [appointment.prospectId] : []),
+        ];
+        for (const userId of referenced) {
+          expect(userIds).toContain(userId);
+        }
+      }
+    });
+
+    it('should seed appointments in the week of the date and the week after', () => {
+      const thisWeek = { year: getISOWeekYear(TODAY), week: getISOWeek(TODAY) };
+      const nextWeek = {
+        year: getISOWeekYear(addWeeks(TODAY, 1)),
+        week: getISOWeek(addWeeks(TODAY, 1)),
+      };
+
+      const weeks = createSeedAppointments(TODAY).map(({ year, week }) => ({
+        year,
+        week,
+      }));
+
+      expect(weeks).toContainEqual(thisWeek);
+      expect(weeks).toContainEqual(nextWeek);
+      for (const week of weeks) {
+        expect([thisWeek, nextWeek]).toContainEqual(week);
+      }
+    });
+
+    it('should seed each timeslot at most once per week', () => {
+      const keys = createSeedAppointments(TODAY).map(
+        ({ timeslotId, year, week }) => `${timeslotId}/${year}/${week}`,
+      );
+
+      expect(new Set(keys).size).toBe(keys.length);
+    });
+
+    it('should start with the seeded timeslots and appointments', async () => {
+      vi.setSystemTime(TODAY);
+      const service = TestBed.inject(TimeslotService);
+
+      expect(await firstValueFrom(service.getTimeslots())).toEqual(
+        SEED_TIMESLOTS,
+      );
+      expect(await firstValueFrom(service.getAppointments())).toEqual(
+        createSeedAppointments(TODAY),
+      );
     });
   });
 });

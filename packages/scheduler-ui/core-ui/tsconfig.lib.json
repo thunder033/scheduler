@@ -22,6 +22,7 @@
     "src/**/*.test.jsx",
     "src/**/*.spec.jsx",
     "src/test-setup.ts",
+    "src/testing.ts",
     "src/test-utils/**/*.ts",
     "src/**/*.harness.ts"
   ]

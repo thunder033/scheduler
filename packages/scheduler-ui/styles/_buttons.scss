@@ -1,0 +1,13 @@
+@use '@angular/material' as mat;
+
+// Material's buttons are fully rounded; these are only slightly
+$slightly-rounded-corner: 0.25rem;
+
+// For the filled buttons within the element it is included in
+@mixin slightly-rounded-filled-buttons {
+  @include mat.button-overrides(
+    (
+      filled-container-shape: $slightly-rounded-corner,
+    )
+  );
+}

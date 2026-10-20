@@ -28,6 +28,8 @@ import {
 } from './planning.actions';
 import { PlanningState } from './planning.state';
 
+/** A year long past, so its weeks have none of the appointments that are seeded around today */
+const PAST_YEAR = 2001;
 const MISSING_TIMESLOT_ID = 'missing-timeslot';
 const MISSING_APPOINTMENT_ID = 'missing-appointment';
 
@@ -43,7 +45,7 @@ function createTimeslotDraft(
 }
 
 function createWeek(overrides: Partial<AppointmentWeek> = {}): AppointmentWeek {
-  return { year: 2026, week: 42, ...overrides };
+  return { year: PAST_YEAR, week: 42, ...overrides };
 }
 
 function createAvailability(

@@ -30,9 +30,10 @@ import {
 import { AppointmentsHarness } from './appointments.harness';
 
 const LOCALE = 'en-US';
-const DEFAULT_TODAY = new Date(2026, 9, 19);
-/** Week 53 of 2026, which is followed by the first week of 2027 */
-const LAST_WEEK_OF_YEAR = new Date(2026, 11, 28);
+/** A Monday in a year long past, whose weeks have none of the appointments seeded around today */
+const DEFAULT_TODAY = new Date(2001, 9, 15);
+/** Week 53 of 2004, which is followed by the first week of 2005 */
+const LAST_WEEK_OF_YEAR = new Date(2004, 11, 27);
 
 /** A day of the week none of the seeded timeslots use */
 const UNSEEDED_DAY = 2;
@@ -75,14 +76,14 @@ async function setup({
   drafts = [],
   appointmentWeeks = [],
 }: SetupOptions = {}) {
-  vi.setSystemTime(today);
-
   await TestBed.configureTestingModule({
     imports: [AppointmentsComponent],
     providers: [provideTestState()],
   }).compileComponents();
 
+  // The service seeds appointments around the time it is created, which is the real time here
   const timeslotService = TestBed.inject(TimeslotService);
+  vi.setSystemTime(today);
   for (const draft of drafts) {
     await firstValueFrom(timeslotService.createTimeslot(draft));
   }

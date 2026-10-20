@@ -3,7 +3,10 @@
 @use '../../../packages/scheduler-ui/styles/material-theme';
 @use '../../../packages/scheduler-ui/styles/availability-colors';
 @use '../../../packages/scheduler-ui/styles/utilties';
+@use '../../../packages/scheduler-ui/styles/expandable-card';
 @use '@angular/material' as mat;
+
+@include expandable-card.content-animations;
 
 html {
   height: 100%;

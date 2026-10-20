@@ -1,0 +1,55 @@
+// Shared by the cards that expand to show more content, so the parts of a card that animate
+// together do so at the same pace. Components use the variables; the classes are in the global styles.
+$expand-duration: 200ms;
+$expand-easing: ease-in-out;
+
+// The content of a card grows and shrinks in height. Put `content-expander` on the content, with
+// `content-clip` inside it; the `content-expand` and `content-collapse` classes are added to the
+// expander while it animates.
+@mixin content-animations {
+  .content-expander {
+    display: grid;
+    grid-template-rows: 1fr;
+  }
+
+  .content-clip {
+    min-height: 0;
+  }
+
+  // Only clip while animating, so the focus outlines of form fields aren't cut off otherwise
+  .content-expand {
+    animation: content-expand $expand-duration $expand-easing;
+
+    .content-clip {
+      overflow: hidden;
+    }
+  }
+
+  .content-collapse {
+    animation: content-collapse $expand-duration $expand-easing forwards;
+
+    .content-clip {
+      overflow: hidden;
+    }
+  }
+
+  @keyframes content-expand {
+    from {
+      grid-template-rows: 0fr;
+    }
+
+    to {
+      grid-template-rows: 1fr;
+    }
+  }
+
+  @keyframes content-collapse {
+    from {
+      grid-template-rows: 1fr;
+    }
+
+    to {
+      grid-template-rows: 0fr;
+    }
+  }
+}

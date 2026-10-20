@@ -10,7 +10,7 @@ import {
   UserRole,
 } from '@org/models';
 import { SetCurrentUser } from '@org/scheduler-ui/state';
-import { provideTestState } from '@org/scheduler-ui/test-utils';
+import { CommonTest, provideTestState } from '@org/scheduler-ui/test-utils';
 import { firstValueFrom } from 'rxjs';
 import { AVAILABILITY_STATUS_LABELS } from '../availability-status/availability-status.component';
 import { formatTimeRange } from '../open-timeslot-card/open-timeslot-card.component';
@@ -64,17 +64,23 @@ interface SetupOptions {
   appointment?: Appointment;
   /** The user signed in, whose availability is shown */
   user?: User | null;
+  /** Runs the enter and leave animations, which TestBed disables unless asked */
+  animated?: boolean;
 }
 
 async function setup({
   timeslot = createTimeslot(),
   appointment = createAppointment(),
   user = createUser(),
+  animated = false,
 }: SetupOptions = {}) {
   await TestBed.configureTestingModule({
     imports: [AppointmentCardComponent],
     providers: [provideTestState()],
   }).compileComponents();
+  if (animated) {
+    CommonTest.withAnimations();
+  }
 
   if (user) {
     await firstValueFrom(
@@ -146,9 +152,67 @@ describe('AppointmentCardComponent', () => {
   it('should not show an availability without a user', async () => {
     const { harness } = await setup({
       user: null,
-      appointment: createAppointment({ availabilities: [createAvailability()] }),
+      appointment: createAppointment({
+        availabilities: [createAvailability()],
+      }),
     });
 
     expect(await harness.hasAvailability()).toBe(false);
+  });
+
+  describe('editing the availability', () => {
+    const withAvailability = createAppointment({
+      availabilities: [createAvailability()],
+    });
+
+    it('should offer adding the availability when the user has not set it', async () => {
+      const { harness } = await setup();
+
+      expect(await harness.hasAddAvailability()).toBe(true);
+      expect(await harness.hasEditAvailability()).toBe(false);
+    });
+
+    it('should offer editing the availability next to it when the user has set it', async () => {
+      const { harness } = await setup({ appointment: withAvailability });
+
+      expect(await harness.hasEditAvailability()).toBe(true);
+      expect(await harness.hasAddAvailability()).toBe(false);
+    });
+
+    it('should offer editing instead of adding once the user sets the availability', async () => {
+      const { fixture, harness } = await setup();
+
+      fixture.componentRef.setInput('appointment', withAvailability);
+
+      expect(await harness.hasEditAvailability()).toBe(true);
+      expect(await harness.hasAddAvailability()).toBe(false);
+    });
+
+    it.each([
+      { name: 'adding', appointment: createAppointment() },
+      { name: 'editing', appointment: withAvailability },
+    ])(
+      'should expand when $name starts and collapse when it stops',
+      async ({ appointment }) => {
+        const { harness } = await setup({ appointment });
+        expect(await harness.isExpanded()).toBe(false);
+
+        await harness.toggleAvailabilityEditing();
+        expect(await harness.isExpanded()).toBe(true);
+        expect(await harness.hasContent()).toBe(true);
+
+        await harness.toggleAvailabilityEditing();
+        expect(await harness.isExpanded()).toBe(false);
+        expect(await harness.hasContent()).toBe(false);
+      },
+    );
+
+    it('should animate the content in when it expands', async () => {
+      const { harness } = await setup({ animated: true });
+
+      await harness.toggleAvailabilityEditing();
+
+      expect(await harness.isContentAnimating()).toBe(true);
+    });
   });
 });

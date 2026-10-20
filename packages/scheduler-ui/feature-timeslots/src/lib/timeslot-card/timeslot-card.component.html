@@ -31,12 +31,12 @@
     </div>
     @if (editing()) {
       <div
-        class="editor-expander"
-        qa-editor
-        (animate.enter)="expandEditor($event)"
-        (animate.leave)="collapseEditor($event)"
+        class="content-expander"
+        qa-expandable-content
+        (animate.enter)="expandContent($event)"
+        (animate.leave)="collapseContent($event)"
       >
-        <div class="editor-clip">
+        <div class="content-clip">
           <div
             class="mt-2 flex flex-wrap gap-4 pt-2"
             (mousedown)="$event.stopPropagation()"

@@ -43,6 +43,9 @@
       ],
       "@org/scheduler-ui/core-ui": [
         "./packages/scheduler-ui/core-ui/src/index.ts"
+      ],
+      "@org/scheduler-ui/core-ui/testing": [
+        "./packages/scheduler-ui/core-ui/src/testing.ts"
       ]
     }
   },

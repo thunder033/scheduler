@@ -211,7 +211,7 @@ describe('TimeslotPlannerComponent', () => {
         OTHER_UNSEEDED_DAY,
         formatTimeRange(timeslot),
       );
-      expect(await card.isEditorAnimating()).toBe(false);
+      expect(await card.isContentAnimating()).toBe(false);
     });
 
     it('should keep the timeslot in edit mode after it is moved', async () => {
