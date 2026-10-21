@@ -2,8 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "module": "commonjs",
-    "types": ["jest", "node"]
+    "types": ["vitest/globals", "vitest/importMeta", "node"]
   },
-  "include": ["jest.config.ts", "src/**/*.ts"]
+  "include": ["vitest.e2e.config.mts", "src/**/*.ts"]
 }
