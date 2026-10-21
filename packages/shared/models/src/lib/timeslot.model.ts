@@ -15,7 +15,7 @@ export enum AvailabilityStatus {
 }
 
 export interface Availability {
-  memberId: string;
+  participantId: string;
   status: AvailabilityStatus;
 }
 

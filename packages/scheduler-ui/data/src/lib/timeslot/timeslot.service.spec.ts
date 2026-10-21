@@ -39,7 +39,7 @@ function createAvailability(
   overrides: Partial<Availability> = {},
 ): Availability {
   return {
-    memberId: 'member-1',
+    participantId: 'member-1',
     status: AvailabilityStatus.Available,
     ...overrides,
   };
@@ -304,9 +304,9 @@ describe('TimeslotService', () => {
       ).toEqual(updated);
     });
 
-    it('should replace the existing availability for the same member', async () => {
+    it('should replace the existing availability for the same participant', async () => {
       const { service, appointment } = await setup();
-      const other = createAvailability({ memberId: 'member-2' });
+      const other = createAvailability({ participantId: 'member-2' });
       const replacement = createAvailability({
         status: AvailabilityStatus.IfNeeded,
       });
@@ -341,10 +341,10 @@ describe('TimeslotService', () => {
   });
 
   describe('removeAvailability', () => {
-    it("should remove only the given member's availability", async () => {
+    it("should remove only the given participant's availability", async () => {
       const { service, appointment } = await setup();
       const removed = createAvailability();
-      const kept = createAvailability({ memberId: 'member-2' });
+      const kept = createAvailability({ participantId: 'member-2' });
       for (const availability of [removed, kept]) {
         await firstValueFrom(
           service.setAvailability(appointment.appointmentId, availability),
@@ -352,7 +352,10 @@ describe('TimeslotService', () => {
       }
 
       const updated = await firstValueFrom(
-        service.removeAvailability(appointment.appointmentId, removed.memberId),
+        service.removeAvailability(
+          appointment.appointmentId,
+          removed.participantId,
+        ),
       );
 
       expect(updated.availabilities).toEqual([kept]);
@@ -363,7 +366,7 @@ describe('TimeslotService', () => {
       ).toEqual(updated);
     });
 
-    it('should leave the appointment unchanged when the member has no availability', async () => {
+    it('should leave the appointment unchanged when the participant has no availability', async () => {
       const { service, appointment } = await setup();
 
       const updated = await firstValueFrom(
@@ -492,7 +495,9 @@ describe('TimeslotService', () => {
 
       for (const appointment of createSeedAppointments(TODAY)) {
         const referenced = [
-          ...appointment.availabilities.map(({ memberId }) => memberId),
+          ...appointment.availabilities.map(
+            ({ participantId }) => participantId,
+          ),
           ...appointment.confirmedUserIds,
           ...(appointment.prospectId ? [appointment.prospectId] : []),
         ];

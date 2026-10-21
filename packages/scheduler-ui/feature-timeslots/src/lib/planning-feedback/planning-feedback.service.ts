@@ -8,7 +8,7 @@ import {
   ofActionErrored,
 } from '@ngxs/store';
 import {
-  ConfirmMember,
+  ConfirmParticipant,
   CreateAppointment,
   CreateTimeslot,
   DeleteTimeslot,
@@ -18,7 +18,7 @@ import {
   RemoveProspect,
   SetAvailability,
   SetProspect,
-  UnconfirmMember,
+  UnconfirmParticipant,
   UpdateTimeslot,
 } from '@org/scheduler-ui/state';
 
@@ -39,8 +39,8 @@ const SAVE_ACTIONS = [
   RemoveAvailability,
   SetProspect,
   RemoveProspect,
-  ConfirmMember,
-  UnconfirmMember,
+  ConfirmParticipant,
+  UnconfirmParticipant,
 ];
 
 const API_ACTIONS = [LoadTimeslots, LoadAppointmentsByWeek, ...SAVE_ACTIONS];

@@ -40,7 +40,7 @@ function createAvailability(
   overrides: Partial<Availability> = {},
 ): Availability {
   return {
-    memberId: 'other-member',
+    participantId: 'other-member',
     status: AvailabilityStatus.Available,
     ...overrides,
   };
@@ -175,7 +175,7 @@ describe('OpenTimeslotCardComponent', () => {
         year: week.year,
         week: week.week,
         availabilities: [
-          { memberId: user?.id, status: AvailabilityStatus.IfNeeded },
+          { participantId: user?.id, status: AvailabilityStatus.IfNeeded },
         ],
       }),
     ]);
@@ -189,7 +189,7 @@ describe('OpenTimeslotCardComponent', () => {
     await harness.saveAvailability();
 
     expect(getAppointments()[0].availabilities).toEqual([
-      { memberId: user?.id, status: firstStatus },
+      { participantId: user?.id, status: firstStatus },
     ]);
   });
 
@@ -208,7 +208,7 @@ describe('OpenTimeslotCardComponent', () => {
     expect(appointments[0].availabilities).toEqual(
       expect.arrayContaining([
         other,
-        expect.objectContaining({ memberId: user?.id }),
+        expect.objectContaining({ participantId: user?.id }),
       ]),
     );
     expect(appointments[0].availabilities).toHaveLength(2);

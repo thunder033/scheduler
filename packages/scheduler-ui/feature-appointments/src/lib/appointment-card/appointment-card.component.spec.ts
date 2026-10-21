@@ -46,7 +46,7 @@ function createAvailability(
   overrides: Partial<Availability> = {},
 ): Availability {
   return {
-    memberId: 'member-1',
+    participantId: 'member-1',
     status: AvailabilityStatus.Available,
     ...overrides,
   };
@@ -166,7 +166,7 @@ describe('AppointmentCardComponent', () => {
 
     it('should ask the user to set their availability when they have not', async () => {
       const { harness } = await setup({
-        availabilities: [createAvailability({ memberId: 'other-member' })],
+        availabilities: [createAvailability({ participantId: 'other-member' })],
       });
       const select = await getAvailabilitySelect(harness);
 
@@ -179,7 +179,7 @@ describe('AppointmentCardComponent', () => {
       async (status) => {
         const { harness } = await setup({
           availabilities: [
-            createAvailability({ memberId: 'other-member' }),
+            createAvailability({ participantId: 'other-member' }),
             createAvailability({ status }),
           ],
         });
@@ -214,7 +214,7 @@ describe('AppointmentCardComponent', () => {
       );
 
       expect(await getSavedAvailabilities()).toEqual([
-        { memberId: user?.id, status: AvailabilityStatus.IfNeeded },
+        { participantId: user?.id, status: AvailabilityStatus.IfNeeded },
       ]);
     });
 
@@ -227,13 +227,13 @@ describe('AppointmentCardComponent', () => {
         await select.selectOption(AVAILABILITY_STATUS_LABELS[status]);
 
         expect(await getSavedAvailabilities()).toEqual([
-          { memberId: user?.id, status },
+          { participantId: user?.id, status },
         ]);
       },
     );
 
     it('should replace the availability the user has set, leaving those of others', async () => {
-      const other = createAvailability({ memberId: 'other-member' });
+      const other = createAvailability({ participantId: 'other-member' });
       const { harness, user, getSavedAvailabilities } = await setup({
         availabilities: [other, createAvailability()],
       });
@@ -247,7 +247,7 @@ describe('AppointmentCardComponent', () => {
       expect(saved).toHaveLength(2);
       expect(saved).toContainEqual(other);
       expect(saved).toContainEqual({
-        memberId: user?.id,
+        participantId: user?.id,
         status: AvailabilityStatus.Unavailable,
       });
     });
@@ -288,11 +288,11 @@ describe('AppointmentCardComponent', () => {
         availabilities: [
           createAvailability(),
           createAvailability({
-            memberId: member.id,
+            participantId: member.id,
             status: AvailabilityStatus.IfNeeded,
           }),
           createAvailability({
-            memberId: prospect.id,
+            participantId: prospect.id,
             status: AvailabilityStatus.Unavailable,
           }),
         ],
@@ -327,7 +327,9 @@ describe('AppointmentCardComponent', () => {
 
     it('should name a participant whose user is not known', async () => {
       const { harness } = await setup({
-        availabilities: [createAvailability({ memberId: 'unknown-member' })],
+        availabilities: [
+          createAvailability({ participantId: 'unknown-member' }),
+        ],
       });
 
       expect(await harness.getParticipantAvailabilities()).toEqual([
@@ -344,7 +346,7 @@ describe('AppointmentCardComponent', () => {
 
       fixture.componentRef.setInput('appointment', {
         ...appointment,
-        availabilities: [createAvailability({ memberId: member.id })],
+        availabilities: [createAvailability({ participantId: member.id })],
       });
 
       expect(await harness.getParticipantAvailabilities()).toEqual([
@@ -411,7 +413,7 @@ describe('AppointmentCardComponent', () => {
         user: coordinator,
         availabilities: [
           createAvailability({
-            memberId: coordinator.id,
+            participantId: coordinator.id,
             status: AvailabilityStatus.IfNeeded,
           }),
         ],
@@ -451,7 +453,9 @@ describe('AppointmentCardComponent', () => {
       'should offer to confirm a participant who is %s while editing',
       async (status) => {
         const { harness } = await setupEditing({
-          availabilities: [createAvailability({ memberId: member.id, status })],
+          availabilities: [
+            createAvailability({ participantId: member.id, status }),
+          ],
         });
 
         expect(
@@ -466,7 +470,7 @@ describe('AppointmentCardComponent', () => {
       const { harness } = await setupEditing({
         availabilities: [
           createAvailability({
-            memberId: member.id,
+            participantId: member.id,
             status: AvailabilityStatus.Unavailable,
           }),
         ],
@@ -482,7 +486,9 @@ describe('AppointmentCardComponent', () => {
       'should enable the checkbox of a participant who is %s',
       async (status) => {
         const { harness } = await setupEditing({
-          availabilities: [createAvailability({ memberId: member.id, status })],
+          availabilities: [
+            createAvailability({ participantId: member.id, status }),
+          ],
         });
 
         expect(
@@ -496,7 +502,7 @@ describe('AppointmentCardComponent', () => {
     it('should not offer to confirm anyone when not editing', async () => {
       const { harness } = await setup({
         user: coordinator,
-        availabilities: [createAvailability({ memberId: member.id })],
+        availabilities: [createAvailability({ participantId: member.id })],
       });
 
       expect(
@@ -507,8 +513,8 @@ describe('AppointmentCardComponent', () => {
     it('should confirm the participant that is checked', async () => {
       const { harness, getSavedConfirmedUserIds } = await setupEditing({
         availabilities: [
-          createAvailability({ memberId: member.id }),
-          createAvailability({ memberId: prospect.id }),
+          createAvailability({ participantId: member.id }),
+          createAvailability({ participantId: prospect.id }),
         ],
       });
 
@@ -521,7 +527,7 @@ describe('AppointmentCardComponent', () => {
 
     it('should take back the confirmation of a participant that is unchecked', async () => {
       const { harness, getSavedConfirmedUserIds } = await setupEditing({
-        availabilities: [createAvailability({ memberId: member.id })],
+        availabilities: [createAvailability({ participantId: member.id })],
         confirmedUserIds: [member.id],
       });
       const participantAvailability =
@@ -537,8 +543,8 @@ describe('AppointmentCardComponent', () => {
       const { harness } = await setup({
         user: coordinator,
         availabilities: [
-          createAvailability({ memberId: member.id }),
-          createAvailability({ memberId: prospect.id }),
+          createAvailability({ participantId: member.id }),
+          createAvailability({ participantId: prospect.id }),
         ],
         confirmedUserIds: [member.id],
       });
@@ -564,7 +570,7 @@ describe('AppointmentCardComponent', () => {
     it('should offer to confirm the user among the participants while editing', async () => {
       const { harness } = await setup({
         user: coordinator,
-        availabilities: [createAvailability({ memberId: coordinator.id })],
+        availabilities: [createAvailability({ participantId: coordinator.id })],
       });
       const own = await harness.getParticipantAvailability({
         name: coordinator.displayName,
@@ -580,7 +586,7 @@ describe('AppointmentCardComponent', () => {
     it('should confirm the user that checks their own availability', async () => {
       const { harness, getSavedConfirmedUserIds } = await setup({
         user: coordinator,
-        availabilities: [createAvailability({ memberId: coordinator.id })],
+        availabilities: [createAvailability({ participantId: coordinator.id })],
       });
       await harness.toggleEditingAppointment();
 
@@ -615,7 +621,7 @@ describe('AppointmentCardComponent', () => {
       const user = createUser({ roles: [UserRole.Coordinator] });
       const { fixture, harness, service, appointment } = await setup({
         user,
-        availabilities: [createAvailability({ memberId: user.id })],
+        availabilities: [createAvailability({ participantId: user.id })],
         confirmedUserIds: [user.id],
       });
       await harness.toggleEditingAppointment();
@@ -641,8 +647,8 @@ describe('AppointmentCardComponent', () => {
     it('should list the facilitators apart from the prospect', async () => {
       const { harness } = await setup({
         availabilities: [
-          createAvailability({ memberId: prospect.id }),
-          createAvailability({ memberId: member.id }),
+          createAvailability({ participantId: prospect.id }),
+          createAvailability({ participantId: member.id }),
         ],
       });
 
@@ -668,7 +674,7 @@ describe('AppointmentCardComponent', () => {
     it('should include coordinators among the facilitators', async () => {
       const { harness } = await setup({
         user: coordinator,
-        availabilities: [createAvailability({ memberId: coordinator.id })],
+        availabilities: [createAvailability({ participantId: coordinator.id })],
       });
 
       const [section] = await harness.getParticipantSections();
@@ -679,7 +685,7 @@ describe('AppointmentCardComponent', () => {
 
     it('should leave out a section without anyone in it', async () => {
       const { harness } = await setup({
-        availabilities: [createAvailability({ memberId: prospect.id })],
+        availabilities: [createAvailability({ participantId: prospect.id })],
       });
 
       expect(
@@ -697,15 +703,15 @@ describe('AppointmentCardComponent', () => {
       const { harness } = await setup({
         availabilities: [
           createAvailability({
-            memberId: 'unavailable-member',
+            participantId: 'unavailable-member',
             status: AvailabilityStatus.Unavailable,
           }),
           createAvailability({
-            memberId: 'if-needed-member',
+            participantId: 'if-needed-member',
             status: AvailabilityStatus.IfNeeded,
           }),
           createAvailability({
-            memberId: 'available-member',
+            participantId: 'available-member',
             status: AvailabilityStatus.Available,
           }),
         ],
@@ -722,9 +728,9 @@ describe('AppointmentCardComponent', () => {
 
     describe('when participants are confirmed', () => {
       const availabilities = [
-        createAvailability({ memberId: member.id }),
-        createAvailability({ memberId: 'other-member' }),
-        createAvailability({ memberId: prospect.id }),
+        createAvailability({ participantId: member.id }),
+        createAvailability({ participantId: 'other-member' }),
+        createAvailability({ participantId: prospect.id }),
       ];
 
       it('should list only the confirmed in a section that has some, outside of editing', async () => {
@@ -809,7 +815,9 @@ describe('AppointmentCardComponent', () => {
     it('should still show the availability of the participants', async () => {
       const { harness } = await setup({
         week: PAST_WEEK,
-        availabilities: [createAvailability({ memberId: SEED_USERS[1].id })],
+        availabilities: [
+          createAvailability({ participantId: SEED_USERS[1].id }),
+        ],
       });
 
       expect(await harness.getParticipantAvailabilities()).toHaveLength(1);

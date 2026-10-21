@@ -77,7 +77,7 @@ export class RemoveAvailability {
 
   constructor(
     readonly appointmentId: string,
-    readonly memberId: string,
+    readonly participantId: string,
   ) {}
 }
 
@@ -96,20 +96,20 @@ export class RemoveProspect {
   constructor(readonly appointmentId: string) {}
 }
 
-export class ConfirmMember {
-  static readonly type = '[Planning] Confirm Member';
+export class ConfirmParticipant {
+  static readonly type = '[Planning] Confirm Participant';
 
   constructor(
     readonly appointmentId: string,
-    readonly memberId: string,
+    readonly participantId: string,
   ) {}
 }
 
-export class UnconfirmMember {
+export class UnconfirmParticipant {
   static readonly type = '[Planning] Unconfirm Member';
 
   constructor(
     readonly appointmentId: string,
-    readonly memberId: string,
+    readonly participantId: string,
   ) {}
 }

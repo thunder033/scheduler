@@ -85,7 +85,7 @@ export class OpenTimeslotCardComponent {
       await firstValueFrom(
         this.store.dispatch(
           new SetAvailability(appointmentId, {
-            memberId: user.id,
+            participantId: user.id,
             status: this.availability().status ?? DEFAULT_AVAILABILITY_STATUS,
           }),
         ),

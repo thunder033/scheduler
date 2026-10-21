@@ -425,9 +425,11 @@ describe('AppointmentsComponent', () => {
     );
     expect(
       getLoadedAppointments(week).flatMap(({ availabilities }) =>
-        availabilities.filter(({ memberId }) => memberId === user.id),
+        availabilities.filter(({ participantId }) => participantId === user.id),
       ),
-    ).toEqual([{ memberId: user.id, status: AvailabilityStatus.Unavailable }]);
+    ).toEqual([
+      { participantId: user.id, status: AvailabilityStatus.Unavailable },
+    ]);
   });
 
   it('should return to the same week after navigating forward and back', async () => {

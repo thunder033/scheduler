@@ -14,7 +14,7 @@ import {
 } from '@org/scheduler-ui/data';
 import { Observable, tap, throwError } from 'rxjs';
 import {
-  ConfirmMember,
+  ConfirmParticipant,
   CreateAppointment,
   CreateTimeslot,
   DeleteTimeslot,
@@ -26,7 +26,7 @@ import {
   SetProspect,
   StartEditingTimeslot,
   StopEditingTimeslot,
-  UnconfirmMember,
+  UnconfirmParticipant,
   UpdateTimeslot,
   UpdateEditingTimeslot,
 } from './planning.actions';
@@ -215,10 +215,10 @@ export class PlanningState {
   @Action(RemoveAvailability)
   removeAvailability(
     context: PlanningContext,
-    { appointmentId, memberId }: RemoveAvailability,
+    { appointmentId, participantId }: RemoveAvailability,
   ): Observable<Appointment> {
     return this.timeslotService
-      .removeAvailability(appointmentId, memberId)
+      .removeAvailability(appointmentId, participantId)
       .pipe(tap((appointment) => this.upsertAppointment(context, appointment)));
   }
 
@@ -242,23 +242,23 @@ export class PlanningState {
       .pipe(tap((appointment) => this.upsertAppointment(context, appointment)));
   }
 
-  @Action(ConfirmMember)
-  confirmMember(
+  @Action(ConfirmParticipant)
+  confirmParticipant(
     context: PlanningContext,
-    { appointmentId, memberId }: ConfirmMember,
+    { appointmentId, participantId }: ConfirmParticipant,
   ): Observable<Appointment> {
     return this.updateConfirmedUsers(context, appointmentId, (ids) => [
-      ...new Set([...ids, memberId]),
+      ...new Set([...ids, participantId]),
     ]);
   }
 
-  @Action(UnconfirmMember)
-  unconfirmMember(
+  @Action(UnconfirmParticipant)
+  unconfirmParticipant(
     context: PlanningContext,
-    { appointmentId, memberId }: UnconfirmMember,
+    { appointmentId, participantId }: UnconfirmParticipant,
   ): Observable<Appointment> {
     return this.updateConfirmedUsers(context, appointmentId, (ids) =>
-      ids.filter((id) => id !== memberId),
+      ids.filter((id) => id !== participantId),
     );
   }
 

@@ -10,7 +10,7 @@ import {
 } from '@org/scheduler-ui/data';
 import { firstValueFrom } from 'rxjs';
 import {
-  ConfirmMember,
+  ConfirmParticipant,
   CreateAppointment,
   CreateTimeslot,
   DeleteTimeslot,
@@ -23,7 +23,7 @@ import {
   StartEditingTimeslot,
   StopEditingTimeslot,
   UpdateEditingTimeslot,
-  UnconfirmMember,
+  UnconfirmParticipant,
   UpdateTimeslot,
 } from './planning.actions';
 import { PlanningState } from './planning.state';
@@ -52,7 +52,7 @@ function createAvailability(
   overrides: Partial<Availability> = {},
 ): Availability {
   return {
-    memberId: 'member-1',
+    participantId: 'member-1',
     status: AvailabilityStatus.Available,
     ...overrides,
   };
@@ -418,7 +418,7 @@ describe('PlanningState', () => {
   });
 
   describe('SetAvailability', () => {
-    it('should set the availability on the appointment, replacing the same member', async () => {
+    it('should set the availability on the appointment, replacing the same participant', async () => {
       const { store, getAppointment } = await setup({ withAppointment: true });
       const { appointmentId } = getAppointment();
       const replacement = createAvailability({
@@ -451,11 +451,11 @@ describe('PlanningState', () => {
   });
 
   describe('RemoveAvailability', () => {
-    it("should remove only the member's availability", async () => {
+    it("should remove only the participant's availability", async () => {
       const { store, getAppointment } = await setup({ withAppointment: true });
       const { appointmentId } = getAppointment();
       const removed = createAvailability();
-      const kept = createAvailability({ memberId: 'member-2' });
+      const kept = createAvailability({ participantId: 'member-2' });
       for (const availability of [removed, kept]) {
         await firstValueFrom(
           store.dispatch(new SetAvailability(appointmentId, availability)),
@@ -463,7 +463,9 @@ describe('PlanningState', () => {
       }
 
       await firstValueFrom(
-        store.dispatch(new RemoveAvailability(appointmentId, removed.memberId)),
+        store.dispatch(
+          new RemoveAvailability(appointmentId, removed.participantId),
+        ),
       );
 
       expect(getAppointment().availabilities).toEqual([kept]);
@@ -498,16 +500,16 @@ describe('PlanningState', () => {
     });
   });
 
-  describe('ConfirmMember', () => {
-    it('should add the member to those already confirmed', async () => {
+  describe('ConfirmParticipant', () => {
+    it('should add the participant to those already confirmed', async () => {
       const { store, getAppointment } = await setup({ withAppointment: true });
       const { appointmentId } = getAppointment();
       await firstValueFrom(
-        store.dispatch(new ConfirmMember(appointmentId, 'member-1')),
+        store.dispatch(new ConfirmParticipant(appointmentId, 'member-1')),
       );
 
       await firstValueFrom(
-        store.dispatch(new ConfirmMember(appointmentId, 'member-2')),
+        store.dispatch(new ConfirmParticipant(appointmentId, 'member-2')),
       );
 
       expect(getAppointment().confirmedUserIds).toEqual([
@@ -516,13 +518,13 @@ describe('PlanningState', () => {
       ]);
     });
 
-    it('should not confirm the same member twice', async () => {
+    it('should not confirm the same participant twice', async () => {
       const { store, getAppointment } = await setup({ withAppointment: true });
       const { appointmentId } = getAppointment();
 
       for (let attempt = 0; attempt < 2; attempt++) {
         await firstValueFrom(
-          store.dispatch(new ConfirmMember(appointmentId, 'member-1')),
+          store.dispatch(new ConfirmParticipant(appointmentId, 'member-1')),
         );
       }
 
@@ -534,38 +536,40 @@ describe('PlanningState', () => {
 
       await expect(
         firstValueFrom(
-          store.dispatch(new ConfirmMember(MISSING_APPOINTMENT_ID, 'member-1')),
+          store.dispatch(
+            new ConfirmParticipant(MISSING_APPOINTMENT_ID, 'member-1'),
+          ),
         ),
       ).rejects.toThrow(appointmentNotFoundMessage(MISSING_APPOINTMENT_ID));
     });
   });
 
-  describe('UnconfirmMember', () => {
-    it('should remove only the given member from those confirmed', async () => {
+  describe('UnconfirmParticipant', () => {
+    it('should remove only the given participant from those confirmed', async () => {
       const { store, getAppointment } = await setup({ withAppointment: true });
       const { appointmentId } = getAppointment();
-      for (const memberId of ['member-1', 'member-2']) {
+      for (const participantId of ['member-1', 'member-2']) {
         await firstValueFrom(
-          store.dispatch(new ConfirmMember(appointmentId, memberId)),
+          store.dispatch(new ConfirmParticipant(appointmentId, participantId)),
         );
       }
 
       await firstValueFrom(
-        store.dispatch(new UnconfirmMember(appointmentId, 'member-1')),
+        store.dispatch(new UnconfirmParticipant(appointmentId, 'member-1')),
       );
 
       expect(getAppointment().confirmedUserIds).toEqual(['member-2']);
     });
 
-    it('should leave confirmations unchanged when the member is not confirmed', async () => {
+    it('should leave confirmations unchanged when the participant is not confirmed', async () => {
       const { store, getAppointment } = await setup({ withAppointment: true });
       const { appointmentId } = getAppointment();
       await firstValueFrom(
-        store.dispatch(new ConfirmMember(appointmentId, 'member-1')),
+        store.dispatch(new ConfirmParticipant(appointmentId, 'member-1')),
       );
 
       await firstValueFrom(
-        store.dispatch(new UnconfirmMember(appointmentId, 'member-2')),
+        store.dispatch(new UnconfirmParticipant(appointmentId, 'member-2')),
       );
 
       expect(getAppointment().confirmedUserIds).toEqual(['member-1']);
@@ -577,7 +581,7 @@ describe('PlanningState', () => {
       await expect(
         firstValueFrom(
           store.dispatch(
-            new UnconfirmMember(MISSING_APPOINTMENT_ID, 'member-1'),
+            new UnconfirmParticipant(MISSING_APPOINTMENT_ID, 'member-1'),
           ),
         ),
       ).rejects.toThrow(appointmentNotFoundMessage(MISSING_APPOINTMENT_ID));

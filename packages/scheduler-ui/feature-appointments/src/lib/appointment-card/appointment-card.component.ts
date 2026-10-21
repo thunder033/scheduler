@@ -17,10 +17,10 @@ import {
 } from '@org/models';
 import { ExpandableCard } from '@org/scheduler-ui/core-ui';
 import {
-  ConfirmMember,
+  ConfirmParticipant,
   LocalUserState,
   SetAvailability,
-  UnconfirmMember,
+  UnconfirmParticipant,
   UsersState,
 } from '@org/scheduler-ui/state';
 import { firstValueFrom } from 'rxjs';
@@ -110,7 +110,7 @@ export class AppointmentCardComponent extends ExpandableCard {
     const user = this.currentUser();
     return (
       this.appointment().availabilities.find(
-        ({ memberId }) => memberId === user?.id,
+        ({ participantId }) => participantId === user?.id,
       )?.status ?? null
     );
   });
@@ -120,7 +120,7 @@ export class AppointmentCardComponent extends ExpandableCard {
     const users = this.usersById();
     const { availabilities, confirmedUserIds } = this.appointment();
     const editing = this.expanded();
-    return availabilities.map(({ memberId: participantId, status }) => ({
+    return availabilities.map(({ participantId, status }) => ({
       participantId,
       status,
       confirmed: confirmedUserIds.includes(participantId),
@@ -193,8 +193,8 @@ export class AppointmentCardComponent extends ExpandableCard {
     await firstValueFrom(
       this.store.dispatch(
         confirmed
-          ? new ConfirmMember(appointmentId, participantId)
-          : new UnconfirmMember(appointmentId, participantId),
+          ? new ConfirmParticipant(appointmentId, participantId)
+          : new UnconfirmParticipant(appointmentId, participantId),
       ),
     );
   }
@@ -212,7 +212,7 @@ export class AppointmentCardComponent extends ExpandableCard {
       await firstValueFrom(
         this.store.dispatch(
           new SetAvailability(this.appointment().appointmentId, {
-            memberId: user.id,
+            participantId: user.id,
             status,
           }),
         ),

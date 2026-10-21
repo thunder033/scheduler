@@ -1,9 +1,4 @@
-import {
-  parse,
-  setISODay,
-  setISOWeek,
-  setISOWeekYear,
-} from 'date-fns';
+import { parse, setISODay, setISOWeek, setISOWeekYear } from 'date-fns';
 import { Timeslot } from '@org/models';
 import { AppointmentWeek } from '@org/scheduler-ui/data';
 
@@ -16,10 +11,7 @@ export function dateInWeek(
   { year, week }: AppointmentWeek,
   dayOfWeek: number,
 ): Date {
-  return setISODay(
-    setISOWeek(setISOWeekYear(MID_YEAR, year), week),
-    dayOfWeek,
-  );
+  return setISODay(setISOWeek(setISOWeekYear(MID_YEAR, year), week), dayOfWeek);
 }
 
 /** Whether the timeslot has ended, when it is on the day, which is when it is in the past */

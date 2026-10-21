@@ -85,7 +85,7 @@ export function createSeedAppointments(now = new Date()): Appointment[] {
       timeslotId: 'mock-timeslot-1',
       ...thisWeek,
       availabilities: [
-        { memberId: MEMBER.id, status: AvailabilityStatus.Available },
+        { participantId: MEMBER.id, status: AvailabilityStatus.Available },
       ],
       confirmedUserIds: [],
     },
@@ -94,8 +94,8 @@ export function createSeedAppointments(now = new Date()): Appointment[] {
       timeslotId: 'mock-timeslot-2',
       ...thisWeek,
       availabilities: [
-        { memberId: COORDINATOR.id, status: AvailabilityStatus.Available },
-        { memberId: MEMBER.id, status: AvailabilityStatus.IfNeeded },
+        { participantId: COORDINATOR.id, status: AvailabilityStatus.Available },
+        { participantId: MEMBER.id, status: AvailabilityStatus.IfNeeded },
       ],
       confirmedUserIds: [],
     },
@@ -104,8 +104,11 @@ export function createSeedAppointments(now = new Date()): Appointment[] {
       timeslotId: 'mock-timeslot-6',
       ...thisWeek,
       availabilities: [
-        { memberId: MEMBER.id, status: AvailabilityStatus.IfNeeded },
-        { memberId: COORDINATOR.id, status: AvailabilityStatus.Unavailable },
+        { participantId: MEMBER.id, status: AvailabilityStatus.IfNeeded },
+        {
+          participantId: COORDINATOR.id,
+          status: AvailabilityStatus.Unavailable,
+        },
       ],
       confirmedUserIds: [],
       prospectId: PROSPECT.id,
@@ -115,7 +118,7 @@ export function createSeedAppointments(now = new Date()): Appointment[] {
       timeslotId: 'mock-timeslot-3',
       ...nextWeek,
       availabilities: [
-        { memberId: COORDINATOR.id, status: AvailabilityStatus.IfNeeded },
+        { participantId: COORDINATOR.id, status: AvailabilityStatus.IfNeeded },
       ],
       confirmedUserIds: [],
     },
@@ -124,8 +127,8 @@ export function createSeedAppointments(now = new Date()): Appointment[] {
       timeslotId: 'mock-timeslot-1',
       ...nextWeek,
       availabilities: [
-        { memberId: MEMBER.id, status: AvailabilityStatus.Available },
-        { memberId: COORDINATOR.id, status: AvailabilityStatus.Available },
+        { participantId: MEMBER.id, status: AvailabilityStatus.Available },
+        { participantId: COORDINATOR.id, status: AvailabilityStatus.Available },
       ],
       confirmedUserIds: [MEMBER.id],
     },
@@ -230,7 +233,7 @@ export class TimeslotService {
     return of(appointment);
   }
 
-  /** Adds the member's availability, replacing any existing entry for them */
+  /** Adds the participant's availability, replacing any existing entry for them */
   setAvailability(
     appointmentId: string,
     availability: Availability,
@@ -238,21 +241,21 @@ export class TimeslotService {
     return this.updateAppointment(appointmentId, (appointment) => ({
       availabilities: [
         ...appointment.availabilities.filter(
-          (existing) => existing.memberId !== availability.memberId,
+          (existing) => existing.participantId !== availability.participantId,
         ),
         availability,
       ],
     }));
   }
 
-  /** Removing a member with no availability set leaves the appointment unchanged */
+  /** Removing a participant with no availability set leaves the appointment unchanged */
   removeAvailability(
     appointmentId: string,
-    memberId: string,
+    participantId: string,
   ): Observable<Appointment> {
     return this.updateAppointment(appointmentId, (appointment) => ({
       availabilities: appointment.availabilities.filter(
-        (existing) => existing.memberId !== memberId,
+        (existing) => existing.participantId !== participantId,
       ),
     }));
   }

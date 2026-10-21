@@ -24,11 +24,11 @@ export class ParticipantAvailabilityHarness extends ComponentHarness {
   static with(
     options: ParticipantAvailabilityHarnessFilters = {},
   ): HarnessPredicate<ParticipantAvailabilityHarness> {
-    return new HarnessPredicate(ParticipantAvailabilityHarness, options).addOption(
-      'name',
-      options.name,
-      (harness, name) =>
-        HarnessPredicate.stringMatches(harness.getName(), name),
+    return new HarnessPredicate(
+      ParticipantAvailabilityHarness,
+      options,
+    ).addOption('name', options.name, (harness, name) =>
+      HarnessPredicate.stringMatches(harness.getName(), name),
     );
   }
 
