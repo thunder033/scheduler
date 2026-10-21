@@ -3,7 +3,8 @@ import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
 import { of } from 'rxjs';
-import { User, UserRole } from '@org/models';
+import { UserRole } from '@org/models';
+import { mockUser } from '@org/scheduler-ui/data/testing';
 import {
   LocalUserState,
   SetCurrentUser,
@@ -60,12 +61,7 @@ describe('SideNavComponent', () => {
 
   it('should display the current user', async () => {
     const { harness, store } = await setup();
-    const user: User = {
-      id: 'user-1',
-      displayName: 'Test User',
-      contact: [],
-      roles: [UserRole.Member],
-    };
+    const user = mockUser.MEMBER;
 
     store.dispatch(new SetCurrentUser(user));
 
@@ -84,14 +80,10 @@ describe('SideNavComponent', () => {
   });
 
   describe('navigation items', () => {
-    function createUser(roles: UserRole[]): User {
-      return { id: 'user-1', displayName: 'Test User', contact: [], roles };
-    }
-
     it('should list the items for everyone, but not the role-specific ones, to a member', async () => {
       const { harness, store } = await setup();
 
-      store.dispatch(new SetCurrentUser(createUser([UserRole.Member])));
+      store.dispatch(new SetCurrentUser(mockUser.MEMBER));
 
       expect(await harness.getNavigationLabels()).toEqual(
         NAV_ITEMS.filter((item) => !item.role).map((item) => item.label),
@@ -101,7 +93,7 @@ describe('SideNavComponent', () => {
     it('should also list the role-specific items to a user with that role', async () => {
       const { harness, store } = await setup();
 
-      store.dispatch(new SetCurrentUser(createUser([UserRole.Coordinator])));
+      store.dispatch(new SetCurrentUser(mockUser.COORDINATOR));
 
       expect(await harness.getNavigationLabels()).toEqual(
         NAV_ITEMS.map((item) => item.label),

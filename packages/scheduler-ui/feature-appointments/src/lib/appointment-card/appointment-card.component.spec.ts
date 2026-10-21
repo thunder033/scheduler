@@ -2,11 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
 import { Availability, AvailabilityStatus, User, UserRole } from '@org/models';
-import {
-  AppointmentWeek,
-  SEED_USERS,
-  TimeslotService,
-} from '@org/scheduler-ui/data';
+import { AppointmentWeek, TimeslotService } from '@org/scheduler-ui/data';
+import { mockTimeslot, mockUser } from '@org/scheduler-ui/data/testing';
 import {
   LoadAppointmentsByWeek,
   LoadUsers,
@@ -26,27 +23,21 @@ import {
 } from './appointment-card.component';
 import { AppointmentCardHarness } from './appointment-card.harness';
 
-/** A week in a year far ahead, which is not over and has none of the appointments that are seeded around today */
+/** A week in a year far ahead, which is not over */
 const FUTURE_WEEK: AppointmentWeek = { year: 2099, week: 43 };
 /** A week in a year long past, which is over */
 const PAST_WEEK: AppointmentWeek = { year: 2001, week: 43 };
 const STATUSES = Object.values(AvailabilityStatus);
-
-function createUser(overrides: Partial<User> = {}): User {
-  return {
-    id: 'member-1',
-    displayName: 'Member One',
-    contact: [],
-    roles: [UserRole.Member],
-    ...overrides,
-  };
-}
+/** The users that exist from the start, whose names are shown for the participants */
+/** The user signed in unless a test signs in another, whose availability is the default one */
+const SIGNED_IN_USER = mockUser();
+const SEEDED_USERS = [mockUser.COORDINATOR, mockUser.MEMBER, mockUser.PROSPECT];
 
 function createAvailability(
   overrides: Partial<Availability> = {},
 ): Availability {
   return {
-    participantId: 'member-1',
+    participantId: SIGNED_IN_USER.id,
     status: AvailabilityStatus.Available,
     ...overrides,
   };
@@ -76,12 +67,15 @@ async function setup({
   availabilities = [],
   confirmedUserIds = [],
   week = FUTURE_WEEK,
-  user = createUser(),
+  user = SIGNED_IN_USER,
   animated = false,
 }: SetupOptions = {}) {
+  const timeslot = mockTimeslot.MONDAY_MORNING;
   await TestBed.configureTestingModule({
     imports: [AppointmentCardComponent],
-    providers: [provideTestState()],
+    providers: [
+      provideTestState({ users: SEEDED_USERS, timeslots: [timeslot] }),
+    ],
   }).compileComponents();
   if (animated) {
     CommonTest.withAnimations();
@@ -94,9 +88,6 @@ async function setup({
   }
 
   const service = TestBed.inject(TimeslotService);
-  const timeslot = await firstValueFrom(
-    service.createTimeslot({ start: '09:00', end: '10:30', dayOfWeek: 1 }),
-  );
   let appointment = await firstValueFrom(
     service.createAppointment(timeslot.timeslotId, week),
   );
@@ -281,7 +272,7 @@ describe('AppointmentCardComponent', () => {
   });
 
   describe('the availability of the participants', () => {
-    const [, member, prospect] = SEED_USERS;
+    const { MEMBER: member, PROSPECT: prospect } = mockUser;
 
     it('should show the name of each of the participants with their status', async () => {
       const { harness } = await setup({
@@ -299,18 +290,24 @@ describe('AppointmentCardComponent', () => {
       });
 
       expect(await harness.getParticipantAvailabilities()).toEqual([
-        { name: 'Member One', status: AvailabilityStatus.Available },
+        {
+          name: SIGNED_IN_USER.displayName,
+          status: AvailabilityStatus.Available,
+        },
         { name: member.displayName, status: AvailabilityStatus.IfNeeded },
         { name: prospect.displayName, status: AvailabilityStatus.Unavailable },
       ]);
     });
 
     it('should list the availability of the user among the others', async () => {
-      const user = createUser({ displayName: 'Coordinator One' });
+      const user = mockUser.COORDINATOR;
       const { harness } = await setup({
         user,
         availabilities: [
-          createAvailability({ status: AvailabilityStatus.IfNeeded }),
+          createAvailability({
+            participantId: user.id,
+            status: AvailabilityStatus.IfNeeded,
+          }),
         ],
       });
 
@@ -356,7 +353,7 @@ describe('AppointmentCardComponent', () => {
   });
 
   describe('editing the appointment', () => {
-    const coordinator = createUser({ roles: [UserRole.Coordinator] });
+    const coordinator = mockUser.COORDINATOR;
 
     it('should offer editing to a coordinator', async () => {
       const { harness } = await setup({ user: coordinator });
@@ -364,16 +361,14 @@ describe('AppointmentCardComponent', () => {
       expect(await harness.hasEditAppointment()).toBe(true);
     });
 
-    it.each([UserRole.Member, UserRole.Prospect])(
-      'should not offer editing to a %s',
-      async (role) => {
-        const { harness } = await setup({
-          user: createUser({ roles: [role] }),
-        });
+    it.each([
+      [UserRole.Member, mockUser.MEMBER],
+      [UserRole.Prospect, mockUser.PROSPECT],
+    ])('should not offer editing to a %s', async (_role, user) => {
+      const { harness } = await setup({ user });
 
-        expect(await harness.hasEditAppointment()).toBe(false);
-      },
-    );
+      expect(await harness.hasEditAppointment()).toBe(false);
+    });
 
     it('should not offer editing without a user', async () => {
       const { harness } = await setup({ user: null });
@@ -428,8 +423,8 @@ describe('AppointmentCardComponent', () => {
   });
 
   describe('confirming participants', () => {
-    const coordinator = createUser({ roles: [UserRole.Coordinator] });
-    const [, member, prospect] = SEED_USERS;
+    const coordinator = mockUser.COORDINATOR;
+    const { MEMBER: member, PROSPECT: prospect } = mockUser;
 
     async function setupEditing(options: SetupOptions = {}) {
       const result = await setup({ user: coordinator, ...options });
@@ -565,7 +560,7 @@ describe('AppointmentCardComponent', () => {
   });
 
   describe('confirming the user', () => {
-    const coordinator = createUser({ roles: [UserRole.Coordinator] });
+    const coordinator = mockUser.COORDINATOR;
 
     it('should offer to confirm the user among the participants while editing', async () => {
       const { harness } = await setup({
@@ -600,7 +595,7 @@ describe('AppointmentCardComponent', () => {
     it('should replace the availability of the user with a notice that they are confirmed', async () => {
       const { harness } = await setup({
         availabilities: [createAvailability()],
-        confirmedUserIds: ['member-1'],
+        confirmedUserIds: [SIGNED_IN_USER.id],
       });
 
       expect(await harness.availabilitySelect()).toBeNull();
@@ -618,7 +613,7 @@ describe('AppointmentCardComponent', () => {
     });
 
     it('should offer the availability again when the confirmation is taken back', async () => {
-      const user = createUser({ roles: [UserRole.Coordinator] });
+      const user = mockUser.COORDINATOR;
       const { fixture, harness, service, appointment } = await setup({
         user,
         availabilities: [createAvailability({ participantId: user.id })],
@@ -641,8 +636,8 @@ describe('AppointmentCardComponent', () => {
   });
 
   describe('the sections of the participants', () => {
-    const [, member, prospect] = SEED_USERS;
-    const coordinator = createUser({ roles: [UserRole.Coordinator] });
+    const { MEMBER: member, PROSPECT: prospect } = mockUser;
+    const coordinator = mockUser.COORDINATOR;
 
     it('should list the facilitators apart from the prospect', async () => {
       const { harness } = await setup({
@@ -791,7 +786,7 @@ describe('AppointmentCardComponent', () => {
   });
 
   describe('once the appointment is over', () => {
-    const coordinator = createUser({ roles: [UserRole.Coordinator] });
+    const coordinator = mockUser.COORDINATOR;
 
     it('should not offer editing, even to a coordinator', async () => {
       const { harness } = await setup({ user: coordinator, week: PAST_WEEK });
@@ -816,7 +811,7 @@ describe('AppointmentCardComponent', () => {
       const { harness } = await setup({
         week: PAST_WEEK,
         availabilities: [
-          createAvailability({ participantId: SEED_USERS[1].id }),
+          createAvailability({ participantId: mockUser.MEMBER.id }),
         ],
       });
 

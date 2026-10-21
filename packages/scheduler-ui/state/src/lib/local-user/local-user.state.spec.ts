@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideStore, Store } from '@ngxs/store';
-import { ContactMethod, User, UserRole } from '@org/models';
+import { UserRole } from '@org/models';
+import { mockUser } from '@org/scheduler-ui/data/testing';
 import {
   SetCurrentUser,
   SetSideNavCollapsed,
@@ -13,16 +14,6 @@ import {
   THEME_PREFERENCES,
 } from './local-user.model';
 import { LocalUserState } from './local-user.state';
-
-function createUser(overrides: Partial<User> = {}): User {
-  return {
-    id: 'user-1',
-    displayName: 'Test User',
-    contact: [{ method: ContactMethod.Phone, value: '555-0100' }],
-    roles: [UserRole.Member],
-    ...overrides,
-  };
-}
 
 function setup() {
   TestBed.configureTestingModule({
@@ -104,7 +95,7 @@ describe('LocalUserState', () => {
 
     it('should expose the current user once set', () => {
       const { store } = setup();
-      const user = createUser();
+      const user = mockUser.MEMBER;
 
       store.dispatch(new SetCurrentUser(user));
 
@@ -113,7 +104,7 @@ describe('LocalUserState', () => {
 
     it('should clear the current user when set to null', () => {
       const { store } = setup();
-      store.dispatch(new SetCurrentUser(createUser()));
+      store.dispatch(new SetCurrentUser(mockUser.MEMBER));
 
       store.dispatch(new SetCurrentUser(null));
 
@@ -135,7 +126,7 @@ describe('LocalUserState', () => {
       it('should be true for every role the current user has', () => {
         const { store } = setup();
         const roles = [UserRole.Coordinator, UserRole.Member];
-        store.dispatch(new SetCurrentUser(createUser({ roles })));
+        store.dispatch(new SetCurrentUser(mockUser({ roles })));
 
         for (const role of roles) {
           expect(store.selectSnapshot(LocalUserState.hasRole(role))).toBe(true);
@@ -144,9 +135,7 @@ describe('LocalUserState', () => {
 
       it('should be false for roles the current user does not have', () => {
         const { store } = setup();
-        store.dispatch(
-          new SetCurrentUser(createUser({ roles: [UserRole.Member] })),
-        );
+        store.dispatch(new SetCurrentUser(mockUser.MEMBER));
 
         expect(
           store.selectSnapshot(LocalUserState.hasRole(UserRole.Coordinator)),
@@ -155,9 +144,7 @@ describe('LocalUserState', () => {
 
       it('should be false again once the current user is cleared', () => {
         const { store } = setup();
-        store.dispatch(
-          new SetCurrentUser(createUser({ roles: [UserRole.Member] })),
-        );
+        store.dispatch(new SetCurrentUser(mockUser.MEMBER));
 
         store.dispatch(new SetCurrentUser(null));
 
@@ -171,7 +158,7 @@ describe('LocalUserState', () => {
       const { store } = setup();
       store.dispatch(new SetThemePreference('dark'));
 
-      store.dispatch(new SetCurrentUser(createUser()));
+      store.dispatch(new SetCurrentUser(mockUser.MEMBER));
 
       expect(store.selectSnapshot(LocalUserState.themePreference)).toBe('dark');
     });

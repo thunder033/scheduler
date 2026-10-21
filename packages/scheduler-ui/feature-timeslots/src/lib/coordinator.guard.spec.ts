@@ -6,7 +6,8 @@ import {
   UrlTree,
 } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { User, UserRole } from '@org/models';
+import { UserRole } from '@org/models';
+import { mockUser } from '@org/scheduler-ui/data/testing';
 import { SetCurrentUser } from '@org/scheduler-ui/state';
 import { provideTestState } from '@org/scheduler-ui/test-utils';
 import { coordinatorGuard, ROOT_URL } from './coordinator.guard';
@@ -15,13 +16,7 @@ function setup(roles?: UserRole[]) {
   TestBed.configureTestingModule({ providers: [provideTestState()] });
   const store = TestBed.inject(Store);
   if (roles) {
-    const user: User = {
-      id: 'user-1',
-      displayName: 'Test User',
-      contact: [],
-      roles,
-    };
-    store.dispatch(new SetCurrentUser(user));
+    store.dispatch(new SetCurrentUser(mockUser({ roles })));
   }
 
   return {

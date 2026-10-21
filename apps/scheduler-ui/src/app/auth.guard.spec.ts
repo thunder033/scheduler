@@ -3,11 +3,13 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { Store } from '@ngxs/store';
-import { ContactMethod, User, UserRole } from '@org/models';
+import { User } from '@org/models';
+import { mockUser } from '@org/scheduler-ui/data/testing';
 import {
   provideSchedulerUiState,
   SetCurrentUser,
 } from '@org/scheduler-ui/state';
+import { provideTestSeeds } from '@org/scheduler-ui/test-utils';
 import { LOGIN_PATH } from './app.paths';
 import { authGuard } from './auth.guard';
 
@@ -15,15 +17,6 @@ const PROTECTED_PATH = 'protected';
 
 @Component({ template: '' })
 class TestPage {}
-
-function createUser(): User {
-  return {
-    id: 'user-1',
-    displayName: 'Test User',
-    contact: [{ method: ContactMethod.Phone, value: '555-0100' }],
-    roles: [UserRole.Member],
-  };
-}
 
 async function setup(currentUser: User | null) {
   localStorage.clear();
@@ -34,6 +27,7 @@ async function setup(currentUser: User | null) {
         { path: PROTECTED_PATH, component: TestPage, canActivate: [authGuard] },
       ]),
       provideSchedulerUiState(),
+      provideTestSeeds(),
     ],
   });
   TestBed.inject(Store).dispatch(new SetCurrentUser(currentUser));
@@ -45,7 +39,7 @@ async function setup(currentUser: User | null) {
 
 describe('authGuard', () => {
   it('should allow navigation when there is a current user', async () => {
-    const { routerHarness, router } = await setup(createUser());
+    const { routerHarness, router } = await setup(mockUser.MEMBER);
 
     await routerHarness.navigateByUrl(`/${PROTECTED_PATH}`);
 

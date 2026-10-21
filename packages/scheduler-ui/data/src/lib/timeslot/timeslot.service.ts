@@ -1,139 +1,13 @@
-import { Injectable } from '@angular/core';
-import {
-  Appointment,
-  Availability,
-  AvailabilityStatus,
-  Timeslot,
-} from '@org/models';
-import { addWeeks, getISOWeek, getISOWeekYear } from 'date-fns';
+import { Injectable, inject } from '@angular/core';
+import { Appointment, Availability, Timeslot } from '@org/models';
 import { Observable, of, throwError } from 'rxjs';
-import { SEED_USERS } from '../user/user.service';
+import { SEED_APPOINTMENTS, SEED_TIMESLOTS } from '../seed/seed.tokens';
 
 export type TimeslotDraft = Omit<Timeslot, 'timeslotId'>;
 
 export type TimeslotChanges = Partial<TimeslotDraft>;
 
 export type AppointmentWeek = Pick<Appointment, 'year' | 'week'>;
-
-const DAY_MONDAY = 1;
-const DAY_WEDNESDAY = 3;
-const DAY_FRIDAY = 5;
-const DAY_SATURDAY = 6;
-
-export const SEED_TIMESLOTS: Timeslot[] = [
-  {
-    timeslotId: 'mock-timeslot-1',
-    start: '09:00',
-    end: '10:00',
-    dayOfWeek: DAY_MONDAY,
-  },
-  {
-    timeslotId: 'mock-timeslot-2',
-    start: '18:00',
-    end: '19:30',
-    dayOfWeek: DAY_WEDNESDAY,
-  },
-  {
-    timeslotId: 'mock-timeslot-3',
-    start: '11:00',
-    end: '12:00',
-    dayOfWeek: DAY_SATURDAY,
-  },
-  {
-    timeslotId: 'mock-timeslot-4',
-    start: '12:00',
-    end: '13:00',
-    dayOfWeek: DAY_WEDNESDAY,
-  },
-  {
-    timeslotId: 'mock-timeslot-5',
-    start: '19:00',
-    end: '20:30',
-    dayOfWeek: DAY_MONDAY,
-  },
-  {
-    timeslotId: 'mock-timeslot-6',
-    start: '17:00',
-    end: '18:30',
-    dayOfWeek: DAY_FRIDAY,
-  },
-  {
-    timeslotId: 'mock-timeslot-7',
-    start: '14:00',
-    end: '15:30',
-    dayOfWeek: DAY_SATURDAY,
-  },
-];
-
-const [COORDINATOR, MEMBER, PROSPECT] = SEED_USERS;
-
-function toAppointmentWeek(date: Date): AppointmentWeek {
-  return { year: getISOWeekYear(date), week: getISOWeek(date) };
-}
-
-/**
- * Appointments in the week of the date and the one after, so there are always some around
- * today, with availabilities of the seeded users.
- */
-export function createSeedAppointments(now = new Date()): Appointment[] {
-  const thisWeek = toAppointmentWeek(now);
-  const nextWeek = toAppointmentWeek(addWeeks(now, 1));
-
-  return [
-    {
-      appointmentId: 'mock-appointment-1',
-      timeslotId: 'mock-timeslot-1',
-      ...thisWeek,
-      availabilities: [
-        { participantId: MEMBER.id, status: AvailabilityStatus.Available },
-      ],
-      confirmedUserIds: [],
-    },
-    {
-      appointmentId: 'mock-appointment-2',
-      timeslotId: 'mock-timeslot-2',
-      ...thisWeek,
-      availabilities: [
-        { participantId: COORDINATOR.id, status: AvailabilityStatus.Available },
-        { participantId: MEMBER.id, status: AvailabilityStatus.IfNeeded },
-      ],
-      confirmedUserIds: [],
-    },
-    {
-      appointmentId: 'mock-appointment-3',
-      timeslotId: 'mock-timeslot-6',
-      ...thisWeek,
-      availabilities: [
-        { participantId: MEMBER.id, status: AvailabilityStatus.IfNeeded },
-        {
-          participantId: COORDINATOR.id,
-          status: AvailabilityStatus.Unavailable,
-        },
-      ],
-      confirmedUserIds: [],
-      prospectId: PROSPECT.id,
-    },
-    {
-      appointmentId: 'mock-appointment-4',
-      timeslotId: 'mock-timeslot-3',
-      ...nextWeek,
-      availabilities: [
-        { participantId: COORDINATOR.id, status: AvailabilityStatus.IfNeeded },
-      ],
-      confirmedUserIds: [],
-    },
-    {
-      appointmentId: 'mock-appointment-5',
-      timeslotId: 'mock-timeslot-1',
-      ...nextWeek,
-      availabilities: [
-        { participantId: MEMBER.id, status: AvailabilityStatus.Available },
-        { participantId: COORDINATOR.id, status: AvailabilityStatus.Available },
-      ],
-      confirmedUserIds: [MEMBER.id],
-    },
-  ];
-}
 
 export function timeslotNotFoundMessage(id: string): string {
   return `Timeslot not found: ${id}`;
@@ -148,10 +22,10 @@ export function appointmentNotFoundMessage(id: string): string {
 })
 export class TimeslotService {
   private timeslots = new Map<string, Timeslot>(
-    SEED_TIMESLOTS.map((timeslot) => [timeslot.timeslotId, timeslot]),
+    inject(SEED_TIMESLOTS).map((timeslot) => [timeslot.timeslotId, timeslot]),
   );
   private appointments = new Map<string, Appointment>(
-    createSeedAppointments().map((appointment) => [
+    inject(SEED_APPOINTMENTS).map((appointment) => [
       appointment.appointmentId,
       appointment,
     ]),

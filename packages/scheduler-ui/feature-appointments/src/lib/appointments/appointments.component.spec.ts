@@ -2,13 +2,17 @@ import { formatDate } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
-import { AvailabilityStatus, User, UserRole } from '@org/models';
+import { AvailabilityStatus, Timeslot, User, UserRole } from '@org/models';
 import {
   AppointmentWeek,
-  SEED_USERS,
   TimeslotDraft,
   TimeslotService,
 } from '@org/scheduler-ui/data';
+import {
+  mockTimeslot,
+  mockTimeslotDraft,
+  mockUser,
+} from '@org/scheduler-ui/data/testing';
 import {
   PlanningState,
   SetCurrentUser,
@@ -35,34 +39,13 @@ import {
 import { AppointmentsHarness } from './appointments.harness';
 
 const LOCALE = 'en-US';
-/** A Monday in a year long past, whose weeks have none of the appointments seeded around today */
+/** A Monday in a year long past, whose weeks have no appointments unless a test creates them */
 const DEFAULT_TODAY = new Date(2001, 9, 15);
 /** Week 53 of 2004, which is followed by the first week of 2005 */
 const LAST_WEEK_OF_YEAR = new Date(2004, 11, 27);
 
-/** A day of the week none of the seeded timeslots use */
+/** A day of the week the default seeded timeslot does not use */
 const UNSEEDED_DAY = 2;
-
-function createTimeslotDraft(
-  overrides: Partial<TimeslotDraft> = {},
-): TimeslotDraft {
-  return {
-    start: '13:00',
-    end: '14:00',
-    dayOfWeek: UNSEEDED_DAY,
-    ...overrides,
-  };
-}
-
-function createUser(overrides: Partial<User> = {}): User {
-  return {
-    id: 'member-1',
-    displayName: 'Member One',
-    contact: [],
-    roles: [UserRole.Member],
-    ...overrides,
-  };
-}
 
 function toWeek(date: Date): AppointmentWeek {
   return { year: getISOWeekYear(date), week: getISOWeek(date) };
@@ -70,6 +53,10 @@ function toWeek(date: Date): AppointmentWeek {
 
 interface SetupOptions {
   today?: Date;
+  /** The timeslots that exist from the start; the first is the one appointments are created for */
+  seededTimeslots?: Timeslot[];
+  /** The users that exist from the start */
+  seededUsers?: User[];
   /** Timeslots created in addition to the seeded ones */
   drafts?: TimeslotDraft[];
   /** Weeks that already have an appointment, for the first of the timeslots */
@@ -78,15 +65,18 @@ interface SetupOptions {
 
 async function setup({
   today = DEFAULT_TODAY,
+  seededTimeslots = [mockTimeslot.MONDAY_MORNING],
+  seededUsers = [mockUser.COORDINATOR, mockUser.MEMBER],
   drafts = [],
   appointmentWeeks = [],
 }: SetupOptions = {}) {
   await TestBed.configureTestingModule({
     imports: [AppointmentsComponent],
-    providers: [provideTestState()],
+    providers: [
+      provideTestState({ timeslots: seededTimeslots, users: seededUsers }),
+    ],
   }).compileComponents();
 
-  // The service seeds appointments around the time it is created, which is the real time here
   const timeslotService = TestBed.inject(TimeslotService);
   vi.setSystemTime(today);
   for (const draft of drafts) {
@@ -109,6 +99,7 @@ async function setup({
     fixture,
     harness,
     today,
+    seededUsers,
     /** The timeslot the appointments are created for */
     timeslot,
     /** Signs the user in, who the availability is for */
@@ -218,7 +209,7 @@ describe('AppointmentsComponent', () => {
 
   it('should list an open timeslot under the day of the week of each timeslot', async () => {
     const { harness, getServiceTimeslots } = await setup({
-      drafts: [createTimeslotDraft()],
+      drafts: [mockTimeslotDraft({ dayOfWeek: UNSEEDED_DAY })],
     });
 
     const timeRangesByDay = await harness.getTimeRangesByDay();
@@ -246,8 +237,16 @@ describe('AppointmentsComponent', () => {
   });
 
   it('should list the open timeslots of a day in order of their start', async () => {
-    const early = createTimeslotDraft({ start: '08:00', end: '09:00' });
-    const late = createTimeslotDraft({ start: '15:00', end: '16:00' });
+    const early = mockTimeslotDraft({
+      dayOfWeek: UNSEEDED_DAY,
+      start: '08:00',
+      end: '09:00',
+    });
+    const late = mockTimeslotDraft({
+      dayOfWeek: UNSEEDED_DAY,
+      start: '15:00',
+      end: '16:00',
+    });
     const { harness } = await setup({ drafts: [late, early] });
 
     const timeRangesByDay = await harness.getTimeRangesByDay();
@@ -263,8 +262,16 @@ describe('AppointmentsComponent', () => {
     const TUESDAY_NOON = new Date(2001, 9, 16, 12);
 
     it('should not list an open timeslot that has ended', async () => {
-      const ended = createTimeslotDraft({ start: '08:00', end: '09:00' });
-      const upcoming = createTimeslotDraft({ start: '15:00', end: '16:00' });
+      const ended = mockTimeslotDraft({
+        dayOfWeek: UNSEEDED_DAY,
+        start: '08:00',
+        end: '09:00',
+      });
+      const upcoming = mockTimeslotDraft({
+        dayOfWeek: UNSEEDED_DAY,
+        start: '15:00',
+        end: '16:00',
+      });
       const { harness } = await setup({
         today: TUESDAY_NOON,
         drafts: [ended, upcoming],
@@ -313,7 +320,9 @@ describe('AppointmentsComponent', () => {
   });
 
   it('should list the same open timeslots in every week', async () => {
-    const { harness } = await setup({ drafts: [createTimeslotDraft()] });
+    const { harness } = await setup({
+      drafts: [mockTimeslotDraft({ dayOfWeek: UNSEEDED_DAY })],
+    });
     const timeRangesByDay = await harness.getTimeRangesByDay();
 
     await harness.nextWeek();
@@ -364,7 +373,7 @@ describe('AppointmentsComponent', () => {
 
   it('should show the appointment with the availability of the user once they add it', async () => {
     const { harness, timeslot, signIn } = await setup();
-    await signIn(createUser());
+    await signIn(mockUser.MEMBER);
     const day = (await harness.getDays())[timeslot.dayOfWeek - 1];
     const [openCard] = await day.getOpenTimeslotCards({
       timeRange: formatTimeRange(timeslot),
@@ -390,19 +399,19 @@ describe('AppointmentsComponent', () => {
   });
 
   it('should load the users, to name the participants whose availability is shown', async () => {
-    const { harness } = await setup();
+    const { harness, seededUsers } = await setup();
 
     await harness.getWeekTitle();
 
     expect(
       Object.keys(TestBed.inject(Store).selectSnapshot(UsersState.usersById)),
-    ).toEqual(SEED_USERS.map(({ id }) => id));
+    ).toEqual(seededUsers.map(({ id }) => id));
   });
 
   it('should save a status chosen on the appointment, and show it on the appointment', async () => {
     const { harness, timeslot, signIn, getLoadedAppointments } = await setup();
     const week = toWeek(DEFAULT_TODAY);
-    const user = createUser();
+    const user = mockUser.MEMBER;
     await signIn(user);
     const day = (await harness.getDays())[timeslot.dayOfWeek - 1];
     const [openCard] = await day.getOpenTimeslotCards({

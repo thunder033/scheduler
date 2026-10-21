@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { provideStore, Store } from '@ngxs/store';
-import { ContactMethod, User, UserRole } from '@org/models';
-import { UserService } from '@org/scheduler-ui/data';
+import { User, UserRole } from '@org/models';
+import { SEED_USERS } from '@org/scheduler-ui/data';
+import { mockUser } from '@org/scheduler-ui/data/testing';
 import { firstValueFrom } from 'rxjs';
 import { LoadUsers } from './users.actions';
 import { USERS_STATE_NAME } from './users.model';
@@ -9,19 +10,12 @@ import { UsersState } from './users.state';
 
 const MISSING_USER_ID = 'missing-user';
 
-function createUser(overrides: Partial<User> = {}): User {
-  return {
-    id: 'user-1',
-    displayName: 'Test User',
-    contact: [{ method: ContactMethod.Phone, value: '555-0100' }],
-    roles: [UserRole.Member],
-    ...overrides,
-  };
-}
-
-function setup(users: User[] = []) {
+function setup(users: User[] = [], seededUsers: User[] = []) {
   TestBed.configureTestingModule({
-    providers: [provideStore([UsersState])],
+    providers: [
+      provideStore([UsersState]),
+      { provide: SEED_USERS, useValue: seededUsers },
+    ],
   });
 
   const store = TestBed.inject(Store);
@@ -36,32 +30,20 @@ function setup(users: User[] = []) {
 
 describe('UsersState', () => {
   describe('LoadUsers', () => {
-    it('should load the users of the service', async () => {
-      const { store } = setup();
-      const created = await firstValueFrom(
-        TestBed.inject(UserService).createUser({
-          displayName: 'Created User',
-          contact: [],
-          roles: [UserRole.Member],
-        }),
-      );
-      const serviceUsers = await firstValueFrom(
-        TestBed.inject(UserService).getUsers(),
-      );
+    it('should load the seeded users of the service', async () => {
+      const seededUsers = [mockUser.COORDINATOR, mockUser.MEMBER];
+      const { store } = setup([], seededUsers);
 
       await firstValueFrom(store.dispatch(new LoadUsers()));
 
       expect(store.selectSnapshot(UsersState.usersById)).toEqual(
-        Object.fromEntries(serviceUsers.map((user) => [user.id, user])),
-      );
-      expect(store.selectSnapshot(UsersState.userById(created.id))).toEqual(
-        created,
+        Object.fromEntries(seededUsers.map((user) => [user.id, user])),
       );
     });
 
     it('should replace the users that were loaded before', async () => {
-      const stale = createUser({ id: 'stale-user' });
-      const { store } = setup([stale]);
+      const stale = mockUser({ id: 'stale-user' });
+      const { store } = setup([stale], [mockUser.MEMBER]);
 
       await firstValueFrom(store.dispatch(new LoadUsers()));
 
@@ -71,29 +53,26 @@ describe('UsersState', () => {
 
   describe('usersById', () => {
     it('should select the users by their ids', () => {
-      const users = [
-        createUser({ id: 'user-1' }),
-        createUser({ id: 'user-2' }),
-      ];
+      const users = [mockUser.MEMBER, mockUser.COORDINATOR];
       const { store } = setup(users);
 
       expect(store.selectSnapshot(UsersState.usersById)).toEqual({
-        'user-1': users[0],
-        'user-2': users[1],
+        [users[0].id]: users[0],
+        [users[1].id]: users[1],
       });
     });
   });
 
   describe('userById', () => {
     it('should select the user with the given id', () => {
-      const user = createUser({ id: 'user-1' });
-      const { store } = setup([user, createUser({ id: 'user-2' })]);
+      const user = mockUser.MEMBER;
+      const { store } = setup([user, mockUser.COORDINATOR]);
 
       expect(store.selectSnapshot(UsersState.userById(user.id))).toEqual(user);
     });
 
     it('should select null when no user has the given id', () => {
-      const { store } = setup([createUser()]);
+      const { store } = setup([mockUser.MEMBER]);
 
       expect(
         store.selectSnapshot(UsersState.userById(MISSING_USER_ID)),
@@ -105,9 +84,11 @@ describe('UsersState', () => {
     it.each(Object.values(UserRole))(
       'should select only the users with the %s role',
       (role) => {
-        const users = Object.values(UserRole).map((userRole) =>
-          createUser({ id: `user-${userRole}`, roles: [userRole] }),
-        );
+        const users = [
+          mockUser.COORDINATOR,
+          mockUser.MEMBER,
+          mockUser.PROSPECT,
+        ];
         const { store } = setup(users);
 
         expect(store.selectSnapshot(UsersState.usersByRole(role))).toEqual(
@@ -118,7 +99,7 @@ describe('UsersState', () => {
 
     it('should select a user with multiple roles under each of their roles', () => {
       const roles = [UserRole.Coordinator, UserRole.Member];
-      const user = createUser({ roles });
+      const user = mockUser({ roles });
       const { store } = setup([user]);
 
       for (const role of roles) {
@@ -129,7 +110,7 @@ describe('UsersState', () => {
     });
 
     it('should select an empty list when no user has the role', () => {
-      const { store } = setup([createUser({ roles: [UserRole.Member] })]);
+      const { store } = setup([mockUser.MEMBER]);
 
       expect(
         store.selectSnapshot(UsersState.usersByRole(UserRole.Coordinator)),

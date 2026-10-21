@@ -8,6 +8,7 @@ import {
   SetThemePreference,
   THEME_PREFERENCES,
 } from '@org/scheduler-ui/state';
+import { provideTestSeeds } from '@org/scheduler-ui/test-utils';
 import { AppComponent } from './app.component';
 import { AppHarness } from './app.harness';
 
@@ -15,7 +16,11 @@ async function setup() {
   localStorage.clear();
   await TestBed.configureTestingModule({
     imports: [AppComponent],
-    providers: [provideRouter([]), provideSchedulerUiState()],
+    providers: [
+      provideRouter([]),
+      provideSchedulerUiState(),
+      provideTestSeeds(),
+    ],
   }).compileComponents();
 
   const fixture = TestBed.createComponent(AppComponent);

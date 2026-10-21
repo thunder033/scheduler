@@ -1,13 +1,25 @@
 import { TestBed } from '@angular/core/testing';
 import { provideStore, Store } from '@ngxs/store';
-import { Availability, AvailabilityStatus } from '@org/models';
+import {
+  Appointment,
+  Availability,
+  AvailabilityStatus,
+  Timeslot,
+} from '@org/models';
 import {
   appointmentNotFoundMessage,
   AppointmentWeek,
+  SEED_APPOINTMENTS,
+  SEED_TIMESLOTS,
   TimeslotDraft,
   TimeslotService,
   timeslotNotFoundMessage,
 } from '@org/scheduler-ui/data';
+import {
+  mockAppointment,
+  mockTimeslot,
+  mockTimeslotDraft,
+} from '@org/scheduler-ui/data/testing';
 import { firstValueFrom } from 'rxjs';
 import {
   ConfirmParticipant,
@@ -28,21 +40,11 @@ import {
 } from './planning.actions';
 import { PlanningState } from './planning.state';
 
-/** A year long past, so its weeks have none of the appointments that are seeded around today */
+/** A year long past, so its weeks have none of the seeded appointments unless a test seeds them */
 const PAST_YEAR = 2001;
+const CREATED_TIMESLOT_MESSAGE = 'The created timeslot should be in the store';
 const MISSING_TIMESLOT_ID = 'missing-timeslot';
 const MISSING_APPOINTMENT_ID = 'missing-appointment';
-
-function createTimeslotDraft(
-  overrides: Partial<TimeslotDraft> = {},
-): TimeslotDraft {
-  return {
-    start: '13:00',
-    end: '14:00',
-    dayOfWeek: 2,
-    ...overrides,
-  };
-}
 
 function createWeek(overrides: Partial<AppointmentWeek> = {}): AppointmentWeek {
   return { year: PAST_YEAR, week: 42, ...overrides };
@@ -58,21 +60,42 @@ function createAvailability(
   };
 }
 
-/** Sets up the store with a timeslot, and optionally an appointment for it in `week` */
+function provideSeeds(timeslots: Timeslot[], appointments: Appointment[]) {
+  return [
+    provideStore([PlanningState]),
+    { provide: SEED_TIMESLOTS, useValue: timeslots },
+    { provide: SEED_APPOINTMENTS, useValue: appointments },
+  ];
+}
+
+/**
+ * Sets up the store with a timeslot, and optionally an appointment for it in `week`, on top of
+ * the seeded timeslots and appointments
+ */
 async function setup({
   withAppointment = false,
   week = createWeek(),
-}: { withAppointment?: boolean; week?: AppointmentWeek } = {}) {
+  seededTimeslots = [],
+  seededAppointments = [],
+}: {
+  withAppointment?: boolean;
+  week?: AppointmentWeek;
+  seededTimeslots?: Timeslot[];
+  seededAppointments?: Appointment[];
+} = {}) {
   TestBed.configureTestingModule({
-    providers: [provideStore([PlanningState])],
+    providers: provideSeeds(seededTimeslots, seededAppointments),
   });
   const store = TestBed.inject(Store);
   const timeslotService = TestBed.inject(TimeslotService);
 
-  await firstValueFrom(
-    store.dispatch(new CreateTimeslot(createTimeslotDraft())),
-  );
-  const timeslot = store.selectSnapshot(PlanningState.timeslots)[0];
+  await firstValueFrom(store.dispatch(new CreateTimeslot(mockTimeslotDraft())));
+  const timeslot = store
+    .selectSnapshot(PlanningState.timeslots)
+    .find(({ timeslotId }) =>
+      seededTimeslots.every((seeded) => seeded.timeslotId !== timeslotId),
+    );
+  assert(timeslot, CREATED_TIMESLOT_MESSAGE);
 
   if (withAppointment) {
     await firstValueFrom(
@@ -96,9 +119,7 @@ async function setup({
 describe('PlanningState', () => {
   describe('timeslots', () => {
     it('should select an empty list before anything is loaded or created', () => {
-      TestBed.configureTestingModule({
-        providers: [provideStore([PlanningState])],
-      });
+      TestBed.configureTestingModule({ providers: provideSeeds([], []) });
 
       expect(
         TestBed.inject(Store).selectSnapshot(PlanningState.timeslots),
@@ -107,20 +128,26 @@ describe('PlanningState', () => {
   });
 
   describe('LoadTimeslots', () => {
-    it('should load the timeslots from the service', async () => {
-      const { store, timeslotService } = await setup();
-      const expected = await firstValueFrom(timeslotService.getTimeslots());
+    it('should load the seeded timeslots from the service', async () => {
+      const seededTimeslots = [
+        mockTimeslot.MONDAY_MORNING,
+        mockTimeslot.FRIDAY_EVENING,
+      ];
+      const { store, timeslot } = await setup({ seededTimeslots });
 
       await firstValueFrom(store.dispatch(new LoadTimeslots()));
 
-      expect(store.selectSnapshot(PlanningState.timeslots)).toEqual(expected);
+      expect(store.selectSnapshot(PlanningState.timeslots)).toEqual([
+        ...seededTimeslots,
+        timeslot,
+      ]);
     });
   });
 
   describe('CreateTimeslot', () => {
     it('should add the new timeslot', async () => {
       const { store } = await setup();
-      const draft = createTimeslotDraft({ start: '08:00', end: '09:00' });
+      const draft = mockTimeslotDraft({ start: '08:00', end: '09:00' });
 
       await firstValueFrom(store.dispatch(new CreateTimeslot(draft)));
 
@@ -173,7 +200,7 @@ describe('PlanningState', () => {
         withAppointment: true,
       });
       await firstValueFrom(
-        store.dispatch(new CreateTimeslot(createTimeslotDraft())),
+        store.dispatch(new CreateTimeslot(mockTimeslotDraft())),
       );
       const other = store
         .selectSnapshot(PlanningState.timeslots)
@@ -261,7 +288,7 @@ describe('PlanningState', () => {
     it('should keep editing a timeslot when another one is deleted', async () => {
       const { store, timeslot } = await setup();
       await firstValueFrom(
-        store.dispatch(new CreateTimeslot(createTimeslotDraft())),
+        store.dispatch(new CreateTimeslot(mockTimeslotDraft())),
       );
       const other = store
         .selectSnapshot(PlanningState.timeslots)
@@ -388,6 +415,24 @@ describe('PlanningState', () => {
   });
 
   describe('LoadAppointmentsByWeek', () => {
+    it('should load the seeded appointments of the week only', async () => {
+      const week = createWeek();
+      const inWeek = mockAppointment.MEMBER_AVAILABLE;
+      const otherWeek = mockAppointment.CONFIRMED;
+      const { store, getAppointments } = await setup({
+        week,
+        seededTimeslots: [mockTimeslot.MONDAY_MORNING],
+        seededAppointments: [
+          { ...inWeek, ...week },
+          { ...otherWeek, ...createWeek({ week: week.week + 1 }) },
+        ],
+      });
+
+      await firstValueFrom(store.dispatch(new LoadAppointmentsByWeek(week)));
+
+      expect(getAppointments()).toEqual([{ ...inWeek, ...week }]);
+    });
+
     it('should load the appointments for the week from the service', async () => {
       const { store, timeslotService, timeslot, week, getAppointments } =
         await setup();

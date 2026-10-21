@@ -1,13 +1,26 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Store } from '@ngxs/store';
+import {
+  SEED_APPOINTMENTS,
+  SEED_CURRENT_USER,
+  SEED_TIMESLOTS,
+  SEED_USERS,
+} from '@org/scheduler-ui/data';
 import { SetSideNavCollapsed } from './local-user/local-user.actions';
 import { LocalUserState } from './local-user/local-user.state';
 import { provideSchedulerUiState } from './provide-scheduler-ui-state';
 
 function createStore(): Store {
   TestBed.configureTestingModule({
-    providers: [provideRouter([]), provideSchedulerUiState()],
+    providers: [
+      provideRouter([]),
+      provideSchedulerUiState(),
+      { provide: SEED_USERS, useValue: [] },
+      { provide: SEED_TIMESLOTS, useValue: [] },
+      { provide: SEED_APPOINTMENTS, useValue: [] },
+      { provide: SEED_CURRENT_USER, useValue: null },
+    ],
   });
 
   return TestBed.inject(Store);

@@ -9,6 +9,7 @@ import {
 import { provideRouter } from '@angular/router';
 import { appRoutes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
+import { provideSeedData } from '@org/scheduler-ui/data/testing';
 import { provideSchedulerUiState } from '@org/scheduler-ui/state';
 import { provideCurrentUserInitializer } from './current-user.initializer';
 
@@ -25,6 +26,7 @@ export const appConfig: ApplicationConfig = {
     },
     provideRouter(appRoutes),
     provideHttpClient(),
+    provideSeedData(),
     provideSchedulerUiState(),
     provideCurrentUserInitializer(),
   ],

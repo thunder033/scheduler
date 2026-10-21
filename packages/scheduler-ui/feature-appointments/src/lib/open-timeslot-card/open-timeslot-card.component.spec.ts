@@ -9,6 +9,11 @@ import {
   SetAvailability,
   SetCurrentUser,
 } from '@org/scheduler-ui/state';
+import {
+  mockTimeslot,
+  mockTimeslotDraft,
+  mockUser,
+} from '@org/scheduler-ui/data/testing';
 import { provideTestState } from '@org/scheduler-ui/test-utils';
 import { firstValueFrom } from 'rxjs';
 import { AVAILABILITY_STATUS_LABELS } from '../availability-status/availability-status.component';
@@ -18,22 +23,12 @@ import {
 } from './open-timeslot-card.component';
 import { OpenTimeslotCardHarness } from './open-timeslot-card.harness';
 
-/** A year long past, so its weeks have none of the appointments that are seeded around today */
+/** A year long past, so its weeks have no appointments unless a test creates them */
 const PAST_YEAR = 2001;
 const AVAILABILITY_SELECT_MESSAGE = 'The availability options should be shown';
 
 function createWeek(overrides: Partial<AppointmentWeek> = {}): AppointmentWeek {
   return { year: PAST_YEAR, week: 43, ...overrides };
-}
-
-function createUser(overrides: Partial<User> = {}): User {
-  return {
-    id: 'member-1',
-    displayName: 'Member One',
-    contact: [],
-    roles: [UserRole.Member],
-    ...overrides,
-  };
 }
 
 function createAvailability(
@@ -54,25 +49,18 @@ interface SetupOptions {
 
 async function setup({
   week = createWeek(),
-  user = createUser(),
+  user = mockUser.MEMBER,
 }: SetupOptions = {}) {
+  const timeslot = mockTimeslot.MONDAY_MORNING;
   await TestBed.configureTestingModule({
     imports: [OpenTimeslotCardComponent],
-    providers: [provideTestState()],
+    providers: [provideTestState({ timeslots: [timeslot] })],
   }).compileComponents();
 
   const store = TestBed.inject(Store);
   if (user) {
     await firstValueFrom(store.dispatch(new SetCurrentUser(user)));
   }
-
-  const timeslot = await firstValueFrom(
-    TestBed.inject(TimeslotService).createTimeslot({
-      start: '09:00',
-      end: '10:30',
-      dayOfWeek: 1,
-    }),
-  );
 
   const fixture = TestBed.createComponent(OpenTimeslotCardComponent);
   fixture.componentRef.setInput('timeslot', timeslot);
@@ -121,12 +109,11 @@ describe('OpenTimeslotCardComponent', () => {
 
   it('should display the new time range when the timeslot changes', async () => {
     const { fixture, harness } = await setup();
-    const changed = {
-      timeslotId: 'timeslot-2',
+    const changed = mockTimeslot({
       start: '14:00',
       end: '15:00',
       dayOfWeek: 2,
-    };
+    });
 
     fixture.componentRef.setInput('timeslot', changed);
 

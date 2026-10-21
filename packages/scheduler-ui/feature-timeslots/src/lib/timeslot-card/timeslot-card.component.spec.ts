@@ -18,21 +18,11 @@ import {
   formatTimeRange,
 } from './timeslot-card.component';
 import { TimeslotCardHarness } from './timeslot-card.harness';
+import { mockTimeslotDraft } from '@org/scheduler-ui/data/testing';
 
 const OTHER_TIMESLOT_ID = 'other-timeslot';
 const OTHER_START = '13:00';
 const OTHER_END = '14:00';
-
-function createTimeslotDraft(
-  overrides: Partial<TimeslotDraft> = {},
-): TimeslotDraft {
-  return {
-    start: '09:00',
-    end: '10:30',
-    dayOfWeek: 1,
-    ...overrides,
-  };
-}
 
 interface SetupOptions {
   draft?: TimeslotDraft;
@@ -43,7 +33,7 @@ interface SetupOptions {
 }
 
 async function setup({
-  draft = createTimeslotDraft(),
+  draft = mockTimeslotDraft(),
   alreadyEditing = false,
   animated = false,
 }: SetupOptions = {}) {
@@ -308,7 +298,7 @@ describe('TimeslotCardComponent', () => {
         await firstValueFrom(
           store.dispatch(
             new CreateTimeslot(
-              createTimeslotDraft({ start: OTHER_START, end: OTHER_END }),
+              mockTimeslotDraft({ start: OTHER_START, end: OTHER_END }),
             ),
           ),
         );

@@ -1,19 +1,31 @@
 import { TestBed } from '@angular/core/testing';
+import { User } from '@org/models';
 import { firstValueFrom } from 'rxjs';
-import { AuthService, MOCK_CURRENT_USER } from './auth.service';
+import { SEED_CURRENT_USER } from '../seed/seed.tokens';
+import { mockUser } from '../testing/mock-user';
+import { AuthService } from './auth.service';
 
-function setup() {
-  return { service: TestBed.inject(AuthService) };
+function setup(currentUser: User | null = mockUser.COORDINATOR) {
+  TestBed.configureTestingModule({
+    providers: [{ provide: SEED_CURRENT_USER, useValue: currentUser }],
+  });
+  return { service: TestBed.inject(AuthService), currentUser };
 }
 
 describe('AuthService', () => {
   describe('getCurrentUser', () => {
-    it('should emit the mocked current user', async () => {
-      const { service } = setup();
+    it('should emit the seeded current user', async () => {
+      const { service, currentUser } = setup(mockUser.MEMBER);
 
-      const user = await firstValueFrom(service.getCurrentUser());
+      expect(await firstValueFrom(service.getCurrentUser())).toEqual(
+        currentUser,
+      );
+    });
 
-      expect(user).toEqual(MOCK_CURRENT_USER);
+    it('should emit null when no user is seeded', async () => {
+      const { service } = setup(null);
+
+      expect(await firstValueFrom(service.getCurrentUser())).toBeNull();
     });
   });
 });

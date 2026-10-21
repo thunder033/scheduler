@@ -1,33 +1,26 @@
 import { TestBed } from '@angular/core/testing';
-import { Availability, AvailabilityStatus } from '@org/models';
-import { addWeeks, getISOWeek, getISOWeekYear } from 'date-fns';
+import {
+  Appointment,
+  Availability,
+  AvailabilityStatus,
+  Timeslot,
+} from '@org/models';
 import { firstValueFrom } from 'rxjs';
-import { SEED_USERS } from '../user/user.service';
+import { SEED_APPOINTMENTS, SEED_TIMESLOTS } from '../seed/seed.tokens';
+import { mockAppointment } from '../testing/mock-appointment';
+import { mockTimeslot, mockTimeslotDraft } from '../testing/mock-timeslot';
 import {
   AppointmentWeek,
-  SEED_TIMESLOTS,
   TimeslotDraft,
   TimeslotService,
   appointmentNotFoundMessage,
-  createSeedAppointments,
   timeslotNotFoundMessage,
 } from './timeslot.service';
 
-/** A year long past, so its weeks have none of the appointments that are seeded around today */
+/** A year long past, so its weeks have none of the seeded appointments unless a test seeds them */
 const PAST_YEAR = 2001;
 const MISSING_TIMESLOT_ID = 'missing-timeslot';
 const MISSING_APPOINTMENT_ID = 'missing-appointment';
-
-function createTimeslotDraft(
-  overrides: Partial<TimeslotDraft> = {},
-): TimeslotDraft {
-  return {
-    start: '13:00',
-    end: '14:00',
-    dayOfWeek: 2,
-    ...overrides,
-  };
-}
 
 function createAppointmentWeek(
   overrides: Partial<AppointmentWeek> = {},
@@ -45,22 +38,39 @@ function createAvailability(
   };
 }
 
-async function setup() {
+interface SetupSeeds {
+  timeslots?: Timeslot[];
+  appointments?: Appointment[];
+}
+
+async function setup({
+  timeslots = [mockTimeslot.MONDAY_MORNING, mockTimeslot.WEDNESDAY_EVENING],
+  appointments = [
+    mockAppointment.MEMBER_AVAILABLE,
+    mockAppointment.MIXED_AVAILABILITY,
+  ],
+}: SetupSeeds = {}) {
+  TestBed.configureTestingModule({
+    providers: [
+      { provide: SEED_TIMESLOTS, useValue: timeslots },
+      { provide: SEED_APPOINTMENTS, useValue: appointments },
+    ],
+  });
   const service = TestBed.inject(TimeslotService);
   const timeslot = await firstValueFrom(
-    service.createTimeslot(createTimeslotDraft()),
+    service.createTimeslot(mockTimeslotDraft()),
   );
   const appointment = await firstValueFrom(
     service.createAppointment(timeslot.timeslotId, createAppointmentWeek()),
   );
-  return { service, timeslot, appointment };
+  return { service, timeslot, appointment, timeslots, appointments };
 }
 
 describe('TimeslotService', () => {
   describe('createTimeslot', () => {
     it('should create a timeslot with a generated id that can be retrieved', async () => {
       const { service } = await setup();
-      const draft = createTimeslotDraft();
+      const draft = mockTimeslotDraft();
 
       const created = await firstValueFrom(service.createTimeslot(draft));
 
@@ -74,7 +84,7 @@ describe('TimeslotService', () => {
       const { service, timeslot } = await setup();
 
       const other = await firstValueFrom(
-        service.createTimeslot(createTimeslotDraft()),
+        service.createTimeslot(mockTimeslotDraft()),
       );
 
       expect(other.timeslotId).not.toBe(timeslot.timeslotId);
@@ -164,7 +174,7 @@ describe('TimeslotService', () => {
     it('should keep appointments for other timeslots', async () => {
       const { service, timeslot } = await setup();
       const other = await firstValueFrom(
-        service.createTimeslot(createTimeslotDraft()),
+        service.createTimeslot(mockTimeslotDraft()),
       );
       const otherAppointment = await firstValueFrom(
         service.createAppointment(other.timeslotId, createAppointmentWeek()),
@@ -471,79 +481,56 @@ describe('TimeslotService', () => {
     });
   });
 
-  describe('seed data', () => {
-    const TODAY = new Date(2026, 9, 19);
-
-    afterEach(() => vi.useRealTimers());
-
-    it('should give every seeded timeslot its own id', () => {
-      const ids = SEED_TIMESLOTS.map(({ timeslotId }) => timeslotId);
-
-      expect(new Set(ids).size).toBe(ids.length);
-    });
-
-    it('should seed appointments only for seeded timeslots', () => {
-      const timeslotIds = SEED_TIMESLOTS.map(({ timeslotId }) => timeslotId);
-
-      for (const appointment of createSeedAppointments(TODAY)) {
-        expect(timeslotIds).toContain(appointment.timeslotId);
-      }
-    });
-
-    it('should seed availabilities and confirmations only for seeded users', () => {
-      const userIds = SEED_USERS.map(({ id }) => id);
-
-      for (const appointment of createSeedAppointments(TODAY)) {
-        const referenced = [
-          ...appointment.availabilities.map(
-            ({ participantId }) => participantId,
-          ),
-          ...appointment.confirmedUserIds,
-          ...(appointment.prospectId ? [appointment.prospectId] : []),
-        ];
-        for (const userId of referenced) {
-          expect(userIds).toContain(userId);
-        }
-      }
-    });
-
-    it('should seed appointments in the week of the date and the week after', () => {
-      const thisWeek = { year: getISOWeekYear(TODAY), week: getISOWeek(TODAY) };
-      const nextWeek = {
-        year: getISOWeekYear(addWeeks(TODAY, 1)),
-        week: getISOWeek(addWeeks(TODAY, 1)),
-      };
-
-      const weeks = createSeedAppointments(TODAY).map(({ year, week }) => ({
-        year,
-        week,
-      }));
-
-      expect(weeks).toContainEqual(thisWeek);
-      expect(weeks).toContainEqual(nextWeek);
-      for (const week of weeks) {
-        expect([thisWeek, nextWeek]).toContainEqual(week);
-      }
-    });
-
-    it('should seed each timeslot at most once per week', () => {
-      const keys = createSeedAppointments(TODAY).map(
-        ({ timeslotId, year, week }) => `${timeslotId}/${year}/${week}`,
-      );
-
-      expect(new Set(keys).size).toBe(keys.length);
-    });
-
+  describe('seeded data', () => {
     it('should start with the seeded timeslots and appointments', async () => {
-      vi.setSystemTime(TODAY);
-      const service = TestBed.inject(TimeslotService);
+      const { service, timeslot, appointment, timeslots, appointments } =
+        await setup();
 
-      expect(await firstValueFrom(service.getTimeslots())).toEqual(
-        SEED_TIMESLOTS,
-      );
-      expect(await firstValueFrom(service.getAppointments())).toEqual(
-        createSeedAppointments(TODAY),
-      );
+      expect(await firstValueFrom(service.getTimeslots())).toEqual([
+        ...timeslots,
+        timeslot,
+      ]);
+      expect(await firstValueFrom(service.getAppointments())).toEqual([
+        ...appointments,
+        appointment,
+      ]);
+    });
+
+    it('should start without timeslots and appointments when none are seeded', async () => {
+      const { service, timeslot, appointment } = await setup({
+        timeslots: [],
+        appointments: [],
+      });
+
+      expect(await firstValueFrom(service.getTimeslots())).toEqual([timeslot]);
+      expect(await firstValueFrom(service.getAppointments())).toEqual([
+        appointment,
+      ]);
+    });
+
+    it('should remove the seeded appointments of a deleted seeded timeslot', async () => {
+      const deleted = mockTimeslot.MONDAY_MORNING;
+      const kept = mockAppointment.WITH_PROSPECT;
+      const { service } = await setup({
+        timeslots: [deleted, mockTimeslot.FRIDAY_EVENING],
+        appointments: [
+          mockAppointment.MEMBER_AVAILABLE,
+          mockAppointment.CONFIRMED,
+          kept,
+        ],
+      });
+
+      await firstValueFrom(service.deleteTimeslot(deleted.timeslotId), {
+        defaultValue: undefined,
+      });
+
+      const appointments = await firstValueFrom(service.getAppointments());
+      expect(appointments).toContainEqual(kept);
+      expect(
+        appointments.filter(
+          ({ timeslotId }) => timeslotId === deleted.timeslotId,
+        ),
+      ).toEqual([]);
     });
   });
 });

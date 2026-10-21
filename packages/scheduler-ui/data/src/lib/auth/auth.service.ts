@@ -1,19 +1,15 @@
-import { Injectable } from '@angular/core';
-import { ContactMethod, User, UserRole } from '@org/models';
+import { Injectable, inject } from '@angular/core';
+import { User } from '@org/models';
 import { Observable, of } from 'rxjs';
-
-export const MOCK_CURRENT_USER: User = {
-  id: 'mock-user-1',
-  displayName: 'Mock Coordinator',
-  contact: [{ method: ContactMethod.Phone, value: '555-0100' }],
-  roles: [UserRole.Coordinator],
-};
+import { SEED_CURRENT_USER } from '../seed/seed.tokens';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  private currentUser = inject(SEED_CURRENT_USER);
+
   getCurrentUser(): Observable<User | null> {
-    return of(MOCK_CURRENT_USER);
+    return of(this.currentUser);
   }
 }

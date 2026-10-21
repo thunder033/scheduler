@@ -15,18 +15,9 @@ import {
   SAVING_MESSAGE,
   UNKNOWN_ERROR_MESSAGE,
 } from './planning-feedback.service';
+import { mockTimeslot } from '@org/scheduler-ui/data/testing';
 
 const OPERATION_ERROR_MESSAGE = 'The server could not be reached';
-
-function createTimeslot(overrides: Partial<Timeslot> = {}): Timeslot {
-  return {
-    timeslotId: 'timeslot-1',
-    start: '09:00',
-    end: '10:00',
-    dayOfWeek: 1,
-    ...overrides,
-  };
-}
 
 /** A test scene that starts the feedback the way the dashboard does */
 @Component({ template: '' })
@@ -80,7 +71,7 @@ describe('PlanningFeedbackService', () => {
       const response = holdUpdates();
       dispatch(new UpdateTimeslot('timeslot-1', { start: '08:00' }));
 
-      response.next(createTimeslot());
+      response.next(mockTimeslot.MONDAY_MORNING);
       response.complete();
 
       expect(await (await getSnackBar())?.getMessage()).not.toBe(
@@ -97,11 +88,11 @@ describe('PlanningFeedbackService', () => {
       dispatch(new UpdateTimeslot('timeslot-1', { start: '08:00' }));
       dispatch(new UpdateTimeslot('timeslot-2', { start: '08:00' }));
 
-      responses[0].next(createTimeslot());
+      responses[0].next(mockTimeslot.MONDAY_MORNING);
       responses[0].complete();
       expect(await (await getSnackBar())?.getMessage()).toBe(SAVING_MESSAGE);
 
-      responses[1].next(createTimeslot({ timeslotId: 'timeslot-2' }));
+      responses[1].next(mockTimeslot.WEDNESDAY_EVENING);
       responses[1].complete();
       expect(await (await getSnackBar())?.getMessage()).not.toBe(
         SAVING_MESSAGE,
@@ -126,7 +117,7 @@ describe('PlanningFeedbackService', () => {
       const response = holdUpdates();
       dispatch(new UpdateTimeslot('timeslot-1', { start: '08:00' }));
 
-      response.next(createTimeslot());
+      response.next(mockTimeslot.MONDAY_MORNING);
       response.complete();
 
       expect(await (await getSnackBar())?.getMessage()).toBe(SAVED_MESSAGE);
@@ -150,11 +141,11 @@ describe('PlanningFeedbackService', () => {
       dispatch(new UpdateTimeslot('timeslot-1', { start: '08:00' }));
       dispatch(new UpdateTimeslot('timeslot-2', { start: '08:00' }));
 
-      responses[0].next(createTimeslot());
+      responses[0].next(mockTimeslot.MONDAY_MORNING);
       responses[0].complete();
       expect(await (await getSnackBar())?.getMessage()).toBe(SAVING_MESSAGE);
 
-      responses[1].next(createTimeslot({ timeslotId: 'timeslot-2' }));
+      responses[1].next(mockTimeslot.WEDNESDAY_EVENING);
       responses[1].complete();
       expect(await (await getSnackBar())?.getMessage()).toBe(SAVED_MESSAGE);
     });
@@ -182,7 +173,7 @@ describe('PlanningFeedbackService', () => {
       dispatch(new UpdateTimeslot('timeslot-2', { start: '08:00' }));
 
       responses[0].error(new Error(OPERATION_ERROR_MESSAGE));
-      responses[1].next(createTimeslot({ timeslotId: 'timeslot-2' }));
+      responses[1].next(mockTimeslot.WEDNESDAY_EVENING);
       responses[1].complete();
 
       expect(await (await getSnackBar())?.getMessage()).not.toBe(SAVED_MESSAGE);
@@ -194,7 +185,7 @@ describe('PlanningFeedbackService', () => {
         .mockReturnValueOnce(
           throwError(() => new Error(OPERATION_ERROR_MESSAGE)),
         )
-        .mockReturnValueOnce(of(createTimeslot()));
+        .mockReturnValueOnce(of(mockTimeslot.MONDAY_MORNING));
       dispatch(new UpdateTimeslot('timeslot-1', { start: '08:00' }));
 
       dispatch(new UpdateTimeslot('timeslot-1', { start: '08:30' }));

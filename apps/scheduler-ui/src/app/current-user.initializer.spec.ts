@@ -2,13 +2,15 @@ import { ApplicationInitStatus } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { AuthService } from '@org/scheduler-ui/data';
+import { mockUser } from '@org/scheduler-ui/data/testing';
 import {
   provideSchedulerUiState,
   LocalUserState,
 } from '@org/scheduler-ui/state';
-import { firstValueFrom } from 'rxjs';
+import { provideTestSeeds } from '@org/scheduler-ui/test-utils';
 import { provideCurrentUserInitializer } from './current-user.initializer';
+
+const CURRENT_USER = mockUser.COORDINATOR;
 
 async function setup() {
   localStorage.clear();
@@ -16,6 +18,7 @@ async function setup() {
     providers: [
       provideRouter([]),
       provideSchedulerUiState(),
+      provideTestSeeds({ currentUser: CURRENT_USER }),
       provideCurrentUserInitializer(),
     ],
   });
@@ -26,14 +29,11 @@ async function setup() {
 }
 
 describe('provideCurrentUserInitializer', () => {
-  it('should set the current user from the auth service during app initialization', async () => {
+  it('should set the seeded current user during app initialization', async () => {
     const { store } = await setup();
-    const expectedUser = await firstValueFrom(
-      TestBed.inject(AuthService).getCurrentUser(),
-    );
 
     expect(store.selectSnapshot(LocalUserState.currentUser)).toEqual(
-      expectedUser,
+      CURRENT_USER,
     );
   });
 });
