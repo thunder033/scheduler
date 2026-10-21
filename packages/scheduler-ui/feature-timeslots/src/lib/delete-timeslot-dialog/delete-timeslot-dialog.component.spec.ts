@@ -32,7 +32,7 @@ async function setup() {
 }
 
 describe('DeleteTimeslotDialogComponent', () => {
-  it('should close as confirmed when the deletion is confirmed', async () => {
+  it('closes as confirmed when the deletion is confirmed', async () => {
     const { harness, result } = await setup();
 
     await harness.confirm();
@@ -40,7 +40,7 @@ describe('DeleteTimeslotDialogComponent', () => {
     expect(await result).toBe(true);
   });
 
-  it('should close as not confirmed when the deletion is cancelled', async () => {
+  it('closes as not confirmed when the deletion is cancelled', async () => {
     const { harness, result } = await setup();
 
     await harness.cancel();

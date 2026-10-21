@@ -110,7 +110,7 @@ async function setup(
 }
 
 describe('TimeslotPlannerComponent', () => {
-  it('should list every timeslot under the label of its day of week', async () => {
+  it('lists every timeslot under the label of its day of week', async () => {
     const { getTimeRanges, getServiceTimeslots } = await setup([
       mockTimeslotDraft({ dayOfWeek: DRAFT_DAY }),
     ]);
@@ -123,7 +123,7 @@ describe('TimeslotPlannerComponent', () => {
     }
   });
 
-  it('should always list all seven days from Monday to Sunday', async () => {
+  it('always lists all seven days from Monday to Sunday', async () => {
     const { harness } = await setup();
 
     expect(await harness.getDayLabels()).toEqual(
@@ -134,13 +134,13 @@ describe('TimeslotPlannerComponent', () => {
     expect((await harness.getDayLabels()).at(-1)).toBe(DAY_LABELS[SUNDAY]);
   });
 
-  it('should list days without timeslots as empty', async () => {
+  it('lists days without timeslots as empty', async () => {
     const { getTimeRanges } = await setup();
 
     expect(await getTimeRanges(OTHER_DAY)).toEqual([]);
   });
 
-  it('should order the timeslots within a day by start time', async () => {
+  it('orders the timeslots within a day by start time', async () => {
     const later = mockTimeslotDraft({
       dayOfWeek: DRAFT_DAY,
       start: '15:00',
@@ -159,7 +159,7 @@ describe('TimeslotPlannerComponent', () => {
     ]);
   });
 
-  it('should list timeslots created after it was rendered', async () => {
+  it('lists timeslots created after it was rendered', async () => {
     const { getTimeRanges, store } = await setup();
     const draft = mockTimeslotDraft({ dayOfWeek: DRAFT_DAY });
 
@@ -171,7 +171,7 @@ describe('TimeslotPlannerComponent', () => {
   });
 
   describe('editing a timeslot', () => {
-    it('should only let one timeslot be edited at a time', async () => {
+    it('only lets one timeslot be edited at a time', async () => {
       const first = mockTimeslotDraft({
         dayOfWeek: DRAFT_DAY,
         start: '08:00',
@@ -205,7 +205,7 @@ describe('TimeslotPlannerComponent', () => {
   });
 
   describe('dragging a timeslot to another day', () => {
-    it('should not replay the editing animations for a timeslot that is moved', async () => {
+    it('does not replay the editing animations for a timeslot that is moved', async () => {
       const { dragTimeslotToDay, getListedCard, toggleEditing, created } =
         await setup([mockTimeslotDraft({ dayOfWeek: DRAFT_DAY })], {
           animated: true,
@@ -219,7 +219,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await card.isContentAnimating()).toBe(false);
     });
 
-    it('should keep the timeslot in edit mode after it is moved', async () => {
+    it('keeps the timeslot in edit mode after it is moved', async () => {
       const { dragTimeslotToDay, getListedCard, toggleEditing, created } =
         await setup([mockTimeslotDraft({ dayOfWeek: DRAFT_DAY })]);
       const [timeslot] = created;
@@ -231,7 +231,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await card.isEditing()).toBe(true);
     });
 
-    it('should not move a timeslot that is not being edited', async () => {
+    it('does not move a timeslot that is not being edited', async () => {
       const { dragTimeslotToDay, getTimeRanges, created } = await setup([
         mockTimeslotDraft({ dayOfWeek: DRAFT_DAY }),
       ]);
@@ -245,7 +245,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await getTimeRanges(OTHER_DAY)).toEqual([]);
     });
 
-    it('should not highlight drop targets for a timeslot that is not being edited', async () => {
+    it('does not highlight drop targets for a timeslot that is not being edited', async () => {
       const { pickUpTimeslot, harness, created } = await setup([
         mockTimeslotDraft({ dayOfWeek: DRAFT_DAY }),
       ]);
@@ -256,7 +256,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await harness.getDropTargetDayLabels()).toEqual([]);
     });
 
-    it('should only move a timeslot that is dragged by its header', async () => {
+    it('only moves a timeslot that is dragged by its header', async () => {
       const { dragTimeslotToDay, getTimeRanges, toggleEditing, created } =
         await setup([mockTimeslotDraft({ dayOfWeek: DRAFT_DAY })]);
       const [timeslot] = created;
@@ -269,7 +269,7 @@ describe('TimeslotPlannerComponent', () => {
       ]);
     });
 
-    it('should not move a timeslot once it is no longer being edited', async () => {
+    it('does not move a timeslot once it is no longer being edited', async () => {
       const { dragTimeslotToDay, getTimeRanges, toggleEditing, created } =
         await setup([mockTimeslotDraft({ dayOfWeek: DRAFT_DAY })]);
       const [timeslot] = created;
@@ -283,7 +283,7 @@ describe('TimeslotPlannerComponent', () => {
       ]);
     });
 
-    it('should highlight the other days as drop targets while dragging', async () => {
+    it('highlights the other days as drop targets while dragging', async () => {
       const { pickUpTimeslot, toggleEditing, harness, created } = await setup([
         mockTimeslotDraft({ dayOfWeek: DRAFT_DAY }),
       ]);
@@ -300,7 +300,7 @@ describe('TimeslotPlannerComponent', () => {
       );
     });
 
-    it('should stop highlighting the days once the timeslot is dropped', async () => {
+    it('stops highlighting the days once the timeslot is dropped', async () => {
       const { dragTimeslotToDay, toggleEditing, harness, created } =
         await setup([mockTimeslotDraft({ dayOfWeek: DRAFT_DAY })]);
       const [timeslot] = created;
@@ -311,7 +311,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await harness.getDropTargetDayLabels()).toEqual([]);
     });
 
-    it('should move the timeslot to the day it is dropped on', async () => {
+    it('moves the timeslot to the day it is dropped on', async () => {
       const { dragTimeslotToDay, getTimeRanges, toggleEditing, created } =
         await setup([mockTimeslotDraft({ dayOfWeek: DRAFT_DAY })]);
       const [timeslot] = created;
@@ -325,7 +325,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await getTimeRanges(DRAFT_DAY)).toEqual([]);
     });
 
-    it('should not save the new day until asked to', async () => {
+    it('does not save the new day until asked to', async () => {
       const {
         dragTimeslotToDay,
         getTimeRanges,
@@ -342,7 +342,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await getServiceTimeslots()).toContainEqual(timeslot);
     });
 
-    it('should save the new day and keep the time when asked to', async () => {
+    it('saves the new day and keeps the time when asked to', async () => {
       const {
         dragTimeslotToDay,
         getListedCard,
@@ -364,7 +364,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await getTimeRanges(SUNDAY)).toEqual([formatTimeRange(timeslot)]);
     });
 
-    it('should return the timeslot to its day when editing is closed without saving', async () => {
+    it('returns the timeslot to its day when editing is closed without saving', async () => {
       const {
         dragTimeslotToDay,
         getListedCard,
@@ -386,7 +386,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await getTimeRanges(SUNDAY)).toEqual([]);
     });
 
-    it('should leave the timeslot where it is when dropped on its own day', async () => {
+    it('leaves the timeslot where it is when dropped on its own day', async () => {
       const { dragTimeslotToDay, getTimeRanges, toggleEditing, created } =
         await setup([mockTimeslotDraft({ dayOfWeek: DRAFT_DAY })]);
       const [timeslot] = created;
@@ -403,13 +403,13 @@ describe('TimeslotPlannerComponent', () => {
   describe('creating a timeslot', () => {
     const NEW_TIMES = { start: '09:00', end: '10:00' };
 
-    it('should not show a new timeslot until asked to', async () => {
+    it('does not show a new timeslot until asked to', async () => {
       const { harness } = await setup();
 
       expect(await harness.hasFloatingTimeslot()).toBe(false);
     });
 
-    it('should show a new timeslot floating, without a day', async () => {
+    it('shows a new timeslot floating, without a day', async () => {
       const { harness } = await setup();
 
       await harness.startCreatingTimeslot();
@@ -420,7 +420,7 @@ describe('TimeslotPlannerComponent', () => {
       }
     });
 
-    it('should highlight every day as a drop target while dragging the new timeslot', async () => {
+    it('highlights every day as a drop target while dragging the new timeslot', async () => {
       const { harness, pickUpNewTimeslot } = await setup();
       await harness.startCreatingTimeslot();
 
@@ -431,7 +431,7 @@ describe('TimeslotPlannerComponent', () => {
       );
     });
 
-    it('should list the new timeslot under the day it is dragged to', async () => {
+    it('lists the new timeslot under the day it is dragged to', async () => {
       const { harness, getListedCard, getTimeRanges, dragNewTimeslotToDay } =
         await setup();
       await harness.startCreatingTimeslot();
@@ -444,7 +444,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await card.isEditing()).toBe(true);
     });
 
-    it('should not allow saving while the new timeslot has no day', async () => {
+    it('does not allow saving while the new timeslot has no day', async () => {
       const { harness } = await setup();
       const floatingTimeslot = await harness.startCreatingTimeslot();
 
@@ -453,7 +453,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await floatingTimeslot.canSave()).toBe(false);
     });
 
-    it('should not allow saving while the new timeslot has no times', async () => {
+    it('does not allow saving while the new timeslot has no times', async () => {
       const { harness, getListedCard, dragNewTimeslotToDay } = await setup();
       await harness.startCreatingTimeslot();
 
@@ -463,7 +463,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await card.canSave()).toBe(false);
     });
 
-    it('should keep the times entered before the new timeslot is dragged to a day', async () => {
+    it('keeps the times entered before the new timeslot is dragged to a day', async () => {
       const { harness, getListedCard, dragNewTimeslotToDay } = await setup();
       const floatingTimeslot = await harness.startCreatingTimeslot();
       await floatingTimeslot.setTimes(NEW_TIMES);
@@ -474,7 +474,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await card.canSave()).toBe(true);
     });
 
-    it('should allow saving once the new timeslot has a day and times', async () => {
+    it('allows saving once the new timeslot has a day and times', async () => {
       const { harness, getListedCard, dragNewTimeslotToDay } = await setup();
       await harness.startCreatingTimeslot();
       await dragNewTimeslotToDay(OTHER_DAY);
@@ -485,7 +485,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await card.canSave()).toBe(true);
     });
 
-    it('should not create the timeslot until asked to', async () => {
+    it('does not create the timeslot until asked to', async () => {
       const { harness, dragNewTimeslotToDay, getServiceTimeslots } =
         await setup();
       const before = await getServiceTimeslots();
@@ -497,7 +497,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await getServiceTimeslots()).toEqual(before);
     });
 
-    it('should create the timeslot on the day with the times when asked to', async () => {
+    it('creates the timeslot on the day with the times when asked to', async () => {
       const {
         harness,
         getListedCard,
@@ -521,7 +521,7 @@ describe('TimeslotPlannerComponent', () => {
       ]);
     });
 
-    it('should stop showing the new timeslot when creating it is cancelled', async () => {
+    it('stops showing the new timeslot when creating it is cancelled', async () => {
       const { harness } = await setup();
       const floatingTimeslot = await harness.startCreatingTimeslot();
 
@@ -530,7 +530,7 @@ describe('TimeslotPlannerComponent', () => {
       expect(await harness.hasFloatingTimeslot()).toBe(false);
     });
 
-    it('should stop editing another timeslot when a new one is started', async () => {
+    it('stops editing another timeslot when a new one is started', async () => {
       const { harness, getListedCard, toggleEditing, created } = await setup([
         mockTimeslotDraft({ dayOfWeek: DRAFT_DAY }),
       ]);
@@ -548,7 +548,7 @@ describe('TimeslotPlannerComponent', () => {
   });
 
   describe('deleting a timeslot', () => {
-    it('should remove the timeslot from its day and the service once it is deleted', async () => {
+    it('removes the timeslot from its day and the service once it is deleted', async () => {
       const {
         getListedCard,
         getTimeRanges,

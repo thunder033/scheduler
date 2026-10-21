@@ -8,7 +8,7 @@ function setup(overrides: Partial<User> = {}) {
 }
 
 describe('mockUser', () => {
-  it('should create a user with every field populated', () => {
+  it('creates a user with every field populated', () => {
     const { user } = setup();
 
     expect(user.id).toBeTruthy();
@@ -17,7 +17,7 @@ describe('mockUser', () => {
     expect(user.roles.length).toBeGreaterThan(0);
   });
 
-  it('should apply the overrides over the defaults', () => {
+  it('applies the overrides over the defaults', () => {
     const overrides: Partial<User> = {
       displayName: 'Someone Else',
       roles: [UserRole.Coordinator],
@@ -28,20 +28,20 @@ describe('mockUser', () => {
     expect(user).toMatchObject(overrides);
   });
 
-  it('should give each user a distinct id', () => {
+  it('gives each user a distinct id', () => {
     const { user } = setup();
 
     expect(mockUser().id).not.toBe(user.id);
   });
 
-  it('should keep an overridden id', () => {
+  it('keeps an overridden id', () => {
     const { user } = setup({ id: 'custom-id' });
 
     expect(user.id).toBe('custom-id');
   });
 
   describe('seeded users', () => {
-    it('should seed a user for each role with that role', () => {
+    it('seeds a user for each role with that role', () => {
       const seeded = {
         [UserRole.Coordinator]: mockUser.COORDINATOR,
         [UserRole.Member]: mockUser.MEMBER,
@@ -53,7 +53,7 @@ describe('mockUser', () => {
       }
     });
 
-    it('should give every seeded user its own id', () => {
+    it('gives every seeded user its own id', () => {
       const ids = [
         mockUser.COORDINATOR,
         mockUser.MEMBER,

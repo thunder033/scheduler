@@ -29,7 +29,7 @@ async function setup() {
 }
 
 describe('ThemeMenuComponent', () => {
-  it('should offer every theme option', async () => {
+  it('offers every theme option', async () => {
     const { harness } = await setup();
 
     expect(await harness.getThemes()).toEqual(
@@ -37,7 +37,7 @@ describe('ThemeMenuComponent', () => {
     );
   });
 
-  it('should show the current theme preference', async () => {
+  it('shows the current theme preference', async () => {
     const { harness } = await setup();
 
     expect(await harness.getSelectedTheme()).toBe(
@@ -46,7 +46,7 @@ describe('ThemeMenuComponent', () => {
   });
 
   it.each(THEME_OPTIONS)(
-    'should apply the $label theme when selected',
+    'applies the $label theme when selected',
     async ({ value, label }) => {
       const { harness, store } = await setup();
 

@@ -29,7 +29,7 @@ async function setup() {
 }
 
 describe('provideCurrentUserInitializer', () => {
-  it('should set the seeded current user during app initialization', async () => {
+  it('sets the seeded current user during app initialization', async () => {
     const { store } = await setup();
 
     expect(store.selectSnapshot(LocalUserState.currentUser)).toEqual(

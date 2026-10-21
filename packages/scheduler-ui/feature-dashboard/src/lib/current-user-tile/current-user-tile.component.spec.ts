@@ -23,7 +23,7 @@ async function setup() {
 }
 
 describe('CurrentUserTileComponent', () => {
-  it('should display the display name of the current user', async () => {
+  it('displays the display name of the current user', async () => {
     const { harness, store } = await setup();
     const user = mockUser.MEMBER;
 
@@ -32,13 +32,13 @@ describe('CurrentUserTileComponent', () => {
     expect(await harness.getDisplayName()).toBe(user.displayName);
   });
 
-  it('should display nothing when there is no current user', async () => {
+  it('displays nothing when there is no current user', async () => {
     const { harness } = await setup();
 
     expect(await harness.getDisplayName()).toBeNull();
   });
 
-  it('should update when the current user changes', async () => {
+  it('updates when the current user changes', async () => {
     const { harness, store } = await setup();
     store.dispatch(new SetCurrentUser(mockUser.MEMBER));
     const next = mockUser.COORDINATOR;

@@ -72,9 +72,8 @@ async function setup({
 
   const fixture = TestBed.createComponent(TestHostComponent);
   fixture.componentInstance.startExpanded = alreadyExpanded;
-  const harness = await TestbedHarnessEnvironment.loader(fixture).getHarness(
-    TestCardHarness,
-  );
+  const harness =
+    await TestbedHarnessEnvironment.loader(fixture).getHarness(TestCardHarness);
 
   const getElement = (selector: string): Element | null =>
     fixture.nativeElement.querySelector(selector);
@@ -97,14 +96,14 @@ async function setup({
 }
 
 describe('ExpandableCard', () => {
-  it('should not be expanded by default', async () => {
+  it('is not expanded by default', async () => {
     const { harness } = await setup();
 
     expect(await harness.isExpanded()).toBe(false);
     expect(await harness.hasContent()).toBe(false);
   });
 
-  it('should show its content while expanded', async () => {
+  it('shows its content while expanded', async () => {
     const { harness } = await setup();
 
     await harness.toggle();
@@ -113,7 +112,7 @@ describe('ExpandableCard', () => {
     expect(await harness.hasContent()).toBe(true);
   });
 
-  it('should be expanded when created expanded', async () => {
+  it('is expanded when created expanded', async () => {
     const { harness } = await setup({ alreadyExpanded: true });
 
     expect(await harness.isExpanded()).toBe(true);
@@ -121,7 +120,7 @@ describe('ExpandableCard', () => {
   });
 
   describe('animations', () => {
-    it('should animate the content in when it expands', async () => {
+    it('animates the content in when it expands', async () => {
       const { harness } = await setup({ animated: true });
 
       await harness.toggle();
@@ -129,7 +128,7 @@ describe('ExpandableCard', () => {
       expect(await harness.isContentAnimating()).toBe(true);
     });
 
-    it('should not animate the content in when the card is created expanded', async () => {
+    it('does not animate the content in when the card is created expanded', async () => {
       const { harness } = await setup({
         alreadyExpanded: true,
         animated: true,
@@ -139,7 +138,7 @@ describe('ExpandableCard', () => {
       expect(await harness.isContentAnimating()).toBe(false);
     });
 
-    it('should keep animating the content when something inside it finishes its own animation', async () => {
+    it('keeps animating the content when something inside it finishes its own animation', async () => {
       const { harness, getElement, getAnimations } = await setup({
         animated: true,
       });
@@ -150,7 +149,7 @@ describe('ExpandableCard', () => {
       expect(await harness.isContentAnimating()).toBe(true);
     });
 
-    it('should stop animating the content once the content finishes its animation', async () => {
+    it('stops animating the content once the content finishes its animation', async () => {
       const { harness, getElement, getAnimations } = await setup({
         animated: true,
       });
@@ -161,7 +160,7 @@ describe('ExpandableCard', () => {
       expect(await harness.isContentAnimating()).toBe(false);
     });
 
-    it('should animate the content out when it collapses', async () => {
+    it('animates the content out when it collapses', async () => {
       const { harness } = await setup({ animated: true });
       await harness.toggle();
 
@@ -172,7 +171,7 @@ describe('ExpandableCard', () => {
       expect(await harness.hasContent()).toBe(true);
     });
 
-    it('should remove the content once it finishes collapsing', async () => {
+    it('removes the content once it finishes collapsing', async () => {
       const { harness, getElement, getAnimations } = await setup({
         animated: true,
       });
@@ -184,7 +183,7 @@ describe('ExpandableCard', () => {
       expect(await harness.hasContent()).toBe(false);
     });
 
-    it('should not animate the content out when the expanded card itself goes away', async () => {
+    it('does not animate the content out when the expanded card itself goes away', async () => {
       const { harness, getElement, removeCard } = await setup({
         alreadyExpanded: true,
         animated: true,

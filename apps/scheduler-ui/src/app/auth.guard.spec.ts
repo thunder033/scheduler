@@ -38,7 +38,7 @@ async function setup(currentUser: User | null) {
 }
 
 describe('authGuard', () => {
-  it('should allow navigation when there is a current user', async () => {
+  it('allows navigation when there is a current user', async () => {
     const { routerHarness, router } = await setup(mockUser.MEMBER);
 
     await routerHarness.navigateByUrl(`/${PROTECTED_PATH}`);
@@ -46,7 +46,7 @@ describe('authGuard', () => {
     expect(router.url).toBe(`/${PROTECTED_PATH}`);
   });
 
-  it('should redirect to the login page when there is no current user', async () => {
+  it('redirects to the login page when there is no current user', async () => {
     const { routerHarness, router } = await setup(null);
 
     await routerHarness.navigateByUrl(`/${PROTECTED_PATH}`);

@@ -22,13 +22,13 @@ function setup(
 
 describe('UserService', () => {
   describe('seeded users', () => {
-    it('should start with the seeded users', async () => {
+    it('starts with the seeded users', async () => {
       const { service, seededUsers } = setup();
 
       expect(await firstValueFrom(service.getUsers())).toEqual(seededUsers);
     });
 
-    it('should start without users when none are seeded', async () => {
+    it('starts without users when none are seeded', async () => {
       const { service } = setup([]);
 
       expect(await firstValueFrom(service.getUsers())).toEqual([]);
@@ -36,7 +36,7 @@ describe('UserService', () => {
   });
 
   describe('createUser', () => {
-    it('should create a user with a generated id that can be retrieved', async () => {
+    it('creates a user with a generated id that can be retrieved', async () => {
       const { service } = setup();
       const draft = mockUserDraft();
 
@@ -48,7 +48,7 @@ describe('UserService', () => {
       );
     });
 
-    it('should generate a distinct id for each user', async () => {
+    it('generates a distinct id for each user', async () => {
       const { service } = setup();
 
       const first = await firstValueFrom(service.createUser(mockUserDraft()));
@@ -59,14 +59,14 @@ describe('UserService', () => {
   });
 
   describe('getUsers', () => {
-    it('should include created users', async () => {
+    it('includes created users', async () => {
       const { service } = setup();
       const created = await firstValueFrom(service.createUser(mockUserDraft()));
 
       expect(await firstValueFrom(service.getUsers())).toContainEqual(created);
     });
 
-    it('should not expose internal state to mutation', async () => {
+    it('does not expose internal state to mutation', async () => {
       const { service } = setup();
       const before = await firstValueFrom(service.getUsers());
 
@@ -78,7 +78,7 @@ describe('UserService', () => {
 
   describe('getUsersByRole', () => {
     it.each(Object.values(UserRole))(
-      'should only include seeded users with the %s role',
+      'only includes seeded users with the %s role',
       async (role) => {
         const { service, seededUsers } = setup();
 
@@ -90,7 +90,7 @@ describe('UserService', () => {
       },
     );
 
-    it('should include created users with the role', async () => {
+    it('includes created users with the role', async () => {
       const { service } = setup();
       const created = await firstValueFrom(
         service.createUser(mockUserDraft({ roles: [UserRole.Member] })),
@@ -103,7 +103,7 @@ describe('UserService', () => {
       expect(members).toContainEqual(created);
     });
 
-    it('should include a user with multiple roles under each of their roles', async () => {
+    it('includes a user with multiple roles under each of their roles', async () => {
       const { service } = setup();
       const roles = [UserRole.Coordinator, UserRole.Prospect];
       const created = await firstValueFrom(
@@ -117,7 +117,7 @@ describe('UserService', () => {
       }
     });
 
-    it('should exclude users with other roles', async () => {
+    it('excludes users with other roles', async () => {
       const { service } = setup();
       const created = await firstValueFrom(
         service.createUser(mockUserDraft({ roles: [UserRole.Prospect] })),
@@ -132,7 +132,7 @@ describe('UserService', () => {
   });
 
   describe('getUserById', () => {
-    it('should emit null when the user does not exist', async () => {
+    it('emits null when the user does not exist', async () => {
       const { service } = setup();
 
       expect(
@@ -142,7 +142,7 @@ describe('UserService', () => {
   });
 
   describe('updateUser', () => {
-    it('should apply the changes and keep the id', async () => {
+    it('applies the changes and keeps the id', async () => {
       const { service } = setup();
       const created = await firstValueFrom(service.createUser(mockUserDraft()));
       const changes = { displayName: 'Renamed User', roles: [UserRole.Member] };
@@ -157,7 +157,7 @@ describe('UserService', () => {
       );
     });
 
-    it('should error when the user does not exist', async () => {
+    it('errors when the user does not exist', async () => {
       const { service } = setup();
 
       await expect(
@@ -167,7 +167,7 @@ describe('UserService', () => {
   });
 
   describe('deleteUser', () => {
-    it('should remove the user', async () => {
+    it('removes the user', async () => {
       const { service } = setup();
       const created = await firstValueFrom(service.createUser(mockUserDraft()));
 
@@ -178,7 +178,7 @@ describe('UserService', () => {
       expect(await firstValueFrom(service.getUserById(created.id))).toBeNull();
     });
 
-    it('should error when the user does not exist', async () => {
+    it('errors when the user does not exist', async () => {
       const { service } = setup();
 
       await expect(

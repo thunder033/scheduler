@@ -53,13 +53,13 @@ async function setup({
 }
 
 describe('AvailabilitySelectComponent', () => {
-  it('should label the field as the availability of the user', async () => {
+  it('labels the field as the availability of the user', async () => {
     const { harness } = await setup();
 
     expect(await harness.getLabel()).toBe(AVAILABILITY_LABEL);
   });
 
-  it('should offer every availability status as an option', async () => {
+  it('offers every availability status as an option', async () => {
     const { harness } = await setup();
 
     expect(await harness.getOptions()).toEqual(
@@ -67,27 +67,30 @@ describe('AvailabilitySelectComponent', () => {
     );
   });
 
-  it('should show a dot for the status of each option', async () => {
+  it('shows a dot for the status of each option', async () => {
     const { harness } = await setup();
 
     expect(await harness.getOptionStatuses()).toEqual(STATUSES);
   });
 
-  it.each(STATUSES)('should show the %s status when it is the value', async (status) => {
-    const { harness } = await setup({ status });
+  it.each(STATUSES)(
+    'shows the %s status when it is the value',
+    async (status) => {
+      const { harness } = await setup({ status });
 
-    expect(await harness.getSelectedStatus()).toBe(status);
-    expect(await harness.getPlaceholder()).toBeNull();
-  });
+      expect(await harness.getSelectedStatus()).toBe(status);
+      expect(await harness.getPlaceholder()).toBeNull();
+    },
+  );
 
-  it('should show the placeholder, and no status, when there is no value', async () => {
+  it('shows the placeholder, and no status, when there is no value', async () => {
     const { harness } = await setup({ status: null });
 
     expect(await harness.getPlaceholder()).toBe(PLACEHOLDER);
     expect(await harness.getSelectedStatus()).toBeNull();
   });
 
-  it('should show the status the form changes to', async () => {
+  it('shows the status the form changes to', async () => {
     const { harness, setFormStatus } = await setup({
       status: AvailabilityStatus.Available,
     });
@@ -97,7 +100,7 @@ describe('AvailabilitySelectComponent', () => {
     expect(await harness.getSelectedStatus()).toBe(AvailabilityStatus.IfNeeded);
   });
 
-  it('should show the placeholder again when the form clears the value', async () => {
+  it('shows the placeholder again when the form clears the value', async () => {
     const { harness, setFormStatus } = await setup({
       status: AvailabilityStatus.Available,
     });
@@ -107,7 +110,7 @@ describe('AvailabilitySelectComponent', () => {
     expect(await harness.getPlaceholder()).toBe(PLACEHOLDER);
   });
 
-  it('should change the value of the form to the status that is chosen', async () => {
+  it('changes the value of the form to the status that is chosen', async () => {
     const { harness, getFormStatus } = await setup({
       status: AvailabilityStatus.Available,
     });
@@ -120,7 +123,7 @@ describe('AvailabilitySelectComponent', () => {
     expect(await harness.getSelectedStatus()).toBe(AvailabilityStatus.IfNeeded);
   });
 
-  it('should let a status be chosen when there was none', async () => {
+  it('lets a status be chosen when there was none', async () => {
     const { harness, getFormStatus } = await setup({ status: null });
 
     await harness.selectOption(

@@ -25,7 +25,7 @@ function setup() {
 
 describe('LocalUserState', () => {
   describe('theme', () => {
-    it('should default to the default preference', () => {
+    it('defaults to the default preference', () => {
       const { store } = setup();
 
       expect(store.selectSnapshot(LocalUserState.themePreference)).toBe(
@@ -37,7 +37,7 @@ describe('LocalUserState', () => {
     });
 
     it.each(THEME_PREFERENCES)(
-      'should expose the %s preference and its color scheme once set',
+      'exposes the %s preference and its color scheme once set',
       (preference) => {
         const { store } = setup();
 
@@ -54,7 +54,7 @@ describe('LocalUserState', () => {
   });
 
   describe('side nav', () => {
-    it('should default to the default collapsed state', () => {
+    it('defaults to the default collapsed state', () => {
       const { store } = setup();
 
       expect(store.selectSnapshot(LocalUserState.sideNavCollapsed)).toBe(
@@ -63,7 +63,7 @@ describe('LocalUserState', () => {
     });
 
     it.each([true, false])(
-      'should expose the collapsed state once set to %s',
+      'exposes the collapsed state once set to %s',
       (collapsed) => {
         const { store } = setup();
         store.dispatch(new SetSideNavCollapsed(!collapsed));
@@ -76,7 +76,7 @@ describe('LocalUserState', () => {
       },
     );
 
-    it('should not affect the theme preference', () => {
+    it('does not affect the theme preference', () => {
       const { store } = setup();
       store.dispatch(new SetThemePreference('dark'));
 
@@ -87,13 +87,13 @@ describe('LocalUserState', () => {
   });
 
   describe('currentUser', () => {
-    it('should have no current user by default', () => {
+    it('has no current user by default', () => {
       const { store } = setup();
 
       expect(store.selectSnapshot(LocalUserState.currentUser)).toBeNull();
     });
 
-    it('should expose the current user once set', () => {
+    it('exposes the current user once set', () => {
       const { store } = setup();
       const user = mockUser.MEMBER;
 
@@ -102,7 +102,7 @@ describe('LocalUserState', () => {
       expect(store.selectSnapshot(LocalUserState.currentUser)).toEqual(user);
     });
 
-    it('should clear the current user when set to null', () => {
+    it('clears the current user when set to null', () => {
       const { store } = setup();
       store.dispatch(new SetCurrentUser(mockUser.MEMBER));
 
@@ -113,7 +113,7 @@ describe('LocalUserState', () => {
 
     describe('hasRole', () => {
       it.each(Object.values(UserRole))(
-        'should be false for the %s role when there is no current user',
+        'is false for the %s role when there is no current user',
         (role) => {
           const { store } = setup();
 
@@ -123,7 +123,7 @@ describe('LocalUserState', () => {
         },
       );
 
-      it('should be true for every role the current user has', () => {
+      it('is true for every role the current user has', () => {
         const { store } = setup();
         const roles = [UserRole.Coordinator, UserRole.Member];
         store.dispatch(new SetCurrentUser(mockUser({ roles })));
@@ -133,7 +133,7 @@ describe('LocalUserState', () => {
         }
       });
 
-      it('should be false for roles the current user does not have', () => {
+      it('is false for roles the current user does not have', () => {
         const { store } = setup();
         store.dispatch(new SetCurrentUser(mockUser.MEMBER));
 
@@ -142,7 +142,7 @@ describe('LocalUserState', () => {
         ).toBe(false);
       });
 
-      it('should be false again once the current user is cleared', () => {
+      it('is false again once the current user is cleared', () => {
         const { store } = setup();
         store.dispatch(new SetCurrentUser(mockUser.MEMBER));
 
@@ -154,7 +154,7 @@ describe('LocalUserState', () => {
       });
     });
 
-    it('should not affect the theme preference', () => {
+    it('does not affect the theme preference', () => {
       const { store } = setup();
       store.dispatch(new SetThemePreference('dark'));
 

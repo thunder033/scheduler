@@ -45,20 +45,20 @@ async function setup({
 }
 
 describe('ParticipantAvailabilityComponent', () => {
-  it('should show the name of the participant', async () => {
+  it('shows the name of the participant', async () => {
     const { harness, name } = await setup();
 
     expect(await harness.getName()).toBe(name);
   });
 
-  it.each(STATUSES)('should show the dot of the %s status', async (status) => {
+  it.each(STATUSES)('shows the dot of the %s status', async (status) => {
     const { harness } = await setup({ status });
 
     expect(await harness.getStatus()).toBe(status);
   });
 
   it.each(STATUSES)(
-    'should explain the dot of the %s status in a tooltip',
+    'explains the dot of the %s status in a tooltip',
     async (status) => {
       const { harness } = await setup({ status });
 
@@ -68,19 +68,19 @@ describe('ParticipantAvailabilityComponent', () => {
     },
   );
 
-  it('should explain the mark of a confirmed participant in a tooltip', async () => {
+  it('explains the mark of a confirmed participant in a tooltip', async () => {
     const { harness } = await setup({ confirmed: true });
 
     expect(await harness.getConfirmedTooltip()).toBe(CONFIRMED_LABEL);
   });
 
-  it('should have no mark to explain for a participant who is not confirmed', async () => {
+  it('has no mark to explain for a participant who is not confirmed', async () => {
     const { harness } = await setup();
 
     expect(await harness.getConfirmedTooltip()).toBeNull();
   });
 
-  it('should show the new name and status when they change', async () => {
+  it('shows the new name and status when they change', async () => {
     const { fixture, harness } = await setup();
 
     fixture.componentRef.setInput('name', 'Member Two');
@@ -91,33 +91,33 @@ describe('ParticipantAvailabilityComponent', () => {
   });
 
   describe('confirmation', () => {
-    it('should show a confirmed participant as confirmed, with no way to change it', async () => {
+    it('shows a confirmed participant as confirmed, with no way to change it', async () => {
       const { harness } = await setup({ confirmed: true });
 
       expect(await harness.isConfirmed()).toBe(true);
       expect(await harness.hasConfirmControl()).toBe(false);
     });
 
-    it('should not show a participant who is not confirmed as confirmed', async () => {
+    it('does not show a participant who is not confirmed as confirmed', async () => {
       const { harness } = await setup();
 
       expect(await harness.isConfirmed()).toBe(false);
     });
 
-    it('should offer to confirm a participant who can be confirmed', async () => {
+    it('offers to confirm a participant who can be confirmed', async () => {
       const { harness } = await setup({ confirmable: true });
 
       expect(await harness.hasConfirmControl()).toBe(true);
       expect(await harness.isConfirmed()).toBe(false);
     });
 
-    it('should show a participant who can be confirmed as confirmed when they are', async () => {
+    it('shows a participant who can be confirmed as confirmed when they are', async () => {
       const { harness } = await setup({ confirmable: true, confirmed: true });
 
       expect(await harness.isConfirmed()).toBe(true);
     });
 
-    it('should report the confirmation that is chosen', async () => {
+    it('reports the confirmation that is chosen', async () => {
       const { harness, changes } = await setup({ confirmable: true });
 
       await harness.toggleConfirmed();

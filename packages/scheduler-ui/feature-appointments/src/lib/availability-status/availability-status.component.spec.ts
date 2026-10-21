@@ -28,7 +28,7 @@ async function setup({
 
 describe('AvailabilityStatusComponent', () => {
   it.each(STATUSES)(
-    'should show the label and the dot of the %s status',
+    'shows the label and the dot of the %s status',
     async (status) => {
       const { harness } = await setup({ status });
 
@@ -37,7 +37,7 @@ describe('AvailabilityStatusComponent', () => {
     },
   );
 
-  it('should show the new status when it changes', async () => {
+  it('shows the new status when it changes', async () => {
     const { fixture, harness } = await setup();
 
     fixture.componentRef.setInput('status', AvailabilityStatus.IfNeeded);

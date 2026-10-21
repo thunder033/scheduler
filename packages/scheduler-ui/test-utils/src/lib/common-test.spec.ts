@@ -107,7 +107,7 @@ function getElements(fixture: ComponentFixture<DragScene>) {
 
 describe('CommonTest', () => {
   describe('withDragAndDrop', () => {
-    it('should move an item to the drop list it is dragged to', async () => {
+    it('moves an item to the drop list it is dragged to', async () => {
       const { dragAndDrop, getItem, getList, getItems } = setup();
 
       await dragAndDrop.dragTo(getItem('one'), getList('second'), {
@@ -118,7 +118,7 @@ describe('CommonTest', () => {
       expect(getItems('first')).toEqual(['two']);
     });
 
-    it('should leave an item where it is when it is dropped on its own drop list', async () => {
+    it('leaves an item where it is when it is dropped on its own drop list', async () => {
       const { dragAndDrop, getItem, getList, getItems } = setup();
 
       await dragAndDrop.dragTo(getItem('one'), getList('first'), {
@@ -128,7 +128,7 @@ describe('CommonTest', () => {
       expect(getItems('first')).toEqual(['one', 'two']);
     });
 
-    it('should move items again after the layout has changed', async () => {
+    it('moves items again after the layout has changed', async () => {
       const { dragAndDrop, getItem, getList, getItems } = setup();
       await dragAndDrop.dragTo(getItem('one'), getList('second'), {
         grip: HANDLE_SELECTOR,
@@ -141,7 +141,7 @@ describe('CommonTest', () => {
       expect(getItems('first')).toEqual(['two', 'one']);
     });
 
-    it('should hold an item so the other drop lists can receive it', async () => {
+    it('holds an item so the other drop lists can receive it', async () => {
       const { dragAndDrop, getItem, getList } = setup();
 
       await dragAndDrop.pickUp(getItem('one'), { grip: HANDLE_SELECTOR });
@@ -150,7 +150,7 @@ describe('CommonTest', () => {
       expect(getList('first').classList).not.toContain(RECEIVING_CLASS);
     });
 
-    it('should accept the grip as an element', async () => {
+    it('accepts the grip as an element', async () => {
       const { dragAndDrop, getItem, getList, getItems } = setup();
       const handle = getItem('one').querySelector(HANDLE_SELECTOR);
 
@@ -161,7 +161,7 @@ describe('CommonTest', () => {
       expect(getItems('second')).toEqual(['one']);
     });
 
-    it('should only start a drag from the grip when items have handles', async () => {
+    it('only starts a drag from the grip when items have handles', async () => {
       const { dragAndDrop, getItem, getList, getItems } = setup();
 
       await dragAndDrop.dragTo(getItem('one'), getList('second'));
@@ -169,7 +169,7 @@ describe('CommonTest', () => {
       expect(getItems('first')).toEqual(['one', 'two']);
     });
 
-    it('should report a grip the item does not have', async () => {
+    it('reports a grip the item does not have', async () => {
       const { dragAndDrop, getItem, getList } = setup();
 
       await expect(
@@ -181,7 +181,7 @@ describe('CommonTest', () => {
   });
 
   describe('withAnimations', () => {
-    it('should make elements report an animation', () => {
+    it('makes elements report an animation', () => {
       const before = getComputedStyle(document.body).animationName;
 
       CommonTest.withAnimations();
@@ -189,7 +189,7 @@ describe('CommonTest', () => {
       expect(getComputedStyle(document.body).animationName).not.toBe(before);
     });
 
-    it('should end an animation in a way that bubbles up to the ancestors of the element', () => {
+    it('ends an animation in a way that bubbles up to the ancestors of the element', () => {
       const animations = CommonTest.withAnimations();
       const parent = document.createElement('div');
       const child = parent.appendChild(document.createElement('div'));

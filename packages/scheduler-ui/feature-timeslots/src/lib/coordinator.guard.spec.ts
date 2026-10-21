@@ -32,14 +32,14 @@ function setup(roles?: UserRole[]) {
 }
 
 describe('coordinatorGuard', () => {
-  it('should allow a coordinator', () => {
+  it('allows a coordinator', () => {
     const { canActivate } = setup([UserRole.Coordinator]);
 
     expect(canActivate()).toBe(true);
   });
 
   it.each([[[UserRole.Member]], [[UserRole.Prospect]], [undefined]])(
-    'should send %s to the root',
+    'sends %s to the root',
     (roles) => {
       const { canActivate, router } = setup(roles);
 

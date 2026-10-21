@@ -33,13 +33,13 @@ function setup() {
 }
 
 describe('provideSchedulerUiState', () => {
-  it('should make the NGXS store available for injection', () => {
+  it('makes the NGXS store available for injection', () => {
     const { store } = setup();
 
     expect(store.snapshot()).toBeDefined();
   });
 
-  it('should remember whether the side nav is collapsed in a later session', () => {
+  it('remembers whether the side nav is collapsed in a later session', () => {
     const { store } = setup();
     store.dispatch(new SetSideNavCollapsed(true));
 

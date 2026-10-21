@@ -139,14 +139,14 @@ async function setup({
 }
 
 describe('AppointmentCardComponent', () => {
-  it('should display the time range of the timeslot', async () => {
+  it('displays the time range of the timeslot', async () => {
     const { harness, timeslot } = await setup();
 
     expect(await harness.getTimeRange()).toBe(formatTimeRange(timeslot));
   });
 
   describe('the availability of the user', () => {
-    it('should offer every availability status', async () => {
+    it('offers every availability status', async () => {
       const { harness } = await setup();
       const select = await getAvailabilitySelect(harness);
 
@@ -155,7 +155,7 @@ describe('AppointmentCardComponent', () => {
       );
     });
 
-    it('should ask the user to set their availability when they have not', async () => {
+    it('asks the user to set their availability when they have not', async () => {
       const { harness } = await setup({
         availabilities: [createAvailability({ participantId: 'other-member' })],
       });
@@ -166,7 +166,7 @@ describe('AppointmentCardComponent', () => {
     });
 
     it.each(STATUSES)(
-      'should show the %s status the user has set, with its color',
+      'shows the %s status the user has set, with its color',
       async (status) => {
         const { harness } = await setup({
           availabilities: [
@@ -181,7 +181,7 @@ describe('AppointmentCardComponent', () => {
       },
     );
 
-    it('should show the status once the user sets it', async () => {
+    it('shows the status once the user sets it', async () => {
       const { fixture, harness, appointment } = await setup();
 
       fixture.componentRef.setInput('appointment', {
@@ -196,7 +196,7 @@ describe('AppointmentCardComponent', () => {
       ).toBe(AvailabilityStatus.IfNeeded);
     });
 
-    it('should save the status that is chosen as the availability of the user', async () => {
+    it('saves the status that is chosen as the availability of the user', async () => {
       const { harness, user, getSavedAvailabilities } = await setup();
       const select = await getAvailabilitySelect(harness);
 
@@ -210,7 +210,7 @@ describe('AppointmentCardComponent', () => {
     });
 
     it.each(STATUSES)(
-      'should save the %s status when it is chosen',
+      'saves the %s status when it is chosen',
       async (status) => {
         const { harness, user, getSavedAvailabilities } = await setup();
         const select = await getAvailabilitySelect(harness);
@@ -223,7 +223,7 @@ describe('AppointmentCardComponent', () => {
       },
     );
 
-    it('should replace the availability the user has set, leaving those of others', async () => {
+    it('replaces the availability the user has set, leaving those of others', async () => {
       const other = createAvailability({ participantId: 'other-member' });
       const { harness, user, getSavedAvailabilities } = await setup({
         availabilities: [other, createAvailability()],
@@ -243,7 +243,7 @@ describe('AppointmentCardComponent', () => {
       });
     });
 
-    it('should show the saved status again when saving the choice fails', async () => {
+    it('shows the saved status again when saving the choice fails', async () => {
       const { harness, service, getSavedAvailabilities } = await setup({
         availabilities: [createAvailability()],
       });
@@ -262,7 +262,7 @@ describe('AppointmentCardComponent', () => {
       expect(await getSavedAvailabilities()).toEqual([createAvailability()]);
     });
 
-    it('should not let the user choose without a user', async () => {
+    it('does not let the user choose without a user', async () => {
       const { harness } = await setup({ user: null });
 
       expect(await (await getAvailabilitySelect(harness)).isDisabled()).toBe(
@@ -274,7 +274,7 @@ describe('AppointmentCardComponent', () => {
   describe('the availability of the participants', () => {
     const { MEMBER: member, PROSPECT: prospect } = mockUser;
 
-    it('should show the name of each of the participants with their status', async () => {
+    it('shows the name of each of the participants with their status', async () => {
       const { harness } = await setup({
         availabilities: [
           createAvailability(),
@@ -299,7 +299,7 @@ describe('AppointmentCardComponent', () => {
       ]);
     });
 
-    it('should list the availability of the user among the others', async () => {
+    it('lists the availability of the user among the others', async () => {
       const user = mockUser.COORDINATOR;
       const { harness } = await setup({
         user,
@@ -316,13 +316,13 @@ describe('AppointmentCardComponent', () => {
       ]);
     });
 
-    it('should list no one when no participant has set their availability', async () => {
+    it('lists no one when no participant has set their availability', async () => {
       const { harness } = await setup();
 
       expect(await harness.getParticipantAvailabilities()).toEqual([]);
     });
 
-    it('should name a participant whose user is not known', async () => {
+    it('names a participant whose user is not known', async () => {
       const { harness } = await setup({
         availabilities: [
           createAvailability({ participantId: 'unknown-member' }),
@@ -337,7 +337,7 @@ describe('AppointmentCardComponent', () => {
       ]);
     });
 
-    it('should show the availability of a participant once it is set', async () => {
+    it('shows the availability of a participant once it is set', async () => {
       const { fixture, harness, appointment } = await setup();
       expect(await harness.getParticipantAvailabilities()).toEqual([]);
 
@@ -355,7 +355,7 @@ describe('AppointmentCardComponent', () => {
   describe('editing the appointment', () => {
     const coordinator = mockUser.COORDINATOR;
 
-    it('should offer editing to a coordinator', async () => {
+    it('offers editing to a coordinator', async () => {
       const { harness } = await setup({ user: coordinator });
 
       expect(await harness.hasEditAppointment()).toBe(true);
@@ -364,26 +364,26 @@ describe('AppointmentCardComponent', () => {
     it.each([
       [UserRole.Member, mockUser.MEMBER],
       [UserRole.Prospect, mockUser.PROSPECT],
-    ])('should not offer editing to a %s', async (_role, user) => {
+    ])('does not offer editing to a %s', async (_role, user) => {
       const { harness } = await setup({ user });
 
       expect(await harness.hasEditAppointment()).toBe(false);
     });
 
-    it('should not offer editing without a user', async () => {
+    it('does not offer editing without a user', async () => {
       const { harness } = await setup({ user: null });
 
       expect(await harness.hasEditAppointment()).toBe(false);
     });
 
-    it('should not be expanded by default', async () => {
+    it('is not expanded by default', async () => {
       const { harness } = await setup({ user: coordinator });
 
       expect(await harness.isExpanded()).toBe(false);
       expect(await harness.hasContent()).toBe(false);
     });
 
-    it('should expand when editing starts and collapse when it stops', async () => {
+    it('expands when editing starts and collapses when it stops', async () => {
       const { harness } = await setup({ user: coordinator });
 
       await harness.toggleEditingAppointment();
@@ -395,7 +395,7 @@ describe('AppointmentCardComponent', () => {
       expect(await harness.hasContent()).toBe(false);
     });
 
-    it('should animate the content in when it expands', async () => {
+    it('animates the content in when it expands', async () => {
       const { harness } = await setup({ user: coordinator, animated: true });
 
       await harness.toggleEditingAppointment();
@@ -403,7 +403,7 @@ describe('AppointmentCardComponent', () => {
       expect(await harness.isContentAnimating()).toBe(true);
     });
 
-    it('should keep the availability of the user while it is expanded', async () => {
+    it('keeps the availability of the user while it is expanded', async () => {
       const { harness } = await setup({
         user: coordinator,
         availabilities: [
@@ -432,20 +432,20 @@ describe('AppointmentCardComponent', () => {
       return result;
     }
 
-    it('should explain how to confirm participants while editing', async () => {
+    it('explains how to confirm participants while editing', async () => {
       const { harness } = await setupEditing();
 
       expect(await harness.hasConfirmInstruction()).toBe(true);
     });
 
-    it('should not explain it when not editing', async () => {
+    it('does not explain it when not editing', async () => {
       const { harness } = await setup({ user: coordinator });
 
       expect(await harness.hasConfirmInstruction()).toBe(false);
     });
 
     it.each([AvailabilityStatus.Available, AvailabilityStatus.IfNeeded])(
-      'should offer to confirm a participant who is %s while editing',
+      'offers to confirm a participant who is %s while editing',
       async (status) => {
         const { harness } = await setupEditing({
           availabilities: [
@@ -461,7 +461,7 @@ describe('AppointmentCardComponent', () => {
       },
     );
 
-    it('should show the checkbox of a participant who is unavailable, disabled', async () => {
+    it('shows the checkbox of a participant who is unavailable, disabled', async () => {
       const { harness } = await setupEditing({
         availabilities: [
           createAvailability({
@@ -478,7 +478,7 @@ describe('AppointmentCardComponent', () => {
     });
 
     it.each([AvailabilityStatus.Available, AvailabilityStatus.IfNeeded])(
-      'should enable the checkbox of a participant who is %s',
+      'enables the checkbox of a participant who is %s',
       async (status) => {
         const { harness } = await setupEditing({
           availabilities: [
@@ -494,7 +494,7 @@ describe('AppointmentCardComponent', () => {
       },
     );
 
-    it('should not offer to confirm anyone when not editing', async () => {
+    it('does not offer to confirm anyone when not editing', async () => {
       const { harness } = await setup({
         user: coordinator,
         availabilities: [createAvailability({ participantId: member.id })],
@@ -505,7 +505,7 @@ describe('AppointmentCardComponent', () => {
       ).toBe(false);
     });
 
-    it('should confirm the participant that is checked', async () => {
+    it('confirms the participant that is checked', async () => {
       const { harness, getSavedConfirmedUserIds } = await setupEditing({
         availabilities: [
           createAvailability({ participantId: member.id }),
@@ -520,7 +520,7 @@ describe('AppointmentCardComponent', () => {
       expect(await getSavedConfirmedUserIds()).toEqual([member.id]);
     });
 
-    it('should take back the confirmation of a participant that is unchecked', async () => {
+    it('takes back the confirmation of a participant that is unchecked', async () => {
       const { harness, getSavedConfirmedUserIds } = await setupEditing({
         availabilities: [createAvailability({ participantId: member.id })],
         confirmedUserIds: [member.id],
@@ -534,7 +534,7 @@ describe('AppointmentCardComponent', () => {
       expect(await getSavedConfirmedUserIds()).toEqual([]);
     });
 
-    it('should mark a confirmed participant as confirmed when not editing', async () => {
+    it('marks a confirmed participant as confirmed when not editing', async () => {
       const { harness } = await setup({
         user: coordinator,
         availabilities: [
@@ -562,7 +562,7 @@ describe('AppointmentCardComponent', () => {
   describe('confirming the user', () => {
     const coordinator = mockUser.COORDINATOR;
 
-    it('should offer to confirm the user among the participants while editing', async () => {
+    it('offers to confirm the user among the participants while editing', async () => {
       const { harness } = await setup({
         user: coordinator,
         availabilities: [createAvailability({ participantId: coordinator.id })],
@@ -578,7 +578,7 @@ describe('AppointmentCardComponent', () => {
       expect(await own.isConfirmDisabled()).toBe(false);
     });
 
-    it('should confirm the user that checks their own availability', async () => {
+    it('confirms the user that checks their own availability', async () => {
       const { harness, getSavedConfirmedUserIds } = await setup({
         user: coordinator,
         availabilities: [createAvailability({ participantId: coordinator.id })],
@@ -592,7 +592,7 @@ describe('AppointmentCardComponent', () => {
   });
 
   describe('once the user is confirmed', () => {
-    it('should replace the availability of the user with a notice that they are confirmed', async () => {
+    it('replaces the availability of the user with a notice that they are confirmed', async () => {
       const { harness } = await setup({
         availabilities: [createAvailability()],
         confirmedUserIds: [SIGNED_IN_USER.id],
@@ -602,7 +602,7 @@ describe('AppointmentCardComponent', () => {
       expect(await harness.getConfirmedNotice()).toBe(CONFIRMED_NOTICE);
     });
 
-    it('should let the user change their availability when someone else is confirmed', async () => {
+    it('lets the user change their availability when someone else is confirmed', async () => {
       const { harness } = await setup({
         availabilities: [createAvailability()],
         confirmedUserIds: ['other-member'],
@@ -612,7 +612,7 @@ describe('AppointmentCardComponent', () => {
       expect(await harness.getConfirmedNotice()).toBeNull();
     });
 
-    it('should offer the availability again when the confirmation is taken back', async () => {
+    it('offers the availability again when the confirmation is taken back', async () => {
       const user = mockUser.COORDINATOR;
       const { fixture, harness, service, appointment } = await setup({
         user,
@@ -639,7 +639,7 @@ describe('AppointmentCardComponent', () => {
     const { MEMBER: member, PROSPECT: prospect } = mockUser;
     const coordinator = mockUser.COORDINATOR;
 
-    it('should list the facilitators apart from the prospect', async () => {
+    it('lists the facilitators apart from the prospect', async () => {
       const { harness } = await setup({
         availabilities: [
           createAvailability({ participantId: prospect.id }),
@@ -666,7 +666,7 @@ describe('AppointmentCardComponent', () => {
       ]);
     });
 
-    it('should include coordinators among the facilitators', async () => {
+    it('includes coordinators among the facilitators', async () => {
       const { harness } = await setup({
         user: coordinator,
         availabilities: [createAvailability({ participantId: coordinator.id })],
@@ -678,7 +678,7 @@ describe('AppointmentCardComponent', () => {
       expect(section.participants).toHaveLength(1);
     });
 
-    it('should leave out a section without anyone in it', async () => {
+    it('leaves out a section without anyone in it', async () => {
       const { harness } = await setup({
         availabilities: [createAvailability({ participantId: prospect.id })],
       });
@@ -688,13 +688,13 @@ describe('AppointmentCardComponent', () => {
       ).toEqual([PROSPECT_TITLE]);
     });
 
-    it('should list no sections without any availability', async () => {
+    it('lists no sections without any availability', async () => {
       const { harness } = await setup();
 
       expect(await harness.getParticipantSections()).toEqual([]);
     });
 
-    it('should order each section from available to unavailable', async () => {
+    it('orders each section from available to unavailable', async () => {
       const { harness } = await setup({
         availabilities: [
           createAvailability({
@@ -728,7 +728,7 @@ describe('AppointmentCardComponent', () => {
         createAvailability({ participantId: prospect.id }),
       ];
 
-      it('should list only the confirmed in a section that has some, outside of editing', async () => {
+      it('lists only the confirmed in a section that has some, outside of editing', async () => {
         const { harness } = await setup({
           availabilities,
           confirmedUserIds: [member.id],
@@ -756,7 +756,7 @@ describe('AppointmentCardComponent', () => {
         ]);
       });
 
-      it('should list everyone while editing', async () => {
+      it('lists everyone while editing', async () => {
         const { harness } = await setup({
           user: coordinator,
           availabilities,
@@ -769,7 +769,7 @@ describe('AppointmentCardComponent', () => {
         expect(facilitators.participants).toHaveLength(2);
       });
 
-      it('should list everyone again after editing', async () => {
+      it('lists everyone again after editing', async () => {
         const { harness } = await setup({
           user: coordinator,
           availabilities,
@@ -788,13 +788,13 @@ describe('AppointmentCardComponent', () => {
   describe('once the appointment is over', () => {
     const coordinator = mockUser.COORDINATOR;
 
-    it('should not offer editing, even to a coordinator', async () => {
+    it('does not offer editing, even to a coordinator', async () => {
       const { harness } = await setup({ user: coordinator, week: PAST_WEEK });
 
       expect(await harness.hasEditAppointment()).toBe(false);
     });
 
-    it('should not let the user change their availability', async () => {
+    it('does not let the user change their availability', async () => {
       const { harness } = await setup({
         week: PAST_WEEK,
         availabilities: [createAvailability()],
@@ -807,7 +807,7 @@ describe('AppointmentCardComponent', () => {
       );
     });
 
-    it('should still show the availability of the participants', async () => {
+    it('still shows the availability of the participants', async () => {
       const { harness } = await setup({
         week: PAST_WEEK,
         availabilities: [

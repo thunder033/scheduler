@@ -34,7 +34,7 @@ async function setup() {
 
 describe('AppComponent', () => {
   it.each(THEME_PREFERENCES)(
-    'should apply the color scheme for the %s theme preference',
+    'applies the color scheme for the %s theme preference',
     async (preference) => {
       const { harness, store } = await setup();
 

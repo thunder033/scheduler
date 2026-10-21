@@ -101,13 +101,13 @@ async function setup({
 }
 
 describe('OpenTimeslotCardComponent', () => {
-  it('should display the time range of the timeslot', async () => {
+  it('displays the time range of the timeslot', async () => {
     const { harness, timeslot } = await setup();
 
     expect(await harness.getTimeRange()).toBe(formatTimeRange(timeslot));
   });
 
-  it('should display the new time range when the timeslot changes', async () => {
+  it('displays the new time range when the timeslot changes', async () => {
     const { fixture, harness } = await setup();
     const changed = mockTimeslot({
       start: '14:00',
@@ -120,14 +120,14 @@ describe('OpenTimeslotCardComponent', () => {
     expect(await harness.getTimeRange()).toBe(formatTimeRange(changed));
   });
 
-  it('should offer adding availability before it is started', async () => {
+  it('offers adding availability before it is started', async () => {
     const { harness } = await setup();
 
     expect(await harness.hasAddAvailability()).toBe(true);
     expect(await harness.isAddingAvailability()).toBe(false);
   });
 
-  it('should replace the control to add availability with the options when started', async () => {
+  it('replaces the control to add availability with the options when started', async () => {
     const { harness } = await setup();
 
     await harness.startAddingAvailability();
@@ -136,7 +136,7 @@ describe('OpenTimeslotCardComponent', () => {
     expect(await harness.hasAddAvailability()).toBe(false);
   });
 
-  it('should bring back the control to add availability after saving', async () => {
+  it('brings back the control to add availability after saving', async () => {
     const { harness } = await setup();
     await harness.startAddingAvailability();
 
@@ -145,7 +145,7 @@ describe('OpenTimeslotCardComponent', () => {
     expect(await harness.hasAddAvailability()).toBe(true);
   });
 
-  it('should create the appointment for the timeslot in the week when there is none', async () => {
+  it('creates the appointment for the timeslot in the week when there is none', async () => {
     const { harness, timeslot, week, user, getAppointments } = await setup();
     await harness.startAddingAvailability();
     const select = await harness.availabilitySelect();
@@ -168,7 +168,7 @@ describe('OpenTimeslotCardComponent', () => {
     ]);
   });
 
-  it('should save the availability that was selected first when no other is chosen', async () => {
+  it('saves the availability that was selected first when no other is chosen', async () => {
     const { harness, user, getAppointments } = await setup();
     const [firstStatus] = Object.values(AvailabilityStatus);
     await harness.startAddingAvailability();
@@ -180,7 +180,7 @@ describe('OpenTimeslotCardComponent', () => {
     ]);
   });
 
-  it('should add to the appointment of the timeslot in the week when there is one', async () => {
+  it('adds to the appointment of the timeslot in the week when there is one', async () => {
     const other = createAvailability();
     const { harness, user, createAppointment, getAppointments } = await setup();
     await createAppointment(undefined, [other]);
@@ -201,7 +201,7 @@ describe('OpenTimeslotCardComponent', () => {
     expect(appointments[0].availabilities).toHaveLength(2);
   });
 
-  it('should replace the availability of the user when they save it again', async () => {
+  it('replaces the availability of the user when they save it again', async () => {
     const { harness, getAppointments } = await setup();
     await harness.startAddingAvailability();
     await harness.saveAvailability();
@@ -221,7 +221,7 @@ describe('OpenTimeslotCardComponent', () => {
     ]);
   });
 
-  it('should leave the appointments of other weeks alone', async () => {
+  it('leaves the appointments of other weeks alone', async () => {
     const otherWeek = createWeek({ week: 44 });
     const { harness, createAppointment, getAppointments } = await setup();
     await createAppointment(otherWeek);
@@ -235,7 +235,7 @@ describe('OpenTimeslotCardComponent', () => {
     ]);
   });
 
-  it('should not allow saving availability without a user', async () => {
+  it('does not allow saving availability without a user', async () => {
     const { harness, getAppointments } = await setup({ user: null });
     await harness.startAddingAvailability();
 

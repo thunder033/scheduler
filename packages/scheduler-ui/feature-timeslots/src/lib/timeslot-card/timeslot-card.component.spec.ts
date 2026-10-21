@@ -89,13 +89,13 @@ async function setup({
 }
 
 describe('TimeslotCardComponent', () => {
-  it('should display the time range of the timeslot', async () => {
+  it('displays the time range of the timeslot', async () => {
     const { harness, timeslot } = await setup();
 
     expect(await harness.getTimeRange()).toBe(formatTimeRange(timeslot));
   });
 
-  it('should update when the timeslot changes', async () => {
+  it('updates when the timeslot changes', async () => {
     const { fixture, harness, timeslot } = await setup();
     const next: Timeslot = { ...timeslot, start: '18:00', end: '19:00' };
 
@@ -105,13 +105,13 @@ describe('TimeslotCardComponent', () => {
   });
 
   describe('edit mode', () => {
-    it('should not be editing by default', async () => {
+    it('is not editing by default', async () => {
       const { harness } = await setup();
 
       expect(await harness.isEditing()).toBe(false);
     });
 
-    it('should toggle editing on and off', async () => {
+    it('toggles editing on and off', async () => {
       const { harness } = await setup();
 
       await harness.toggleEditing();
@@ -121,7 +121,7 @@ describe('TimeslotCardComponent', () => {
       expect(await harness.isEditing()).toBe(false);
     });
 
-    it('should stop editing when another timeslot starts being edited', async () => {
+    it('stops editing when another timeslot starts being edited', async () => {
       const { harness, store } = await setup();
       await harness.toggleEditing();
 
@@ -130,7 +130,7 @@ describe('TimeslotCardComponent', () => {
       expect(await harness.isEditing()).toBe(false);
     });
 
-    it('should discard unsaved times when another timeslot starts being edited', async () => {
+    it('discards unsaved times when another timeslot starts being edited', async () => {
       const { harness, store, timeslot } = await setup();
       await harness.toggleEditing();
       await harness.setStartTime('11:00');
@@ -143,7 +143,7 @@ describe('TimeslotCardComponent', () => {
     });
 
     describe('animations', () => {
-      it('should animate the editor in when editing starts', async () => {
+      it('animates the editor in when editing starts', async () => {
         const { harness } = await setup({ animated: true });
 
         await harness.toggleEditing();
@@ -151,7 +151,7 @@ describe('TimeslotCardComponent', () => {
         expect(await harness.isContentAnimating()).toBe(true);
       });
 
-      it('should not animate the editor in when the card is created while its timeslot is being edited', async () => {
+      it('does not animate the editor in when the card is created while its timeslot is being edited', async () => {
         const { harness } = await setup({
           alreadyEditing: true,
           animated: true,
@@ -161,7 +161,7 @@ describe('TimeslotCardComponent', () => {
         expect(await harness.isContentAnimating()).toBe(false);
       });
 
-      it('should keep animating the editor when something inside it finishes its own animation', async () => {
+      it('keeps animating the editor when something inside it finishes its own animation', async () => {
         const { fixture, harness, getAnimations } = await setup({
           animated: true,
         });
@@ -173,7 +173,7 @@ describe('TimeslotCardComponent', () => {
         expect(await harness.isContentAnimating()).toBe(true);
       });
 
-      it('should stop animating the editor once the editor finishes its animation', async () => {
+      it('stops animating the editor once the editor finishes its animation', async () => {
         const { fixture, harness, getAnimations } = await setup({
           animated: true,
         });
@@ -186,7 +186,7 @@ describe('TimeslotCardComponent', () => {
         expect(await harness.isContentAnimating()).toBe(false);
       });
 
-      it('should animate the editor out when editing ends', async () => {
+      it('animates the editor out when editing ends', async () => {
         const { harness } = await setup({ animated: true });
         await harness.toggleEditing();
 
@@ -196,7 +196,7 @@ describe('TimeslotCardComponent', () => {
       });
     });
 
-    it('should show a drag handle only while editing', async () => {
+    it('shows a drag handle only while editing', async () => {
       const { harness } = await setup();
       expect(await harness.hasDragHandle()).toBe(false);
 
@@ -207,7 +207,7 @@ describe('TimeslotCardComponent', () => {
       expect(await harness.hasDragHandle()).toBe(false);
     });
 
-    it('should show the start and end time of the timeslot', async () => {
+    it('shows the start and end time of the timeslot', async () => {
       const { harness, timeslot } = await setup();
 
       await harness.toggleEditing();
@@ -216,7 +216,7 @@ describe('TimeslotCardComponent', () => {
       expect(await harness.getEndTime()).toBe(timeslot.end);
     });
 
-    it('should not save a changed time until asked to', async () => {
+    it('does not save a changed time until asked to', async () => {
       const { harness, timeslot, getSavedTimeslot } = await setup();
       await harness.toggleEditing();
 
@@ -225,7 +225,7 @@ describe('TimeslotCardComponent', () => {
       expect(getSavedTimeslot()).toEqual(timeslot);
     });
 
-    it('should save a changed start time when asked to', async () => {
+    it('saves a changed start time when asked to', async () => {
       const { harness, timeslot, getSavedTimeslot } = await setup();
       await harness.toggleEditing();
       await harness.setStartTime('08:30');
@@ -235,7 +235,7 @@ describe('TimeslotCardComponent', () => {
       expect(getSavedTimeslot()).toEqual({ ...timeslot, start: '08:30' });
     });
 
-    it('should save a changed end time when asked to', async () => {
+    it('saves a changed end time when asked to', async () => {
       const { harness, timeslot, getSavedTimeslot } = await setup();
       await harness.toggleEditing();
       await harness.setEndTime('11:45');
@@ -245,7 +245,7 @@ describe('TimeslotCardComponent', () => {
       expect(getSavedTimeslot()).toEqual({ ...timeslot, end: '11:45' });
     });
 
-    it('should only allow saving once a time has changed', async () => {
+    it('only allows saving once a time has changed', async () => {
       const { harness } = await setup();
       await harness.toggleEditing();
       expect(await harness.canSave()).toBe(false);
@@ -255,7 +255,7 @@ describe('TimeslotCardComponent', () => {
       expect(await harness.canSave()).toBe(true);
     });
 
-    it('should stop editing once the changes are saved', async () => {
+    it('stops editing once the changes are saved', async () => {
       const { harness } = await setup();
       await harness.toggleEditing();
       await harness.setStartTime('08:30');
@@ -265,7 +265,7 @@ describe('TimeslotCardComponent', () => {
       expect(await harness.isEditing()).toBe(false);
     });
 
-    it('should show the saved times after the changes are saved', async () => {
+    it('shows the saved times after the changes are saved', async () => {
       const { fixture, harness, getSavedTimeslot } = await setup();
       await harness.toggleEditing();
       await harness.setStartTime('08:30');
@@ -280,7 +280,7 @@ describe('TimeslotCardComponent', () => {
     });
 
     describe('when the card is recreated', () => {
-      it('should keep the unsaved times', async () => {
+      it('keeps the unsaved times', async () => {
         const { harness, recreateCard } = await setup();
         await harness.toggleEditing();
         await harness.setStartTime('08:30');
@@ -293,7 +293,7 @@ describe('TimeslotCardComponent', () => {
         expect(await recreated.canSave()).toBe(true);
       });
 
-      it('should not use the unsaved times for another timeslot that is edited', async () => {
+      it('does not use the unsaved times for another timeslot that is edited', async () => {
         const { harness, store, createCard } = await setup();
         await firstValueFrom(
           store.dispatch(
@@ -320,7 +320,7 @@ describe('TimeslotCardComponent', () => {
         expect(await otherHarness.getEndTime()).toBe(OTHER_END);
       });
 
-      it('should discard the unsaved times when editing is closed', async () => {
+      it('discards the unsaved times when editing is closed', async () => {
         const { harness, recreateCard } = await setup();
         await harness.toggleEditing();
         await harness.setStartTime('08:30');
@@ -333,7 +333,7 @@ describe('TimeslotCardComponent', () => {
       });
     });
 
-    it('should not allow saving once the times are changed back', async () => {
+    it('does not allow saving once the times are changed back', async () => {
       const { harness, timeslot } = await setup();
       await harness.toggleEditing();
       await harness.setStartTime('08:30');
@@ -348,7 +348,7 @@ describe('TimeslotCardComponent', () => {
         ['after', '11:00'],
         ['equal to', '10:30'],
       ])(
-        'should show the start time as an error and not allow saving it when it is %s the end',
+        'shows the start time as an error and does not allow saving it when it is %s the end',
         async (_relation, start) => {
           const { harness } = await setup();
           await harness.toggleEditing();
@@ -365,7 +365,7 @@ describe('TimeslotCardComponent', () => {
         ['before', '08:00'],
         ['equal to', '09:00'],
       ])(
-        'should show the end time as an error and not allow saving it when it is %s the start',
+        'shows the end time as an error and does not allow saving it when it is %s the start',
         async (_relation, end) => {
           const { harness } = await setup();
           await harness.toggleEditing();
@@ -378,7 +378,7 @@ describe('TimeslotCardComponent', () => {
         },
       );
 
-      it('should clear the error and allow saving once the other time makes the range valid', async () => {
+      it('clears the error and allows saving once the other time makes the range valid', async () => {
         const { harness, timeslot, getSavedTimeslot } = await setup();
         await harness.toggleEditing();
         await harness.setStartTime('11:00');
@@ -393,7 +393,7 @@ describe('TimeslotCardComponent', () => {
         });
       });
 
-      it('should show a cleared time as an error and not allow saving it', async () => {
+      it('shows a cleared time as an error and does not allow saving it', async () => {
         const { harness } = await setup();
         await harness.toggleEditing();
 
@@ -403,7 +403,7 @@ describe('TimeslotCardComponent', () => {
         expect(await harness.canSave()).toBe(false);
       });
 
-      it('should discard the unsaved times when editing is closed', async () => {
+      it('discards the unsaved times when editing is closed', async () => {
         const { harness, timeslot } = await setup();
         await harness.toggleEditing();
         await harness.setStartTime('11:00');
@@ -418,7 +418,7 @@ describe('TimeslotCardComponent', () => {
   });
 
   describe('deleting the timeslot', () => {
-    it('should only offer to delete while editing', async () => {
+    it('only offers to delete while editing', async () => {
       const { harness } = await setup({ alreadyEditing: true });
       expect(await harness.canDelete()).toBe(true);
 
@@ -427,7 +427,7 @@ describe('TimeslotCardComponent', () => {
       expect(await harness.canDelete()).toBe(false);
     });
 
-    it('should not offer to delete a timeslot that is not created yet', async () => {
+    it('does not offer to delete a timeslot that is not created yet', async () => {
       const { store, createCard } = await setup();
       await firstValueFrom(
         store.dispatch(new StartEditingTimeslot(NEW_TIMESLOT.timeslotId)),
@@ -438,7 +438,7 @@ describe('TimeslotCardComponent', () => {
       expect(await harness.canDelete()).toBe(false);
     });
 
-    it('should ask for confirmation without deleting the timeslot', async () => {
+    it('asks for confirmation without deleting the timeslot', async () => {
       const { harness, store } = await setup({ alreadyEditing: true });
 
       await harness.requestDelete();
@@ -447,7 +447,7 @@ describe('TimeslotCardComponent', () => {
       expect(store.selectSnapshot(PlanningState.timeslots)).toHaveLength(1);
     });
 
-    it('should delete the timeslot once it is confirmed', async () => {
+    it('deletes the timeslot once it is confirmed', async () => {
       const { harness, store } = await setup({ alreadyEditing: true });
       await harness.requestDelete();
 
@@ -457,7 +457,7 @@ describe('TimeslotCardComponent', () => {
       expect(store.selectSnapshot(PlanningState.timeslots)).toEqual([]);
     });
 
-    it('should keep the timeslot when the deletion is cancelled', async () => {
+    it('keeps the timeslot when the deletion is cancelled', async () => {
       const { harness, store, timeslot } = await setup({
         alreadyEditing: true,
       });

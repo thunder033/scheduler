@@ -9,13 +9,13 @@ function setup() {
 }
 
 describe('nextMockId', () => {
-  it('should include the entity name in the id', () => {
+  it('includes the entity name in the id', () => {
     const { nextMockId } = setup();
 
     expect(nextMockId(ENTITY_A)).toContain(ENTITY_A);
   });
 
-  it('should give each id of an entity a distinct index', () => {
+  it('gives each id of an entity a distinct index', () => {
     const { nextMockId } = setup();
 
     const ids = [
@@ -27,7 +27,7 @@ describe('nextMockId', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('should index each entity independently', () => {
+  it('indexes each entity independently', () => {
     const { nextMockId } = setup();
 
     const first = nextMockId(ENTITY_A);
@@ -41,7 +41,7 @@ describe('nextMockId', () => {
     expect(firstOfOther).toContain(ENTITY_B);
   });
 
-  it('should restart the indexes after a reset', () => {
+  it('restarts the indexes after a reset', () => {
     const { nextMockId, resetMockIds } = setup();
     const first = nextMockId(ENTITY_A);
     nextMockId(ENTITY_A);

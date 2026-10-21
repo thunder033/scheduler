@@ -68,7 +68,7 @@ async function setup({
 
 describe('TimeslotService', () => {
   describe('createTimeslot', () => {
-    it('should create a timeslot with a generated id that can be retrieved', async () => {
+    it('creates a timeslot with a generated id that can be retrieved', async () => {
       const { service } = await setup();
       const draft = mockTimeslotDraft();
 
@@ -80,7 +80,7 @@ describe('TimeslotService', () => {
       ).toEqual(created);
     });
 
-    it('should generate a distinct id for each timeslot', async () => {
+    it('generates a distinct id for each timeslot', async () => {
       const { service, timeslot } = await setup();
 
       const other = await firstValueFrom(
@@ -92,7 +92,7 @@ describe('TimeslotService', () => {
   });
 
   describe('getTimeslots', () => {
-    it('should include created timeslots', async () => {
+    it('includes created timeslots', async () => {
       const { service, timeslot } = await setup();
 
       expect(await firstValueFrom(service.getTimeslots())).toContainEqual(
@@ -100,7 +100,7 @@ describe('TimeslotService', () => {
       );
     });
 
-    it('should not expose internal state to mutation', async () => {
+    it('does not expose internal state to mutation', async () => {
       const { service } = await setup();
       const before = await firstValueFrom(service.getTimeslots());
 
@@ -111,7 +111,7 @@ describe('TimeslotService', () => {
   });
 
   describe('getTimeslotById', () => {
-    it('should emit null when the timeslot does not exist', async () => {
+    it('emits null when the timeslot does not exist', async () => {
       const { service } = await setup();
 
       expect(
@@ -121,7 +121,7 @@ describe('TimeslotService', () => {
   });
 
   describe('updateTimeslot', () => {
-    it('should apply the changes and keep the id', async () => {
+    it('applies the changes and keeps the id', async () => {
       const { service, timeslot } = await setup();
       const changes = { start: '15:00', end: '16:30' };
 
@@ -135,7 +135,7 @@ describe('TimeslotService', () => {
       ).toEqual(updated);
     });
 
-    it('should error when the timeslot does not exist', async () => {
+    it('errors when the timeslot does not exist', async () => {
       const { service } = await setup();
 
       await expect(
@@ -145,7 +145,7 @@ describe('TimeslotService', () => {
   });
 
   describe('deleteTimeslot', () => {
-    it('should remove the timeslot', async () => {
+    it('removes the timeslot', async () => {
       const { service, timeslot } = await setup();
 
       await firstValueFrom(service.deleteTimeslot(timeslot.timeslotId), {
@@ -157,7 +157,7 @@ describe('TimeslotService', () => {
       ).toBeNull();
     });
 
-    it('should remove the appointments created from the timeslot', async () => {
+    it('removes the appointments created from the timeslot', async () => {
       const { service, timeslot, appointment } = await setup();
 
       await firstValueFrom(service.deleteTimeslot(timeslot.timeslotId), {
@@ -171,7 +171,7 @@ describe('TimeslotService', () => {
       ).toBeNull();
     });
 
-    it('should keep appointments for other timeslots', async () => {
+    it('keeps appointments for other timeslots', async () => {
       const { service, timeslot } = await setup();
       const other = await firstValueFrom(
         service.createTimeslot(mockTimeslotDraft()),
@@ -189,7 +189,7 @@ describe('TimeslotService', () => {
       );
     });
 
-    it('should error when the timeslot does not exist', async () => {
+    it('errors when the timeslot does not exist', async () => {
       const { service } = await setup();
 
       await expect(
@@ -199,7 +199,7 @@ describe('TimeslotService', () => {
   });
 
   describe('createAppointment', () => {
-    it('should create an empty appointment for the timeslot in the given week', async () => {
+    it('creates an empty appointment for the timeslot in the given week', async () => {
       const { service, timeslot } = await setup();
       const week = createAppointmentWeek({ week: 43 });
 
@@ -219,7 +219,7 @@ describe('TimeslotService', () => {
       ).toEqual(created);
     });
 
-    it('should generate a distinct id for each appointment', async () => {
+    it('generates a distinct id for each appointment', async () => {
       const { service, timeslot, appointment } = await setup();
 
       const other = await firstValueFrom(
@@ -229,7 +229,7 @@ describe('TimeslotService', () => {
       expect(other.appointmentId).not.toBe(appointment.appointmentId);
     });
 
-    it('should error when the timeslot does not exist', async () => {
+    it('errors when the timeslot does not exist', async () => {
       const { service } = await setup();
 
       await expect(
@@ -244,7 +244,7 @@ describe('TimeslotService', () => {
   });
 
   describe('getAppointments', () => {
-    it('should include created appointments', async () => {
+    it('includes created appointments', async () => {
       const { service, appointment } = await setup();
 
       expect(await firstValueFrom(service.getAppointments())).toContainEqual(
@@ -254,7 +254,7 @@ describe('TimeslotService', () => {
   });
 
   describe('getAppointmentsByWeek', () => {
-    it('should only include appointments in the given week', async () => {
+    it('only includes appointments in the given week', async () => {
       const { service, timeslot, appointment } = await setup();
       const otherWeek = createAppointmentWeek({ week: appointment.week + 1 });
       const otherYear = createAppointmentWeek({ year: appointment.year + 1 });
@@ -271,7 +271,7 @@ describe('TimeslotService', () => {
       expect(appointments).toEqual([appointment]);
     });
 
-    it('should emit an empty list when the week has no appointments', async () => {
+    it('emits an empty list when the week has no appointments', async () => {
       const { service, appointment } = await setup();
 
       expect(
@@ -286,7 +286,7 @@ describe('TimeslotService', () => {
   });
 
   describe('getAppointmentById', () => {
-    it('should emit null when the appointment does not exist', async () => {
+    it('emits null when the appointment does not exist', async () => {
       const { service } = await setup();
 
       expect(
@@ -298,7 +298,7 @@ describe('TimeslotService', () => {
   });
 
   describe('setAvailability', () => {
-    it('should add the availability to the appointment', async () => {
+    it('adds the availability to the appointment', async () => {
       const { service, appointment } = await setup();
       const availability = createAvailability();
 
@@ -314,7 +314,7 @@ describe('TimeslotService', () => {
       ).toEqual(updated);
     });
 
-    it('should replace the existing availability for the same participant', async () => {
+    it('replaces the existing availability for the same participant', async () => {
       const { service, appointment } = await setup();
       const other = createAvailability({ participantId: 'member-2' });
       const replacement = createAvailability({
@@ -339,7 +339,7 @@ describe('TimeslotService', () => {
       expect(updated.availabilities).toContainEqual(other);
     });
 
-    it('should error when the appointment does not exist', async () => {
+    it('errors when the appointment does not exist', async () => {
       const { service } = await setup();
 
       await expect(
@@ -351,7 +351,7 @@ describe('TimeslotService', () => {
   });
 
   describe('removeAvailability', () => {
-    it("should remove only the given participant's availability", async () => {
+    it("removes only the given participant's availability", async () => {
       const { service, appointment } = await setup();
       const removed = createAvailability();
       const kept = createAvailability({ participantId: 'member-2' });
@@ -376,7 +376,7 @@ describe('TimeslotService', () => {
       ).toEqual(updated);
     });
 
-    it('should leave the appointment unchanged when the participant has no availability', async () => {
+    it('leaves the appointment unchanged when the participant has no availability', async () => {
       const { service, appointment } = await setup();
 
       const updated = await firstValueFrom(
@@ -386,7 +386,7 @@ describe('TimeslotService', () => {
       expect(updated).toEqual(appointment);
     });
 
-    it('should error when the appointment does not exist', async () => {
+    it('errors when the appointment does not exist', async () => {
       const { service } = await setup();
 
       await expect(
@@ -398,7 +398,7 @@ describe('TimeslotService', () => {
   });
 
   describe('setConfirmedUsers', () => {
-    it('should replace the confirmed users', async () => {
+    it('replaces the confirmed users', async () => {
       const { service, appointment } = await setup();
       await firstValueFrom(
         service.setConfirmedUsers(appointment.appointmentId, ['user-1']),
@@ -417,7 +417,7 @@ describe('TimeslotService', () => {
       ).toEqual(updated);
     });
 
-    it('should not retain a reference to the provided list', async () => {
+    it('does not retain a reference to the provided list', async () => {
       const { service, appointment } = await setup();
       const confirmedUserIds = ['user-1'];
       await firstValueFrom(
@@ -432,7 +432,7 @@ describe('TimeslotService', () => {
       expect(stored?.confirmedUserIds).toEqual(['user-1']);
     });
 
-    it('should error when the appointment does not exist', async () => {
+    it('errors when the appointment does not exist', async () => {
       const { service } = await setup();
 
       await expect(
@@ -442,7 +442,7 @@ describe('TimeslotService', () => {
   });
 
   describe('setProspect', () => {
-    it('should set the prospect on the appointment', async () => {
+    it('sets the prospect on the appointment', async () => {
       const { service, appointment } = await setup();
 
       const updated = await firstValueFrom(
@@ -457,7 +457,7 @@ describe('TimeslotService', () => {
       ).toEqual(updated);
     });
 
-    it('should clear the prospect when none is provided', async () => {
+    it('clears the prospect when none is provided', async () => {
       const { service, appointment } = await setup();
       await firstValueFrom(
         service.setProspect(appointment.appointmentId, 'prospect-1'),
@@ -470,7 +470,7 @@ describe('TimeslotService', () => {
       expect(updated.prospectId).toBeUndefined();
     });
 
-    it('should error when the appointment does not exist', async () => {
+    it('errors when the appointment does not exist', async () => {
       const { service } = await setup();
 
       await expect(
@@ -482,7 +482,7 @@ describe('TimeslotService', () => {
   });
 
   describe('seeded data', () => {
-    it('should start with the seeded timeslots and appointments', async () => {
+    it('starts with the seeded timeslots and appointments', async () => {
       const { service, timeslot, appointment, timeslots, appointments } =
         await setup();
 
@@ -496,7 +496,7 @@ describe('TimeslotService', () => {
       ]);
     });
 
-    it('should start without timeslots and appointments when none are seeded', async () => {
+    it('starts without timeslots and appointments when none are seeded', async () => {
       const { service, timeslot, appointment } = await setup({
         timeslots: [],
         appointments: [],
@@ -508,7 +508,7 @@ describe('TimeslotService', () => {
       ]);
     });
 
-    it('should remove the seeded appointments of a deleted seeded timeslot', async () => {
+    it('removes the seeded appointments of a deleted seeded timeslot', async () => {
       const deleted = mockTimeslot.MONDAY_MORNING;
       const kept = mockAppointment.WITH_PROSPECT;
       const { service } = await setup({

@@ -30,7 +30,7 @@ function setup(users: User[] = [], seededUsers: User[] = []) {
 
 describe('UsersState', () => {
   describe('LoadUsers', () => {
-    it('should load the seeded users of the service', async () => {
+    it('loads the seeded users of the service', async () => {
       const seededUsers = [mockUser.COORDINATOR, mockUser.MEMBER];
       const { store } = setup([], seededUsers);
 
@@ -41,7 +41,7 @@ describe('UsersState', () => {
       );
     });
 
-    it('should replace the users that were loaded before', async () => {
+    it('replaces the users that were loaded before', async () => {
       const stale = mockUser({ id: 'stale-user' });
       const { store } = setup([stale], [mockUser.MEMBER]);
 
@@ -52,7 +52,7 @@ describe('UsersState', () => {
   });
 
   describe('usersById', () => {
-    it('should select the users by their ids', () => {
+    it('selects the users by their ids', () => {
       const users = [mockUser.MEMBER, mockUser.COORDINATOR];
       const { store } = setup(users);
 
@@ -64,14 +64,14 @@ describe('UsersState', () => {
   });
 
   describe('userById', () => {
-    it('should select the user with the given id', () => {
+    it('selects the user with the given id', () => {
       const user = mockUser.MEMBER;
       const { store } = setup([user, mockUser.COORDINATOR]);
 
       expect(store.selectSnapshot(UsersState.userById(user.id))).toEqual(user);
     });
 
-    it('should select null when no user has the given id', () => {
+    it('selects null when no user has the given id', () => {
       const { store } = setup([mockUser.MEMBER]);
 
       expect(
@@ -82,7 +82,7 @@ describe('UsersState', () => {
 
   describe('usersByRole', () => {
     it.each(Object.values(UserRole))(
-      'should select only the users with the %s role',
+      'selects only the users with the %s role',
       (role) => {
         const users = [
           mockUser.COORDINATOR,
@@ -97,7 +97,7 @@ describe('UsersState', () => {
       },
     );
 
-    it('should select a user with multiple roles under each of their roles', () => {
+    it('selects a user with multiple roles under each of their roles', () => {
       const roles = [UserRole.Coordinator, UserRole.Member];
       const user = mockUser({ roles });
       const { store } = setup([user]);
@@ -109,7 +109,7 @@ describe('UsersState', () => {
       }
     });
 
-    it('should select an empty list when no user has the role', () => {
+    it('selects an empty list when no user has the role', () => {
       const { store } = setup([mockUser.MEMBER]);
 
       expect(

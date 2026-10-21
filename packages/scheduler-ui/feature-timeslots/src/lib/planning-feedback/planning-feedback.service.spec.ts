@@ -57,7 +57,7 @@ async function setup() {
 
 describe('PlanningFeedbackService', () => {
   describe('while saving changes', () => {
-    it('should show that changes are being saved', async () => {
+    it('shows that changes are being saved', async () => {
       const { dispatch, holdUpdates, getSnackBar } = await setup();
       holdUpdates();
 
@@ -66,7 +66,7 @@ describe('PlanningFeedbackService', () => {
       expect(await (await getSnackBar())?.getMessage()).toBe(SAVING_MESSAGE);
     });
 
-    it('should stop showing it once the changes are saved', async () => {
+    it('stops showing it once the changes are saved', async () => {
       const { dispatch, holdUpdates, getSnackBar } = await setup();
       const response = holdUpdates();
       dispatch(new UpdateTimeslot('timeslot-1', { start: '08:00' }));
@@ -79,7 +79,7 @@ describe('PlanningFeedbackService', () => {
       );
     });
 
-    it('should keep showing it until every save has finished', async () => {
+    it('keeps showing it until every save has finished', async () => {
       const { dispatch, timeslotService, getSnackBar } = await setup();
       const responses = [new Subject<Timeslot>(), new Subject<Timeslot>()];
       vi.spyOn(timeslotService, 'updateTimeslot')
@@ -99,7 +99,7 @@ describe('PlanningFeedbackService', () => {
       );
     });
 
-    it('should not show it while data is only being loaded', async () => {
+    it('does not show it while data is only being loaded', async () => {
       const { dispatch, timeslotService, getSnackBar } = await setup();
       vi.spyOn(timeslotService, 'getTimeslots').mockReturnValue(
         new Subject<Timeslot[]>(),
@@ -112,7 +112,7 @@ describe('PlanningFeedbackService', () => {
   });
 
   describe('when changes are saved', () => {
-    it('should tell the user once the changes are saved', async () => {
+    it('tells the user once the changes are saved', async () => {
       const { dispatch, holdUpdates, getSnackBar } = await setup();
       const response = holdUpdates();
       dispatch(new UpdateTimeslot('timeslot-1', { start: '08:00' }));
@@ -123,7 +123,7 @@ describe('PlanningFeedbackService', () => {
       expect(await (await getSnackBar())?.getMessage()).toBe(SAVED_MESSAGE);
     });
 
-    it('should not tell the user while changes are still being saved', async () => {
+    it('does not tell the user while changes are still being saved', async () => {
       const { dispatch, holdUpdates, getSnackBar } = await setup();
       holdUpdates();
 
@@ -132,7 +132,7 @@ describe('PlanningFeedbackService', () => {
       expect(await (await getSnackBar())?.getMessage()).not.toBe(SAVED_MESSAGE);
     });
 
-    it('should tell the user only once every save has finished', async () => {
+    it('tells the user only once every save has finished', async () => {
       const { dispatch, timeslotService, getSnackBar } = await setup();
       const responses = [new Subject<Timeslot>(), new Subject<Timeslot>()];
       vi.spyOn(timeslotService, 'updateTimeslot')
@@ -150,7 +150,7 @@ describe('PlanningFeedbackService', () => {
       expect(await (await getSnackBar())?.getMessage()).toBe(SAVED_MESSAGE);
     });
 
-    it('should not tell the user when the changes failed to save', async () => {
+    it('does not tell the user when the changes failed to save', async () => {
       const { dispatch, timeslotService, getSnackBar } = await setup();
       vi.spyOn(timeslotService, 'updateTimeslot').mockReturnValue(
         throwError(() => new Error(OPERATION_ERROR_MESSAGE)),
@@ -163,7 +163,7 @@ describe('PlanningFeedbackService', () => {
       );
     });
 
-    it('should not tell the user when only some of the changes saved', async () => {
+    it('does not tell the user when only some of the changes saved', async () => {
       const { dispatch, timeslotService, getSnackBar } = await setup();
       const responses = [new Subject<Timeslot>(), new Subject<Timeslot>()];
       vi.spyOn(timeslotService, 'updateTimeslot')
@@ -179,7 +179,7 @@ describe('PlanningFeedbackService', () => {
       expect(await (await getSnackBar())?.getMessage()).not.toBe(SAVED_MESSAGE);
     });
 
-    it('should tell the user about a later save after an earlier one failed', async () => {
+    it('tells the user about a later save after an earlier one failed', async () => {
       const { dispatch, timeslotService, getSnackBar } = await setup();
       vi.spyOn(timeslotService, 'updateTimeslot')
         .mockReturnValueOnce(
@@ -195,7 +195,7 @@ describe('PlanningFeedbackService', () => {
   });
 
   describe('when an operation fails', () => {
-    it('should show the error message with a way to dismiss it', async () => {
+    it('shows the error message with a way to dismiss it', async () => {
       const { dispatch, timeslotService, getSnackBar } = await setup();
       vi.spyOn(timeslotService, 'updateTimeslot').mockReturnValue(
         throwError(() => new Error(OPERATION_ERROR_MESSAGE)),
@@ -208,7 +208,7 @@ describe('PlanningFeedbackService', () => {
       expect(await snackBar?.getActionDescription()).toBe(DISMISS_LABEL);
     });
 
-    it('should replace the saving message with the error', async () => {
+    it('replaces the saving message with the error', async () => {
       const { dispatch, holdUpdates, getSnackBar } = await setup();
       const response = holdUpdates();
       dispatch(new UpdateTimeslot('timeslot-1', { start: '08:00' }));
@@ -220,7 +220,7 @@ describe('PlanningFeedbackService', () => {
       );
     });
 
-    it('should show errors from loading data', async () => {
+    it('shows errors from loading data', async () => {
       const { dispatch, timeslotService, getSnackBar } = await setup();
       vi.spyOn(timeslotService, 'getTimeslots').mockReturnValue(
         throwError(() => new Error(OPERATION_ERROR_MESSAGE)),
@@ -233,7 +233,7 @@ describe('PlanningFeedbackService', () => {
       );
     });
 
-    it('should show a generic message when the failure is not an error', async () => {
+    it('shows a generic message when the failure is not an error', async () => {
       const { dispatch, timeslotService, getSnackBar } = await setup();
       vi.spyOn(timeslotService, 'updateTimeslot').mockReturnValue(
         throwError(() => OPERATION_ERROR_MESSAGE),

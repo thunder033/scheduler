@@ -118,7 +118,7 @@ async function setup({
 
 describe('PlanningState', () => {
   describe('timeslots', () => {
-    it('should select an empty list before anything is loaded or created', () => {
+    it('selects an empty list before anything is loaded or created', () => {
       TestBed.configureTestingModule({ providers: provideSeeds([], []) });
 
       expect(
@@ -128,7 +128,7 @@ describe('PlanningState', () => {
   });
 
   describe('LoadTimeslots', () => {
-    it('should load the seeded timeslots from the service', async () => {
+    it('loads the seeded timeslots from the service', async () => {
       const seededTimeslots = [
         mockTimeslot.MONDAY_MORNING,
         mockTimeslot.FRIDAY_EVENING,
@@ -145,7 +145,7 @@ describe('PlanningState', () => {
   });
 
   describe('CreateTimeslot', () => {
-    it('should add the new timeslot', async () => {
+    it('adds the new timeslot', async () => {
       const { store } = await setup();
       const draft = mockTimeslotDraft({ start: '08:00', end: '09:00' });
 
@@ -158,7 +158,7 @@ describe('PlanningState', () => {
   });
 
   describe('UpdateTimeslot', () => {
-    it('should apply the changes to the timeslot', async () => {
+    it('applies the changes to the timeslot', async () => {
       const { store, timeslot } = await setup();
       const changes = { start: '15:00', end: '16:30' };
 
@@ -171,7 +171,7 @@ describe('PlanningState', () => {
       ]);
     });
 
-    it('should error when the timeslot does not exist', async () => {
+    it('errors when the timeslot does not exist', async () => {
       const { store } = await setup();
 
       await expect(
@@ -183,7 +183,7 @@ describe('PlanningState', () => {
   });
 
   describe('DeleteTimeslot', () => {
-    it('should remove the timeslot', async () => {
+    it('removes the timeslot', async () => {
       const { store, timeslot } = await setup();
 
       await firstValueFrom(
@@ -195,7 +195,7 @@ describe('PlanningState', () => {
       );
     });
 
-    it('should remove the appointments created from the timeslot but keep others', async () => {
+    it('removes the appointments created from the timeslot but keeps others', async () => {
       const { store, timeslot, week, getAppointments } = await setup({
         withAppointment: true,
       });
@@ -218,7 +218,7 @@ describe('PlanningState', () => {
       ]);
     });
 
-    it('should error when the timeslot does not exist', async () => {
+    it('errors when the timeslot does not exist', async () => {
       const { store } = await setup();
 
       await expect(
@@ -228,13 +228,13 @@ describe('PlanningState', () => {
   });
 
   describe('editing a timeslot', () => {
-    it('should not be editing any timeslot by default', async () => {
+    it('is not editing any timeslot by default', async () => {
       const { store } = await setup();
 
       expect(store.selectSnapshot(PlanningState.editingTimeslot)).toBeNull();
     });
 
-    it('should select the timeslot that started being edited', async () => {
+    it('selects the timeslot that started being edited', async () => {
       const { store, timeslot } = await setup();
 
       await firstValueFrom(
@@ -246,7 +246,7 @@ describe('PlanningState', () => {
       ).toBe(timeslot.timeslotId);
     });
 
-    it('should only edit one timeslot at a time', async () => {
+    it('only edits one timeslot at a time', async () => {
       const { store, timeslot } = await setup();
       await firstValueFrom(
         store.dispatch(new StartEditingTimeslot(timeslot.timeslotId)),
@@ -261,7 +261,7 @@ describe('PlanningState', () => {
       ).toBe(MISSING_TIMESLOT_ID);
     });
 
-    it('should stop editing', async () => {
+    it('stops editing', async () => {
       const { store, timeslot } = await setup();
       await firstValueFrom(
         store.dispatch(new StartEditingTimeslot(timeslot.timeslotId)),
@@ -272,7 +272,7 @@ describe('PlanningState', () => {
       expect(store.selectSnapshot(PlanningState.editingTimeslot)).toBeNull();
     });
 
-    it('should stop editing a timeslot that is deleted', async () => {
+    it('stops editing a timeslot that is deleted', async () => {
       const { store, timeslot } = await setup();
       await firstValueFrom(
         store.dispatch(new StartEditingTimeslot(timeslot.timeslotId)),
@@ -285,7 +285,7 @@ describe('PlanningState', () => {
       expect(store.selectSnapshot(PlanningState.editingTimeslot)).toBeNull();
     });
 
-    it('should keep editing a timeslot when another one is deleted', async () => {
+    it('keeps editing a timeslot when another one is deleted', async () => {
       const { store, timeslot } = await setup();
       await firstValueFrom(
         store.dispatch(new CreateTimeslot(mockTimeslotDraft())),
@@ -325,13 +325,13 @@ describe('PlanningState', () => {
       return { ...scenario, getDraft };
     }
 
-    it('should have no draft by default', async () => {
+    it('has no draft by default', async () => {
       const { store } = await setup();
 
       expect(store.selectSnapshot(PlanningState.editingTimeslot)).toBeNull();
     });
 
-    it('should keep the draft of the timeslot being edited', async () => {
+    it('keeps the draft of the timeslot being edited', async () => {
       const { store, getDraft } = await setupEditing();
 
       await firstValueFrom(store.dispatch(new UpdateEditingTimeslot(DRAFT)));
@@ -339,7 +339,7 @@ describe('PlanningState', () => {
       expect(getDraft()).toEqual(DRAFT);
     });
 
-    it('should ignore a draft when no timeslot is being edited', async () => {
+    it('ignores a draft when no timeslot is being edited', async () => {
       const { store } = await setup();
 
       await firstValueFrom(store.dispatch(new UpdateEditingTimeslot(DRAFT)));
@@ -347,7 +347,7 @@ describe('PlanningState', () => {
       expect(store.selectSnapshot(PlanningState.editingTimeslot)).toBeNull();
     });
 
-    it('should keep the draft when the same timeslot starts being edited again', async () => {
+    it('keeps the draft when the same timeslot starts being edited again', async () => {
       const { store, timeslot, getDraft } = await setupEditing();
       await firstValueFrom(store.dispatch(new UpdateEditingTimeslot(DRAFT)));
 
@@ -358,7 +358,7 @@ describe('PlanningState', () => {
       expect(getDraft()).toEqual(DRAFT);
     });
 
-    it('should drop the draft when another timeslot starts being edited', async () => {
+    it('drops the draft when another timeslot starts being edited', async () => {
       const { store, getDraft } = await setupEditing();
       await firstValueFrom(store.dispatch(new UpdateEditingTimeslot(DRAFT)));
 
@@ -369,7 +369,7 @@ describe('PlanningState', () => {
       expect(getDraft()).toEqual({});
     });
 
-    it('should drop the draft when editing stops', async () => {
+    it('drops the draft when editing stops', async () => {
       const { store, getDraft } = await setupEditing();
       await firstValueFrom(store.dispatch(new UpdateEditingTimeslot(DRAFT)));
 
@@ -378,7 +378,7 @@ describe('PlanningState', () => {
       expect(getDraft()).toEqual({});
     });
 
-    it('should drop the draft when its timeslot is deleted', async () => {
+    it('drops the draft when its timeslot is deleted', async () => {
       const { store, timeslot, getDraft } = await setupEditing();
       await firstValueFrom(store.dispatch(new UpdateEditingTimeslot(DRAFT)));
 
@@ -391,7 +391,7 @@ describe('PlanningState', () => {
   });
 
   describe('CreateAppointment', () => {
-    it('should add an appointment for the timeslot to the given week only', async () => {
+    it('adds an appointment for the timeslot to the given week only', async () => {
       const { timeslot, week, getAppointments } = await setup({
         withAppointment: true,
       });
@@ -403,7 +403,7 @@ describe('PlanningState', () => {
       expect(getAppointments(createWeek({ year: week.year + 1 }))).toEqual([]);
     });
 
-    it('should error when the timeslot does not exist', async () => {
+    it('errors when the timeslot does not exist', async () => {
       const { store, week } = await setup();
 
       await expect(
@@ -415,7 +415,7 @@ describe('PlanningState', () => {
   });
 
   describe('LoadAppointmentsByWeek', () => {
-    it('should load the seeded appointments of the week only', async () => {
+    it('loads the seeded appointments of the week only', async () => {
       const week = createWeek();
       const inWeek = mockAppointment.MEMBER_AVAILABLE;
       const otherWeek = mockAppointment.CONFIRMED;
@@ -433,7 +433,7 @@ describe('PlanningState', () => {
       expect(getAppointments()).toEqual([{ ...inWeek, ...week }]);
     });
 
-    it('should load the appointments for the week from the service', async () => {
+    it('loads the appointments for the week from the service', async () => {
       const { store, timeslotService, timeslot, week, getAppointments } =
         await setup();
       const created = await firstValueFrom(
@@ -445,7 +445,7 @@ describe('PlanningState', () => {
       expect(getAppointments()).toEqual([created]);
     });
 
-    it('should keep appointments already loaded for other weeks', async () => {
+    it('keeps appointments already loaded for other weeks', async () => {
       const { store, timeslotService, timeslot, week, getAppointments } =
         await setup({ withAppointment: true });
       const nextWeek = createWeek({ week: week.week + 1 });
@@ -463,7 +463,7 @@ describe('PlanningState', () => {
   });
 
   describe('SetAvailability', () => {
-    it('should set the availability on the appointment, replacing the same participant', async () => {
+    it('sets the availability on the appointment, replacing the same participant', async () => {
       const { store, getAppointment } = await setup({ withAppointment: true });
       const { appointmentId } = getAppointment();
       const replacement = createAvailability({
@@ -482,7 +482,7 @@ describe('PlanningState', () => {
       expect(getAppointment().availabilities).toEqual([replacement]);
     });
 
-    it('should error when the appointment does not exist', async () => {
+    it('errors when the appointment does not exist', async () => {
       const { store } = await setup();
 
       await expect(
@@ -496,7 +496,7 @@ describe('PlanningState', () => {
   });
 
   describe('RemoveAvailability', () => {
-    it("should remove only the participant's availability", async () => {
+    it("removes only the participant's availability", async () => {
       const { store, getAppointment } = await setup({ withAppointment: true });
       const { appointmentId } = getAppointment();
       const removed = createAvailability();
@@ -518,7 +518,7 @@ describe('PlanningState', () => {
   });
 
   describe('SetProspect', () => {
-    it('should set the prospect on the appointment', async () => {
+    it('sets the prospect on the appointment', async () => {
       const { store, getAppointment } = await setup({ withAppointment: true });
 
       await firstValueFrom(
@@ -532,7 +532,7 @@ describe('PlanningState', () => {
   });
 
   describe('RemoveProspect', () => {
-    it('should clear the prospect from the appointment', async () => {
+    it('clears the prospect from the appointment', async () => {
       const { store, getAppointment } = await setup({ withAppointment: true });
       const { appointmentId } = getAppointment();
       await firstValueFrom(
@@ -546,7 +546,7 @@ describe('PlanningState', () => {
   });
 
   describe('ConfirmParticipant', () => {
-    it('should add the participant to those already confirmed', async () => {
+    it('adds the participant to those already confirmed', async () => {
       const { store, getAppointment } = await setup({ withAppointment: true });
       const { appointmentId } = getAppointment();
       await firstValueFrom(
@@ -563,7 +563,7 @@ describe('PlanningState', () => {
       ]);
     });
 
-    it('should not confirm the same participant twice', async () => {
+    it('does not confirm the same participant twice', async () => {
       const { store, getAppointment } = await setup({ withAppointment: true });
       const { appointmentId } = getAppointment();
 
@@ -576,7 +576,7 @@ describe('PlanningState', () => {
       expect(getAppointment().confirmedUserIds).toEqual(['member-1']);
     });
 
-    it('should error when the appointment is not in the store', async () => {
+    it('errors when the appointment is not in the store', async () => {
       const { store } = await setup();
 
       await expect(
@@ -590,7 +590,7 @@ describe('PlanningState', () => {
   });
 
   describe('UnconfirmParticipant', () => {
-    it('should remove only the given participant from those confirmed', async () => {
+    it('removes only the given participant from those confirmed', async () => {
       const { store, getAppointment } = await setup({ withAppointment: true });
       const { appointmentId } = getAppointment();
       for (const participantId of ['member-1', 'member-2']) {
@@ -606,7 +606,7 @@ describe('PlanningState', () => {
       expect(getAppointment().confirmedUserIds).toEqual(['member-2']);
     });
 
-    it('should leave confirmations unchanged when the participant is not confirmed', async () => {
+    it('leaves confirmations unchanged when the participant is not confirmed', async () => {
       const { store, getAppointment } = await setup({ withAppointment: true });
       const { appointmentId } = getAppointment();
       await firstValueFrom(
@@ -620,7 +620,7 @@ describe('PlanningState', () => {
       expect(getAppointment().confirmedUserIds).toEqual(['member-1']);
     });
 
-    it('should error when the appointment is not in the store', async () => {
+    it('errors when the appointment is not in the store', async () => {
       const { store } = await setup();
 
       await expect(

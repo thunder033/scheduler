@@ -14,7 +14,7 @@ function setup(currentUser: User | null = mockUser.COORDINATOR) {
 
 describe('AuthService', () => {
   describe('getCurrentUser', () => {
-    it('should emit the seeded current user', async () => {
+    it('emits the seeded current user', async () => {
       const { service, currentUser } = setup(mockUser.MEMBER);
 
       expect(await firstValueFrom(service.getCurrentUser())).toEqual(
@@ -22,7 +22,7 @@ describe('AuthService', () => {
       );
     });
 
-    it('should emit null when no user is seeded', async () => {
+    it('emits null when no user is seeded', async () => {
       const { service } = setup(null);
 
       expect(await firstValueFrom(service.getCurrentUser())).toBeNull();

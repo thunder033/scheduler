@@ -23,7 +23,7 @@ async function setup() {
 }
 
 describe('DashboardComponent', () => {
-  it('should welcome the user by name', async () => {
+  it('welcomes the user by name', async () => {
     const { harness, store } = await setup();
     const user = mockUser.MEMBER;
 
@@ -34,7 +34,7 @@ describe('DashboardComponent', () => {
     expect(message).toContain(user.displayName);
   });
 
-  it('should welcome the user when there is no current user', async () => {
+  it('welcomes the user when there is no current user', async () => {
     const { harness } = await setup();
 
     expect(await harness.getWelcomeMessage()).toContain(WELCOME_MESSAGE);

@@ -49,7 +49,7 @@ async function setup(roles: UserRole[] = [UserRole.Member]) {
 }
 
 describe('ShellComponent', () => {
-  it('should show the dashboard beside the navigation by default', async () => {
+  it('shows the dashboard beside the navigation by default', async () => {
     const { loader, navigate, shell } = await setup();
 
     await navigate(`/${WELCOME_PATH}`);
@@ -58,7 +58,7 @@ describe('ShellComponent', () => {
     await expect(loader.getHarness(DashboardHarness)).resolves.toBeDefined();
   });
 
-  it('should take the user to the appointments from the navigation', async () => {
+  it('takes the user to the appointments from the navigation', async () => {
     const { navigate, router, settled, shell } = await setup();
     await navigate(`/${WELCOME_PATH}`);
 
@@ -71,7 +71,7 @@ describe('ShellComponent', () => {
   });
 
   describe('timeslots', () => {
-    it('should take a coordinator there from the navigation', async () => {
+    it('takes a coordinator there from the navigation', async () => {
       const { navigate, router, settled, shell } = await setup([
         UserRole.Coordinator,
       ]);
@@ -85,7 +85,7 @@ describe('ShellComponent', () => {
       expect(router.url).toBe(`/${TIMESLOTS_PATH}`);
     });
 
-    it('should send a member to the dashboard instead', async () => {
+    it('sends a member to the dashboard instead', async () => {
       const { navigate, router } = await setup([UserRole.Member]);
 
       await navigate(`/${TIMESLOTS_PATH}`);

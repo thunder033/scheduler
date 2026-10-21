@@ -53,13 +53,13 @@ async function setup({ desktop = false, collapsed }: SetupOptions = {}) {
 }
 
 describe('SideNavComponent', () => {
-  it('should display the application title', async () => {
+  it('displays the application title', async () => {
     const { harness } = await setup();
 
     expect(await harness.getTitle()).toBe(SIDE_NAV_TITLE);
   });
 
-  it('should display the current user', async () => {
+  it('displays the current user', async () => {
     const { harness, store } = await setup();
     const user = mockUser.MEMBER;
 
@@ -69,7 +69,7 @@ describe('SideNavComponent', () => {
     expect(await currentUserTile.getDisplayName()).toBe(user.displayName);
   });
 
-  it('should let the user choose a theme', async () => {
+  it('lets the user choose a theme', async () => {
     const { harness } = await setup();
     const themeMenu = await harness.themeMenu();
     const { label } = THEME_OPTIONS[0];
@@ -80,7 +80,7 @@ describe('SideNavComponent', () => {
   });
 
   describe('navigation items', () => {
-    it('should list the items for everyone, but not the role-specific ones, to a member', async () => {
+    it('lists the items for everyone, but not the role-specific ones, to a member', async () => {
       const { harness, store } = await setup();
 
       store.dispatch(new SetCurrentUser(mockUser.MEMBER));
@@ -90,7 +90,7 @@ describe('SideNavComponent', () => {
       );
     });
 
-    it('should also list the role-specific items to a user with that role', async () => {
+    it('also lists the role-specific items to a user with that role', async () => {
       const { harness, store } = await setup();
 
       store.dispatch(new SetCurrentUser(mockUser.COORDINATOR));
@@ -102,14 +102,14 @@ describe('SideNavComponent', () => {
   });
 
   describe('on a wide screen', () => {
-    it('should start open and expanded', async () => {
+    it('starts open and expanded', async () => {
       const { harness } = await setup({ desktop: true });
 
       expect(await harness.isOpen()).toBe(true);
       expect(await harness.isCollapsed()).toBe(false);
     });
 
-    it('should collapse to the icons and expand again with the collapse toggle', async () => {
+    it('collapses to the icons and expands again with the collapse toggle', async () => {
       const { harness } = await setup({ desktop: true });
 
       await harness.toggleCollapsed();
@@ -119,13 +119,13 @@ describe('SideNavComponent', () => {
       expect(await harness.isCollapsed()).toBe(false);
     });
 
-    it('should start collapsed when the user left it collapsed', async () => {
+    it('starts collapsed when the user left it collapsed', async () => {
       const { harness } = await setup({ desktop: true, collapsed: true });
 
       expect(await harness.isCollapsed()).toBe(true);
     });
 
-    it('should remember the collapsed state in the local state', async () => {
+    it('remembers the collapsed state in the local state', async () => {
       const { harness, store } = await setup({ desktop: true });
 
       await harness.toggleCollapsed();
@@ -133,7 +133,7 @@ describe('SideNavComponent', () => {
       expect(store.selectSnapshot(LocalUserState.sideNavCollapsed)).toBe(true);
     });
 
-    it('should keep the navigation and theme menu available while collapsed', async () => {
+    it('keeps the navigation and theme menu available while collapsed', async () => {
       const { harness } = await setup({ desktop: true });
       const labels = await harness.getNavigationLabels();
 
@@ -145,25 +145,25 @@ describe('SideNavComponent', () => {
   });
 
   describe('on a narrow screen', () => {
-    it('should not collapse when the user left it collapsed on a wide screen', async () => {
+    it('does not collapse when the user left it collapsed on a wide screen', async () => {
       const { harness } = await setup({ collapsed: true });
 
       expect(await harness.isCollapsed()).toBe(false);
     });
 
-    it('should not offer collapsing, since it folds out instead', async () => {
+    it('does not offer collapsing, since it folds out instead', async () => {
       const { harness } = await setup();
 
       expect(await harness.hasCollapseToggle()).toBe(false);
     });
 
-    it('should start collapsed', async () => {
+    it('starts collapsed', async () => {
       const { harness } = await setup();
 
       expect(await harness.isOpen()).toBe(false);
     });
 
-    it('should fold out and collapse again with the navigation toggle', async () => {
+    it('folds out and collapses again with the navigation toggle', async () => {
       const { harness } = await setup();
 
       await harness.togglePanel();

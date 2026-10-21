@@ -9,7 +9,7 @@ function setup(overrides: Partial<Appointment> = {}) {
 }
 
 describe('mockAppointment', () => {
-  it('should create an appointment with no participants and no prospect', () => {
+  it('creates an appointment with no participants and no prospect', () => {
     const { appointment } = setup();
 
     expect(appointment.appointmentId).toBeTruthy();
@@ -18,7 +18,7 @@ describe('mockAppointment', () => {
     expect(appointment.prospectId).toBeUndefined();
   });
 
-  it('should apply the overrides over the defaults', () => {
+  it('applies the overrides over the defaults', () => {
     const overrides: Partial<Appointment> = {
       timeslotId: 'timeslot-7',
       year: 2027,
@@ -35,13 +35,13 @@ describe('mockAppointment', () => {
     expect(appointment).toMatchObject(overrides);
   });
 
-  it('should give each appointment a distinct id', () => {
+  it('gives each appointment a distinct id', () => {
     const { appointment } = setup();
 
     expect(mockAppointment().appointmentId).not.toBe(appointment.appointmentId);
   });
 
-  it('should keep an overridden id', () => {
+  it('keeps an overridden id', () => {
     const { appointment } = setup({ appointmentId: 'custom-id' });
 
     expect(appointment.appointmentId).toBe('custom-id');
@@ -50,13 +50,13 @@ describe('mockAppointment', () => {
   describe('seeded appointments', () => {
     const seeded: Appointment[] = Object.values(mockAppointment);
 
-    it('should give every seeded appointment its own id', () => {
+    it('gives every seeded appointment its own id', () => {
       const ids = seeded.map(({ appointmentId }) => appointmentId);
 
       expect(new Set(ids).size).toBe(ids.length);
     });
 
-    it('should seed appointments only for seeded timeslots', () => {
+    it('seeds appointments only for seeded timeslots', () => {
       const timeslotIds: string[] = Object.values<Timeslot>(mockTimeslot).map(
         ({ timeslotId }) => timeslotId,
       );

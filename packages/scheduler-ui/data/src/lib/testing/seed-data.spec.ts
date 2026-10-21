@@ -16,20 +16,20 @@ function setup(now = TODAY) {
 }
 
 describe('seed data', () => {
-  it('should give every seeded user its own id', () => {
+  it('gives every seeded user its own id', () => {
     const { userIds } = setup();
 
     expect(new Set(userIds).size).toBe(userIds.length);
   });
 
-  it('should give every seeded timeslot its own id', () => {
+  it('gives every seeded timeslot its own id', () => {
     const { timeslotIds } = setup();
 
     expect(new Set(timeslotIds).size).toBe(timeslotIds.length);
   });
 
   describe('createSeedAppointments', () => {
-    it('should seed appointments only for seeded timeslots', () => {
+    it('seeds appointments only for seeded timeslots', () => {
       const { appointments, timeslotIds } = setup();
 
       for (const appointment of appointments) {
@@ -37,7 +37,7 @@ describe('seed data', () => {
       }
     });
 
-    it('should seed availabilities and confirmations only for seeded users', () => {
+    it('seeds availabilities and confirmations only for seeded users', () => {
       const { appointments, userIds } = setup();
 
       for (const appointment of appointments) {
@@ -54,7 +54,7 @@ describe('seed data', () => {
       }
     });
 
-    it('should seed appointments in the week of the date and the week after', () => {
+    it('seeds appointments in the week of the date and the week after', () => {
       const { appointments } = setup();
       const thisWeek = { year: getISOWeekYear(TODAY), week: getISOWeek(TODAY) };
       const nextWeek = {
@@ -71,7 +71,7 @@ describe('seed data', () => {
       }
     });
 
-    it('should seed each timeslot at most once per week', () => {
+    it('seeds each timeslot at most once per week', () => {
       const { appointments } = setup();
 
       const keys = appointments.map(
@@ -81,7 +81,7 @@ describe('seed data', () => {
       expect(new Set(keys).size).toBe(keys.length);
     });
 
-    it('should keep the same appointment ids however often it is called', () => {
+    it('keeps the same appointment ids however often it is called', () => {
       const { appointments } = setup();
       const later = createSeedAppointments(addWeeks(TODAY, 10));
 

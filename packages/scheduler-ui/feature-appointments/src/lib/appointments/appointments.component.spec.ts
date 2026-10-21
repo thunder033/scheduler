@@ -116,13 +116,13 @@ async function setup({
 describe('AppointmentsComponent', () => {
   afterEach(() => vi.useRealTimers());
 
-  it('should title the calendar with the current week and year', async () => {
+  it('titles the calendar with the current week and year', async () => {
     const { harness, today } = await setup();
 
     expect(await harness.getWeekTitle()).toBe(weekTitle(today));
   });
 
-  it('should show all seven days of the week with their name and date', async () => {
+  it('shows all seven days of the week with their name and date', async () => {
     const { harness, today } = await setup();
 
     expect(await harness.getDayHeadings()).toEqual(
@@ -134,7 +134,7 @@ describe('AppointmentsComponent', () => {
     );
   });
 
-  it('should highlight only the current day', async () => {
+  it('highlights only the current day', async () => {
     const { harness, today } = await setup();
 
     const highlighted = (await harness.getDayHeadings()).filter(
@@ -146,7 +146,7 @@ describe('AppointmentsComponent', () => {
     ]);
   });
 
-  it('should not highlight any day in another week', async () => {
+  it('does not highlight any day in another week', async () => {
     const { harness } = await setup();
 
     await harness.nextWeek();
@@ -156,7 +156,7 @@ describe('AppointmentsComponent', () => {
     ).toBe(false);
   });
 
-  it('should highlight the current day again after returning to its week', async () => {
+  it('highlights the current day again after returning to its week', async () => {
     const { harness } = await setup();
 
     await harness.previousWeek();
@@ -167,7 +167,7 @@ describe('AppointmentsComponent', () => {
     ).toHaveLength(1);
   });
 
-  it('should show the next week after navigating forward', async () => {
+  it('shows the next week after navigating forward', async () => {
     const { harness, today } = await setup();
 
     await harness.nextWeek();
@@ -175,7 +175,7 @@ describe('AppointmentsComponent', () => {
     expect(await harness.getWeekTitle()).toBe(weekTitle(addWeeks(today, 1)));
   });
 
-  it('should show the previous week after navigating back', async () => {
+  it('shows the previous week after navigating back', async () => {
     const { harness, today } = await setup();
 
     await harness.previousWeek();
@@ -183,7 +183,7 @@ describe('AppointmentsComponent', () => {
     expect(await harness.getWeekTitle()).toBe(weekTitle(subWeeks(today, 1)));
   });
 
-  it('should show the days of the new week after navigating', async () => {
+  it('shows the days of the new week after navigating', async () => {
     const { harness, today } = await setup();
     const headingsBefore = await harness.getDayHeadings();
 
@@ -197,7 +197,7 @@ describe('AppointmentsComponent', () => {
     expect(headings[0].date).not.toBe(headingsBefore[0].date);
   });
 
-  it('should continue into the next year after the last week of the year', async () => {
+  it('continues into the next year after the last week of the year', async () => {
     const { harness, today } = await setup({ today: LAST_WEEK_OF_YEAR });
 
     await harness.nextWeek();
@@ -207,7 +207,7 @@ describe('AppointmentsComponent', () => {
     expect(await harness.getWeekTitle()).toBe(weekTitle(next));
   });
 
-  it('should list an open timeslot under the day of the week of each timeslot', async () => {
+  it('lists an open timeslot under the day of the week of each timeslot', async () => {
     const { harness, getServiceTimeslots } = await setup({
       drafts: [mockTimeslotDraft({ dayOfWeek: UNSEEDED_DAY })],
     });
@@ -221,7 +221,7 @@ describe('AppointmentsComponent', () => {
     }
   });
 
-  it('should list no open timeslots under days without timeslots', async () => {
+  it('lists no open timeslots under days without timeslots', async () => {
     const { harness, getServiceTimeslots } = await setup();
     const timeslotDays = new Set(
       (await getServiceTimeslots()).map(({ dayOfWeek }) => dayOfWeek),
@@ -236,7 +236,7 @@ describe('AppointmentsComponent', () => {
     });
   });
 
-  it('should list the open timeslots of a day in order of their start', async () => {
+  it('lists the open timeslots of a day in order of their start', async () => {
     const early = mockTimeslotDraft({
       dayOfWeek: UNSEEDED_DAY,
       start: '08:00',
@@ -261,7 +261,7 @@ describe('AppointmentsComponent', () => {
     /** A Tuesday at noon, with timeslots before and after it */
     const TUESDAY_NOON = new Date(2001, 9, 16, 12);
 
-    it('should not list an open timeslot that has ended', async () => {
+    it('does not list an open timeslot that has ended', async () => {
       const ended = mockTimeslotDraft({
         dayOfWeek: UNSEEDED_DAY,
         start: '08:00',
@@ -284,7 +284,7 @@ describe('AppointmentsComponent', () => {
       ]);
     });
 
-    it('should not list an open timeslot of an earlier day of the week', async () => {
+    it('does not list an open timeslot of an earlier day of the week', async () => {
       const { harness } = await setup({ today: TUESDAY_NOON });
 
       const [monday] = await harness.getTimeRangesByDay();
@@ -292,7 +292,7 @@ describe('AppointmentsComponent', () => {
       expect(monday).toEqual([]);
     });
 
-    it('should not list the open timeslots of a past week', async () => {
+    it('does not list the open timeslots of a past week', async () => {
       const { harness } = await setup({ today: TUESDAY_NOON });
 
       await harness.previousWeek();
@@ -304,7 +304,7 @@ describe('AppointmentsComponent', () => {
       ).toBe(true);
     });
 
-    it('should still show the appointment of a timeslot that has ended', async () => {
+    it('still shows the appointment of a timeslot that has ended', async () => {
       const { harness, timeslot } = await setup({
         today: TUESDAY_NOON,
         appointmentWeeks: [toWeek(TUESDAY_NOON)],
@@ -319,7 +319,7 @@ describe('AppointmentsComponent', () => {
     });
   });
 
-  it('should list the same open timeslots in every week', async () => {
+  it('lists the same open timeslots in every week', async () => {
     const { harness } = await setup({
       drafts: [mockTimeslotDraft({ dayOfWeek: UNSEEDED_DAY })],
     });
@@ -330,7 +330,7 @@ describe('AppointmentsComponent', () => {
     expect(await harness.getTimeRangesByDay()).toEqual(timeRangesByDay);
   });
 
-  it('should load the appointments of the week being viewed', async () => {
+  it('loads the appointments of the week being viewed', async () => {
     const week = toWeek(DEFAULT_TODAY);
     const nextWeek = toWeek(addWeeks(DEFAULT_TODAY, 1));
     const { harness, getLoadedAppointments } = await setup({
@@ -346,7 +346,7 @@ describe('AppointmentsComponent', () => {
     expect(getLoadedAppointments(nextWeek)).toHaveLength(1);
   });
 
-  it('should show an appointment instead of an open timeslot where the timeslot has one', async () => {
+  it('shows an appointment instead of an open timeslot where the timeslot has one', async () => {
     const { harness, timeslot } = await setup({
       appointmentWeeks: [toWeek(DEFAULT_TODAY)],
     });
@@ -359,7 +359,7 @@ describe('AppointmentsComponent', () => {
     expect(await day.getTimeRanges()).not.toContain(formatTimeRange(timeslot));
   });
 
-  it('should show an open timeslot in a week where the timeslot has no appointment', async () => {
+  it('shows an open timeslot in a week where the timeslot has no appointment', async () => {
     const { harness, timeslot } = await setup({
       appointmentWeeks: [toWeek(DEFAULT_TODAY)],
     });
@@ -371,7 +371,7 @@ describe('AppointmentsComponent', () => {
     expect(await day.getAppointmentTimeRanges()).toEqual([]);
   });
 
-  it('should show the appointment with the availability of the user once they add it', async () => {
+  it('shows the appointment with the availability of the user once they add it', async () => {
     const { harness, timeslot, signIn } = await setup();
     await signIn(mockUser.MEMBER);
     const day = (await harness.getDays())[timeslot.dayOfWeek - 1];
@@ -398,7 +398,7 @@ describe('AppointmentsComponent', () => {
     );
   });
 
-  it('should load the users, to name the participants whose availability is shown', async () => {
+  it('loads the users, to name the participants whose availability is shown', async () => {
     const { harness, seededUsers } = await setup();
 
     await harness.getWeekTitle();
@@ -408,7 +408,7 @@ describe('AppointmentsComponent', () => {
     ).toEqual(seededUsers.map(({ id }) => id));
   });
 
-  it('should save a status chosen on the appointment, and show it on the appointment', async () => {
+  it('saves a status chosen on the appointment, and shows it on the appointment', async () => {
     const { harness, timeslot, signIn, getLoadedAppointments } = await setup();
     const week = toWeek(DEFAULT_TODAY);
     const user = mockUser.MEMBER;
@@ -441,7 +441,7 @@ describe('AppointmentsComponent', () => {
     ]);
   });
 
-  it('should return to the same week after navigating forward and back', async () => {
+  it('returns to the same week after navigating forward and back', async () => {
     const { harness, today } = await setup();
 
     await harness.nextWeek();

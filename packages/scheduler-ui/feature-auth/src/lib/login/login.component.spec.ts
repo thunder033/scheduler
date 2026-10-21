@@ -18,7 +18,7 @@ async function setup() {
 }
 
 describe('LoginComponent', () => {
-  it('should render content', async () => {
+  it('renders content', async () => {
     const { harness } = await setup();
 
     expect(await harness.getText()).not.toBe('');
