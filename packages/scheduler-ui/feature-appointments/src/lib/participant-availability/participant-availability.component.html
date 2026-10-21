@@ -1,0 +1,25 @@
+@if (confirmable()) {
+  <mat-checkbox
+    qa-confirm-participant
+    class="-m-2"
+    [checked]="confirmed()"
+    [disabled]="confirmDisabled()"
+    [aria-label]="confirmLabel"
+    (change)="confirmationChange.emit($event.checked)"
+  />
+}
+<lib-availability-dot
+  qa-status
+  [status]="status()"
+  [matTooltip]="statusLabel()"
+/>
+<span qa-name>{{ name() }}</span>
+@if (confirmed() && !confirmable()) {
+  <mat-icon
+    qa-confirmed
+    class="ms-auto text-availability-available"
+    [attr.aria-label]="confirmedLabel"
+    [matTooltip]="confirmedLabel"
+    >check_circle</mat-icon
+  >
+}

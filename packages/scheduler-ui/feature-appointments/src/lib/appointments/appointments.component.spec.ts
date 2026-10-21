@@ -258,6 +258,60 @@ describe('AppointmentsComponent', () => {
     ]);
   });
 
+  describe('timeslots that are over', () => {
+    /** A Tuesday at noon, with timeslots before and after it */
+    const TUESDAY_NOON = new Date(2001, 9, 16, 12);
+
+    it('should not list an open timeslot that has ended', async () => {
+      const ended = createTimeslotDraft({ start: '08:00', end: '09:00' });
+      const upcoming = createTimeslotDraft({ start: '15:00', end: '16:00' });
+      const { harness } = await setup({
+        today: TUESDAY_NOON,
+        drafts: [ended, upcoming],
+      });
+
+      const timeRangesByDay = await harness.getTimeRangesByDay();
+
+      expect(timeRangesByDay[UNSEEDED_DAY - 1]).toEqual([
+        formatTimeRange(upcoming),
+      ]);
+    });
+
+    it('should not list an open timeslot of an earlier day of the week', async () => {
+      const { harness } = await setup({ today: TUESDAY_NOON });
+
+      const [monday] = await harness.getTimeRangesByDay();
+
+      expect(monday).toEqual([]);
+    });
+
+    it('should not list the open timeslots of a past week', async () => {
+      const { harness } = await setup({ today: TUESDAY_NOON });
+
+      await harness.previousWeek();
+
+      expect(
+        (await harness.getTimeRangesByDay()).every(
+          (timeRanges) => timeRanges.length === 0,
+        ),
+      ).toBe(true);
+    });
+
+    it('should still show the appointment of a timeslot that has ended', async () => {
+      const { harness, timeslot } = await setup({
+        today: TUESDAY_NOON,
+        appointmentWeeks: [toWeek(TUESDAY_NOON)],
+      });
+      expect(timeslot.dayOfWeek).toBeLessThan(UNSEEDED_DAY);
+
+      const day = (await harness.getDays())[timeslot.dayOfWeek - 1];
+
+      expect(await day.getAppointmentTimeRanges()).toEqual([
+        formatTimeRange(timeslot),
+      ]);
+    });
+  });
+
   it('should list the same open timeslots in every week', async () => {
     const { harness } = await setup({ drafts: [createTimeslotDraft()] });
     const timeRangesByDay = await harness.getTimeRangesByDay();
@@ -329,12 +383,13 @@ describe('AppointmentsComponent', () => {
       timeRange: formatTimeRange(timeslot),
     });
     const availability = await appointmentCard.availabilitySelect();
+    assert(availability, 'The appointment card has no availability select');
     expect(await availability.getSelectedStatus()).toBe(
       AvailabilityStatus.IfNeeded,
     );
   });
 
-  it('should load the users, to name the members whose availability is shown', async () => {
+  it('should load the users, to name the participants whose availability is shown', async () => {
     const { harness } = await setup();
 
     await harness.getWeekTitle();
@@ -359,6 +414,7 @@ describe('AppointmentsComponent', () => {
       timeRange: formatTimeRange(timeslot),
     });
     const availability = await appointmentCard.availabilitySelect();
+    assert(availability, 'The appointment card has no availability select');
 
     await availability.selectOption(
       AVAILABILITY_STATUS_LABELS[AvailabilityStatus.Unavailable],

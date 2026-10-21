@@ -4,7 +4,7 @@
   <header class="flex w-full justify-between p-1 pr-0">
     <span qa-time-range class="font-bold">{{ timeRange() }}</span>
 
-    @if (isCoordinator()) {
+    @if (canEdit()) {
       <button
         mat-icon-button
         type="button"
@@ -19,38 +19,59 @@
       </button>
     }
   </header>
-  <lib-availability-select
-    class="w-full"
-    [compact]="true"
-    [value]="chosen()"
-    [placeholder]="placeholder"
-    [disabled]="!canChange()"
-    (valueChange)="choose($event)"
-  />
+  @if (confirmed()) {
+    <div
+      class="flex w-full items-start gap-2 rounded-lg bg-tertiary-container p-2 text-body-medium text-on-tertiary-container"
+    >
+      <mat-icon class="shrink-0">info</mat-icon>
+      <p qa-confirmed-notice class="m-0">{{ confirmedNotice }}</p>
+    </div>
+  } @else {
+    <lib-availability-select
+      class="w-full"
+      [compact]="true"
+      [value]="chosen()"
+      [placeholder]="placeholder"
+      [disabled]="!canChange()"
+      (valueChange)="choose($event)"
+    />
+  }
   @if (expanded()) {
-    <!-- What a coordinator edits is yet to be built -->
     <div
       class="content-expander w-full"
       qa-expandable-content
       (animate.enter)="expandContent($event)"
       (animate.leave)="collapseContent($event)"
     >
-      <div class="content-clip"></div>
+      <div class="content-clip">
+        <p qa-confirm-instruction class="m-0 text-body-small">
+          {{ confirmInstruction }}
+        </p>
+      </div>
     </div>
   }
-  @if (others().length) {
-    <ul
-      qa-other-availabilities
-      class="m-0 flex w-full list-none flex-col gap-1 p-0"
-    >
-      @for (other of others(); track other.memberId) {
-        <li>
-          <lib-member-availability
-            [name]="other.name"
-            [status]="other.status"
-          />
-        </li>
-      }
-    </ul>
+  @for (section of sections(); track section.title) {
+    <section qa-participant-section class="w-full">
+      <h4 qa-section-title class="m-0 mb-1 text-label-large">
+        {{ section.title }}
+      </h4>
+      <ul class="m-0 flex w-full list-none flex-col gap-1 p-0">
+        @for (
+          participant of section.participants;
+          track participant.participantId
+        ) {
+          <li>
+            <lib-participant-availability
+              [name]="participant.name"
+              [status]="participant.status"
+              [confirmed]="participant.confirmed"
+              [confirmable]="participant.confirmable"
+              [confirmDisabled]="participant.confirmDisabled"
+              (confirmationChange)="confirm(participant.participantId, $event)"
+            />
+          </li>
+        }
+      </ul>
+    </section>
   }
 </div>

@@ -26,6 +26,7 @@ import {
 import { switchMap } from 'rxjs';
 import { AppointmentCardComponent } from '../appointment-card/appointment-card.component';
 import { OpenTimeslotCardComponent } from '../open-timeslot-card/open-timeslot-card.component';
+import { hasTimeslotEnded } from '../timeslot-time';
 
 export const PREVIOUS_WEEK_LABEL = 'Previous week';
 export const NEXT_WEEK_LABEL = 'Next week';
@@ -93,25 +94,31 @@ export class AppointmentsComponent {
     ),
     { initialValue: [] },
   );
-  /** Each timeslot is shown with the appointment it has in the week, if it has one */
+  /**
+   * Each timeslot is shown with the appointment it has in the week, if it has one. A timeslot that
+   * has ended is left out, unless it has an appointment, which stays to be seen.
+   */
   protected readonly days = computed(() =>
     weekDays(this.viewedDate()).map((date) => ({
       date,
       isToday: isToday(date),
-      slots: timeslotsOnDay(this.timeslots(), getISODay(date)).map(
-        (timeslot) => ({
+      slots: timeslotsOnDay(this.timeslots(), getISODay(date))
+        .map((timeslot) => ({
           timeslot,
           appointment: this.appointments().find(
             ({ timeslotId }) => timeslotId === timeslot.timeslotId,
           ),
-        }),
-      ),
+        }))
+        .filter(
+          ({ timeslot, appointment }) =>
+            appointment || !hasTimeslotEnded(date, timeslot),
+        ),
     })),
   );
 
   constructor() {
     this.store.dispatch(new LoadTimeslots());
-    // The availability of the other members is shown with their names
+    // The availability of the other participants is shown with their names
     this.store.dispatch(new LoadUsers());
     // Availability is added to the appointment of the viewed week, so these have to be known
     effect(() => this.store.dispatch(new LoadAppointmentsByWeek(this.week())));

@@ -1,10 +1,17 @@
-import { BaseHarnessFilters, HarnessPredicate } from '@angular/cdk/testing';
+import {
+  BaseHarnessFilters,
+  ComponentHarness,
+  HarnessPredicate,
+} from '@angular/cdk/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { AvailabilityStatus } from '@org/models';
 import { ExpandableCardHarness } from '@org/scheduler-ui/core-ui/testing';
 import { qaSelector } from '@org/scheduler-ui/test-utils';
 import { AvailabilitySelectHarness } from '../availability-select/availability-select.harness';
-import { MemberAvailabilityHarness } from '../member-availability/member-availability.harness';
+import {
+  ParticipantAvailabilityHarness,
+  ParticipantAvailabilityHarnessFilters,
+} from '../participant-availability/participant-availability.harness';
 
 const NO_EDIT_CONTROL_MESSAGE =
   'The card has no control to edit the appointment';
@@ -14,6 +21,32 @@ const EDITING_NOT_TOGGLED_MESSAGE =
 export interface AppointmentCardHarnessFilters extends BaseHarnessFilters {
   /** The time range the card shows */
   timeRange?: string | RegExp;
+}
+
+/** A group of the participants on the card, such as the facilitators */
+export class ParticipantSectionHarness extends ComponentHarness {
+  static hostSelector = qaSelector('participant-section');
+
+  private readonly title = this.locatorFor(qaSelector('section-title'));
+
+  async getTitle(): Promise<string> {
+    return (await this.title()).text();
+  }
+
+  /** The names and statuses of the participants in the section, in display order */
+  async getParticipants(): Promise<
+    { name: string; status: AvailabilityStatus }[]
+  > {
+    const participants = await this.locatorForAll(
+      ParticipantAvailabilityHarness,
+    )();
+    return Promise.all(
+      participants.map(async (participant) => ({
+        name: await participant.getName(),
+        status: await participant.getStatus(),
+      })),
+    );
+  }
 }
 
 export class AppointmentCardHarness extends ExpandableCardHarness {
@@ -30,9 +63,20 @@ export class AppointmentCardHarness extends ExpandableCardHarness {
     );
   }
 
-  /** Where the current user chooses their availability, which is always there */
-  availabilitySelect = this.locatorFor(AvailabilitySelectHarness);
+  /** Where the current user chooses their availability, which is not there once they are confirmed */
+  availabilitySelect = this.locatorForOptional(AvailabilitySelectHarness);
 
+  /** Finds the participants whose availability is shown */
+  getParticipantAvailability = (
+    filters: ParticipantAvailabilityHarnessFilters = {},
+  ) => this.locatorFor(ParticipantAvailabilityHarness.with(filters))();
+
+  private readonly confirmedNotice = this.locatorForOptional(
+    qaSelector('confirmed-notice'),
+  );
+  private readonly confirmInstruction = this.locatorForOptional(
+    qaSelector('confirm-instruction'),
+  );
   private readonly timeRange = this.locatorFor(qaSelector('time-range'));
   /** Only there for a coordinator */
   private readonly editControl = this.locatorForOptional(
@@ -43,17 +87,45 @@ export class AppointmentCardHarness extends ExpandableCardHarness {
     return (await this.timeRange()).text();
   }
 
-  /** The names and statuses of the other members whose availability is shown, in display order */
-  async getOtherAvailabilities(): Promise<
+  /** The names and statuses of the participants whose availability is shown, in display order */
+  async getParticipantAvailabilities(): Promise<
     { name: string; status: AvailabilityStatus }[]
   > {
-    const members = await this.locatorForAll(MemberAvailabilityHarness)();
+    const participants = await this.locatorForAll(
+      ParticipantAvailabilityHarness,
+    )();
     return Promise.all(
-      members.map(async (member) => ({
-        name: await member.getName(),
-        status: await member.getStatus(),
+      participants.map(async (participant) => ({
+        name: await participant.getName(),
+        status: await participant.getStatus(),
       })),
     );
+  }
+
+  /** The sections the participants are listed in, in display order, each with its participants in display order */
+  async getParticipantSections(): Promise<
+    {
+      title: string;
+      participants: { name: string; status: AvailabilityStatus }[];
+    }[]
+  > {
+    const sections = await this.locatorForAll(ParticipantSectionHarness)();
+    return Promise.all(
+      sections.map(async (section) => ({
+        title: await section.getTitle(),
+        participants: await section.getParticipants(),
+      })),
+    );
+  }
+
+  /** The notice that the user is confirmed to attend, or null when they are not */
+  async getConfirmedNotice(): Promise<string | null> {
+    return (await this.confirmedNotice())?.text() ?? null;
+  }
+
+  /** Whether the instruction to check participants to confirm them is shown */
+  async hasConfirmInstruction(): Promise<boolean> {
+    return (await this.confirmInstruction()) !== null;
   }
 
   /** Whether the control to edit the appointment is there, which it is for a coordinator */
