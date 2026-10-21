@@ -56,6 +56,10 @@
         "development": {
           "buildTarget": "scheduler-ui:build:development"
         }
+      },
+      "dependsOn": ["scheduler-api:serve"],
+      "options": {
+        "proxyConfig": "apps/scheduler-ui/proxy.conf.json"
       }
     },
     "lint": {

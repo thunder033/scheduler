@@ -49,7 +49,8 @@
       ],
       "@org/scheduler-ui/core-ui/testing": [
         "./packages/scheduler-ui/core-ui/src/testing.ts"
-      ]
+      ],
+      "@org/scheduler-api-data": ["./packages/scheduler-api/data/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

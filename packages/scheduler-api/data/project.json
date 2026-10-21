@@ -1,0 +1,9 @@
+{
+  "name": "scheduler-api-data",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/scheduler-api/data/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project scheduler-api-data --web",
+  "targets": {}
+}
