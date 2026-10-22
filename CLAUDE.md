@@ -60,7 +60,8 @@ Mock and seed data come from `@org/scheduler-ui/data/testing` (`packages/schedul
 
 - For navigating/exploring the workspace, invoke the `nx-workspace` skill first - it has patterns for querying projects, targets, and dependencies
 - When running tasks (for example build, lint, test, e2e, etc.), always prefer running the task through `nx` (i.e. `nx run`, `nx run-many`, `nx affected`) instead of using the underlying tooling directly
-  - Nx hang: nx test hangs rarely, about 2% of runs, at vitest startup, before any test runs. It is not a test failure. Run Nx commands under perl -e 'alarm N; exec @ARGV' (macOS has no timeout).
+  - Hangs: Vite ≤ 8.0.x bundled `vite.config.*` with a Rolldown release candidate that occasionally deadlocked, leaving `vitest` (or `vite build`) idle with no output; fixed by Vite 8.3.5. It is not a test failure or an Nx/TUI issue. If a hang recurs, `sample <vitest pid>` and look for parked `rolldown-worker` threads
+  - Run Nx commands under a watchdog that owns its process group: `perl -e 'setpgrp; alarm N; exec @ARGV'` (macOS has no timeout). The alarm only kills the top process, so after exit 142 kill the rest of the group (`pkill -g <pgid>`; Nx then stops its task processes) and check `ps` for orphaned `nx`/`vitest`
   - use `nx format` instead of prettier directly
 - Prefix nx commands with the NPX package manager
 - You have access to the Nx MCP server and its tools, use them to help the user
