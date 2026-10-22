@@ -5,7 +5,7 @@
   "projectType": "library",
   "tags": [],
   "namedInputs": {
-    "sharedGlobals": []
+    "uiStyles": []
   },
   "targets": {
     "typecheck": {

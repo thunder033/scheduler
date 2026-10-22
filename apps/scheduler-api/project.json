@@ -5,7 +5,7 @@
   "projectType": "application",
   "tags": [],
   "namedInputs": {
-    "sharedGlobals": []
+    "uiStyles": []
   },
   "targets": {
     "build": {
@@ -38,12 +38,9 @@
       }
     },
     "serve": {
-      "continuous": true,
       "executor": "@nx/js:node",
-      "dependsOn": ["build"],
       "options": {
-        "buildTarget": "scheduler-api:build",
-        "runBuildTargetDependencies": false
+        "buildTarget": "scheduler-api:build"
       }
     }
   }

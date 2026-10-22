@@ -4,7 +4,7 @@
   "projectType": "application",
   "implicitDependencies": ["scheduler-api"],
   "namedInputs": {
-    "sharedGlobals": []
+    "uiStyles": []
   },
   "targets": {
     "e2e": {

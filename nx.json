@@ -11,10 +11,16 @@
       "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/test-setup.[jt]s"
     ],
-    "sharedGlobals": ["{workspaceRoot}/packages/scheduler-ui/styles/**/*"]
+    "sharedGlobals": ["uiStyles"],
+    "uiStyles": ["{workspaceRoot}/packages/scheduler-ui/styles/**/*"]
   },
   "targetDefaults": {
     "@angular/build:application": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    },
+    "@nx/esbuild:esbuild": {
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
@@ -30,10 +36,12 @@
         "{workspaceRoot}/tools/eslint-rules/**/*"
       ]
     },
-    "@nx/esbuild:esbuild": {
-      "cache": true,
-      "dependsOn": ["^build"],
-      "inputs": ["production", "^production"]
+    "@nx/js:node": {
+      "continuous": true,
+      "dependsOn": ["build"],
+      "options": {
+        "runBuildTargetDependencies": false
+      }
     }
   },
   "release": {
@@ -45,22 +53,15 @@
   },
   "plugins": [
     {
-      "plugin": "@nx/playwright/plugin",
-      "options": {
-        "targetName": "e2e"
-      }
-    },
-    {
       "plugin": "@nx/eslint/plugin",
       "options": {
         "targetName": "lint"
       }
     },
     {
-      "plugin": "@nx/docker",
+      "plugin": "@nx/vitest",
       "options": {
-        "buildTarget": "docker:build",
-        "runTarget": "docker:run"
+        "testTargetName": "test"
       }
     },
     {
@@ -78,9 +79,16 @@
       }
     },
     {
-      "plugin": "@nx/vitest",
+      "plugin": "@nx/playwright/plugin",
       "options": {
-        "testTargetName": "test"
+        "targetName": "e2e"
+      }
+    },
+    {
+      "plugin": "@nx/docker",
+      "options": {
+        "buildTarget": "docker:build",
+        "runTarget": "docker:run"
       }
     }
   ],
