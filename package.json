@@ -41,6 +41,7 @@
     "@nestjs/testing": "^11.0.0",
     "@nx/angular": "23.2.0",
     "@nx/devkit": "23.2.0",
+    "@nx/docker": "23.2.0",
     "@nx/eslint": "23.2.0",
     "@nx/eslint-plugin": "23.2.0",
     "@nx/js": "23.2.0",

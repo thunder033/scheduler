@@ -19,6 +19,34 @@
         "command": "vite build"
       }
     },
+    "prune-lockfile": {
+      "executor": "@nx/js:prune-lockfile",
+      "cache": true,
+      "dependsOn": ["build"],
+      "inputs": [
+        "production",
+        "^production",
+        "{workspaceRoot}/package-lock.json"
+      ],
+      "outputs": [
+        "{projectRoot}/dist/package.json",
+        "{projectRoot}/dist/package-lock.json"
+      ],
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "docker:build": {
+      "dependsOn": ["build", "^build", "prune-lockfile"],
+      "options": {
+        "args": ["--tag scheduler-api"]
+      }
+    },
+    "docker:run": {
+      "options": {
+        "command": "docker run {args} scheduler-api"
+      }
+    },
     "typecheck": {
       "executor": "nx:run-commands"
     },
