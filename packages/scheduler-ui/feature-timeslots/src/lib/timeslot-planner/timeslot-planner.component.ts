@@ -8,14 +8,14 @@ import { Component, computed, inject } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { Store } from '@ngxs/store';
-import { Timeslot } from '@org/models';
+import { Timeslot } from '@scheduler/models';
 import {
   LoadTimeslots,
   NEW_TIMESLOT,
   PlanningState,
   StartEditingTimeslot,
   UpdateEditingTimeslot,
-} from '@org/scheduler-ui/state';
+} from '@scheduler/ui/state';
 import { PlanningFeedbackService } from '../planning-feedback/planning-feedback.service';
 import { TimeslotCardComponent } from '../timeslot-card/timeslot-card.component';
 

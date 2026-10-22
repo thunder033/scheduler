@@ -1,4 +1,4 @@
-import { ContactMethod, User, UserRole } from '@org/models';
+import { ContactMethod, User, UserRole } from '@scheduler/models';
 import { UserDraft } from '../user/user.service';
 import { nextMockId } from './mock-id';
 

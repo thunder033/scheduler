@@ -2,7 +2,7 @@ import { Component, computed, input, output } from '@angular/core';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
-import { AvailabilityStatus } from '@org/models';
+import { AvailabilityStatus } from '@scheduler/models';
 import { AvailabilityDotComponent } from '../availability-dot/availability-dot.component';
 import { AVAILABILITY_STATUS_LABELS } from '../availability-status/availability-status.component';
 

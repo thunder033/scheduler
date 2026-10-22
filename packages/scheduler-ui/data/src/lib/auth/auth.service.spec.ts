@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { User } from '@org/models';
+import { User } from '@scheduler/models';
 import { firstValueFrom } from 'rxjs';
 import { SEED_CURRENT_USER } from '../seed/seed.tokens';
 import { mockUser } from '../testing/mock-user';

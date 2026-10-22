@@ -20,7 +20,7 @@ import {
   SetProspect,
   UnconfirmParticipant,
   UpdateTimeslot,
-} from '@org/scheduler-ui/state';
+} from '@scheduler/ui/state';
 
 export const SAVING_MESSAGE = 'Saving changes...';
 export const SAVED_MESSAGE = 'Changes saved';

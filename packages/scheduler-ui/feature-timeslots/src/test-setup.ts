@@ -1,4 +1,4 @@
-import '@org/scheduler-ui/test-utils';
+import '@scheduler/ui/test-utils';
 import '@angular/compiler';
 import '@analogjs/vitest-angular/setup-snapshots';
 import { setupTestBed } from '@analogjs/vitest-angular/setup-testbed';

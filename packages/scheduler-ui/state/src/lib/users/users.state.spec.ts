@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { provideStore, Store } from '@ngxs/store';
-import { User, UserRole } from '@org/models';
-import { SEED_USERS } from '@org/scheduler-ui/data';
-import { mockUser } from '@org/scheduler-ui/data/testing';
+import { User, UserRole } from '@scheduler/models';
+import { SEED_USERS } from '@scheduler/ui/data';
+import { mockUser } from '@scheduler/ui/data/testing';
 import { firstValueFrom } from 'rxjs';
 import { LoadUsers } from './users.actions';
 import { USERS_STATE_NAME } from './users.model';

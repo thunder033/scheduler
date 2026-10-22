@@ -6,7 +6,7 @@ import {
   State,
   StateContext,
 } from '@ngxs/store';
-import { User, UserRole } from '@org/models';
+import { User, UserRole } from '@scheduler/models';
 import {
   SetCurrentUser,
   SetSideNavCollapsed,

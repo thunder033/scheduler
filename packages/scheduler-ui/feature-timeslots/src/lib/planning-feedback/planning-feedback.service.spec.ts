@@ -3,11 +3,11 @@ import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 import { Store } from '@ngxs/store';
-import { Timeslot } from '@org/models';
-import { TimeslotService } from '@org/scheduler-ui/data';
-import { LoadTimeslots, UpdateTimeslot } from '@org/scheduler-ui/state';
+import { Timeslot } from '@scheduler/models';
+import { TimeslotService } from '@scheduler/ui/data';
+import { LoadTimeslots, UpdateTimeslot } from '@scheduler/ui/state';
 import { Observable, of, Subject, throwError } from 'rxjs';
-import { provideTestState } from '@org/scheduler-ui/test-utils';
+import { provideTestState } from '@scheduler/ui/test-utils';
 import {
   DISMISS_LABEL,
   PlanningFeedbackService,
@@ -15,7 +15,7 @@ import {
   SAVING_MESSAGE,
   UNKNOWN_ERROR_MESSAGE,
 } from './planning-feedback.service';
-import { mockTimeslot } from '@org/scheduler-ui/data/testing';
+import { mockTimeslot } from '@scheduler/ui/data/testing';
 
 const OPERATION_ERROR_MESSAGE = 'The server could not be reached';
 

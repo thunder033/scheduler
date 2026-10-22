@@ -4,9 +4,9 @@ import {
   HarnessPredicate,
 } from '@angular/cdk/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
-import { AvailabilityStatus } from '@org/models';
-import { ExpandableCardHarness } from '@org/scheduler-ui/core-ui/testing';
-import { qaSelector } from '@org/scheduler-ui/test-utils';
+import { AvailabilityStatus } from '@scheduler/models';
+import { ExpandableCardHarness } from '@scheduler/ui/core-ui/testing';
+import { qaSelector } from '@scheduler/ui/test-utils';
 import { AvailabilitySelectHarness } from '../availability-select/availability-select.harness';
 import {
   ParticipantAvailabilityHarness,

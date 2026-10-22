@@ -1,4 +1,4 @@
-import { User, UserRole } from '@org/models';
+import { User, UserRole } from '@scheduler/models';
 import { resetMockIds } from './mock-id';
 import { mockUser } from './mock-user';
 

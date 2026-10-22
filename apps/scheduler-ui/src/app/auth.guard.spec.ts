@@ -3,13 +3,10 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { Store } from '@ngxs/store';
-import { User } from '@org/models';
-import { mockUser } from '@org/scheduler-ui/data/testing';
-import {
-  provideSchedulerUiState,
-  SetCurrentUser,
-} from '@org/scheduler-ui/state';
-import { provideTestSeeds } from '@org/scheduler-ui/test-utils';
+import { User } from '@scheduler/models';
+import { mockUser } from '@scheduler/ui/data/testing';
+import { provideSchedulerUiState, SetCurrentUser } from '@scheduler/ui/state';
+import { provideTestSeeds } from '@scheduler/ui/test-utils';
 import { LOGIN_PATH } from './app.paths';
 import { authGuard } from './auth.guard';
 

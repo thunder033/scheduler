@@ -1,13 +1,13 @@
 import { EnvironmentProviders, Provider } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { Appointment, Timeslot, User } from '@org/models';
+import { Appointment, Timeslot, User } from '@scheduler/models';
 import {
   SEED_APPOINTMENTS,
   SEED_CURRENT_USER,
   SEED_TIMESLOTS,
   SEED_USERS,
-} from '@org/scheduler-ui/data';
-import { provideSchedulerUiState } from '@org/scheduler-ui/state';
+} from '@scheduler/ui/data';
+import { provideSchedulerUiState } from '@scheduler/ui/state';
 
 /** The entities the stubbed services start with; a test only seeds what it expects to find */
 export interface TestSeeds {

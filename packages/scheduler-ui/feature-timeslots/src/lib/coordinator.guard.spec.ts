@@ -6,10 +6,10 @@ import {
   UrlTree,
 } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { UserRole } from '@org/models';
-import { mockUser } from '@org/scheduler-ui/data/testing';
-import { SetCurrentUser } from '@org/scheduler-ui/state';
-import { provideTestState } from '@org/scheduler-ui/test-utils';
+import { UserRole } from '@scheduler/models';
+import { mockUser } from '@scheduler/ui/data/testing';
+import { SetCurrentUser } from '@scheduler/ui/state';
+import { provideTestState } from '@scheduler/ui/test-utils';
 import { coordinatorGuard, ROOT_URL } from './coordinator.guard';
 
 function setup(roles?: UserRole[]) {

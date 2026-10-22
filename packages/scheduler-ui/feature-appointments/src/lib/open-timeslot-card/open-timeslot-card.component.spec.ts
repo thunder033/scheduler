@@ -1,20 +1,25 @@
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
-import { Availability, AvailabilityStatus, User, UserRole } from '@org/models';
-import { AppointmentWeek, TimeslotService } from '@org/scheduler-ui/data';
+import {
+  Availability,
+  AvailabilityStatus,
+  User,
+  UserRole,
+} from '@scheduler/models';
+import { AppointmentWeek, TimeslotService } from '@scheduler/ui/data';
 import {
   CreateAppointment,
   PlanningState,
   SetAvailability,
   SetCurrentUser,
-} from '@org/scheduler-ui/state';
+} from '@scheduler/ui/state';
 import {
   mockTimeslot,
   mockTimeslotDraft,
   mockUser,
-} from '@org/scheduler-ui/data/testing';
-import { provideTestState } from '@org/scheduler-ui/test-utils';
+} from '@scheduler/ui/data/testing';
+import { provideTestState } from '@scheduler/ui/test-utils';
 import { firstValueFrom } from 'rxjs';
 import { AVAILABILITY_STATUS_LABELS } from '../availability-status/availability-status.component';
 import {

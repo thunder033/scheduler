@@ -1,4 +1,4 @@
-import { User } from '@org/models';
+import { User } from '@scheduler/models';
 
 export const USERS_STATE_NAME = 'users';
 

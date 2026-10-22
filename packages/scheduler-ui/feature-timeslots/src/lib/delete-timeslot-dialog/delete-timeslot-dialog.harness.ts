@@ -1,6 +1,6 @@
 import { ComponentHarness } from '@angular/cdk/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
-import { qaSelector } from '@org/scheduler-ui/test-utils';
+import { qaSelector } from '@scheduler/ui/test-utils';
 
 export class DeleteTimeslotDialogHarness extends ComponentHarness {
   static hostSelector = 'lib-delete-timeslot-dialog';

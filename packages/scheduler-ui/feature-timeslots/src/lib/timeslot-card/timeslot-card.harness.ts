@@ -2,9 +2,9 @@ import { BaseHarnessFilters, HarnessPredicate } from '@angular/cdk/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
-import { ExpandableCardHarness } from '@org/scheduler-ui/core-ui/testing';
+import { ExpandableCardHarness } from '@scheduler/ui/core-ui/testing';
 import { DeleteTimeslotDialogHarness } from '../delete-timeslot-dialog/delete-timeslot-dialog.harness';
-import { qaSelector } from '@org/scheduler-ui/test-utils';
+import { qaSelector } from '@scheduler/ui/test-utils';
 import { timeslotCardId } from './timeslot-card.component';
 
 export const CARD_HEADER_SELECTOR = qaSelector('card-header');

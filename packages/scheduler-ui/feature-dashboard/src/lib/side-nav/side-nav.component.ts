@@ -27,8 +27,8 @@ import { MatToolbar } from '@angular/material/toolbar';
 import { MatTooltip } from '@angular/material/tooltip';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { UserRole } from '@org/models';
-import { LocalUserState, SetSideNavCollapsed } from '@org/scheduler-ui/state';
+import { UserRole } from '@scheduler/models';
+import { LocalUserState, SetSideNavCollapsed } from '@scheduler/ui/state';
 import { map } from 'rxjs';
 import { CurrentUserTileComponent } from '../current-user-tile/current-user-tile.component';
 import {

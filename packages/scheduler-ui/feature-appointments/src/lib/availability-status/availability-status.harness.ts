@@ -1,6 +1,6 @@
 import { ComponentHarness } from '@angular/cdk/testing';
-import { AvailabilityStatus } from '@org/models';
-import { qaSelector } from '@org/scheduler-ui/test-utils';
+import { AvailabilityStatus } from '@scheduler/models';
+import { qaSelector } from '@scheduler/ui/test-utils';
 import { AvailabilityDotHarness } from '../availability-dot/availability-dot.harness';
 
 export class AvailabilityStatusHarness extends ComponentHarness {

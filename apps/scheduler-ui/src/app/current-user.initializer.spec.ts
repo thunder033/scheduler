@@ -2,12 +2,9 @@ import { ApplicationInitStatus } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { mockUser } from '@org/scheduler-ui/data/testing';
-import {
-  provideSchedulerUiState,
-  LocalUserState,
-} from '@org/scheduler-ui/state';
-import { provideTestSeeds } from '@org/scheduler-ui/test-utils';
+import { mockUser } from '@scheduler/ui/data/testing';
+import { provideSchedulerUiState, LocalUserState } from '@scheduler/ui/state';
+import { provideTestSeeds } from '@scheduler/ui/test-utils';
 import { provideCurrentUserInitializer } from './current-user.initializer';
 
 const CURRENT_USER = mockUser.COORDINATOR;

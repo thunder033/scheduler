@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { LocalUserState } from '@org/scheduler-ui/state';
+import { LocalUserState } from '@scheduler/ui/state';
 
 export const WELCOME_MESSAGE = 'Welcome';
 

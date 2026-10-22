@@ -1,4 +1,4 @@
-import { User } from '@org/models';
+import { User } from '@scheduler/models';
 import { ThemePreference } from './local-user.model';
 
 export class SetThemePreference {

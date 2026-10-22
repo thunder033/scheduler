@@ -1,5 +1,5 @@
 import { Component, computed, input } from '@angular/core';
-import { AvailabilityStatus } from '@org/models';
+import { AvailabilityStatus } from '@scheduler/models';
 import { AvailabilityDotComponent } from '../availability-dot/availability-dot.component';
 
 export const AVAILABILITY_STATUS_LABELS: Record<AvailabilityStatus, string> = {

@@ -1,5 +1,5 @@
 import { ComponentHarness } from '@angular/cdk/testing';
-import { AvailabilityStatus } from '@org/models';
+import { AvailabilityStatus } from '@scheduler/models';
 
 const STATUS_ATTRIBUTE = 'data-status';
 const UNKNOWN_STATUS_MESSAGE = 'The dot is not for a known availability status';

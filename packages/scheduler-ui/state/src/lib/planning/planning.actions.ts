@@ -1,9 +1,9 @@
-import { Availability, Timeslot } from '@org/models';
+import { Availability, Timeslot } from '@scheduler/models';
 import {
   AppointmentWeek,
   TimeslotChanges,
   TimeslotDraft,
-} from '@org/scheduler-ui/data';
+} from '@scheduler/ui/data';
 
 export class LoadTimeslots {
   static readonly type = '[Planning] Load Timeslots';

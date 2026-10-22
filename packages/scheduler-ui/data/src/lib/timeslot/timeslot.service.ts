@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Appointment, Availability, Timeslot } from '@org/models';
+import { Appointment, Availability, Timeslot } from '@scheduler/models';
 import { Observable, of, throwError } from 'rxjs';
 import { SEED_APPOINTMENTS, SEED_TIMESLOTS } from '../seed/seed.tokens';
 

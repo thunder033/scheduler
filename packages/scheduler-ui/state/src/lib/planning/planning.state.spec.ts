@@ -5,7 +5,7 @@ import {
   Availability,
   AvailabilityStatus,
   Timeslot,
-} from '@org/models';
+} from '@scheduler/models';
 import {
   appointmentNotFoundMessage,
   AppointmentWeek,
@@ -14,12 +14,12 @@ import {
   TimeslotDraft,
   TimeslotService,
   timeslotNotFoundMessage,
-} from '@org/scheduler-ui/data';
+} from '@scheduler/ui/data';
 import {
   mockAppointment,
   mockTimeslot,
   mockTimeslotDraft,
-} from '@org/scheduler-ui/data/testing';
+} from '@scheduler/ui/data/testing';
 import { firstValueFrom } from 'rxjs';
 import {
   ConfirmParticipant,

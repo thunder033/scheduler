@@ -1,6 +1,6 @@
 import { parse, setISODay, setISOWeek, setISOWeekYear } from 'date-fns';
-import { Timeslot } from '@org/models';
-import { AppointmentWeek } from '@org/scheduler-ui/data';
+import { Timeslot } from '@scheduler/models';
+import { AppointmentWeek } from '@scheduler/ui/data';
 
 const TIME_FORMAT = 'HH:mm';
 /** A date well inside any year, so setting the ISO week and year from it cannot cross into another */

@@ -1,4 +1,4 @@
-import { User } from '@org/models';
+import { User } from '@scheduler/models';
 
 export const LOCAL_USER_STATE_NAME = 'localUser';
 

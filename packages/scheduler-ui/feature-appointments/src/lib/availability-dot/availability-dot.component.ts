@@ -1,5 +1,5 @@
 import { Component, computed, input } from '@angular/core';
-import { AvailabilityStatus } from '@org/models';
+import { AvailabilityStatus } from '@scheduler/models';
 
 /**
  * The color each availability status is shown in, which is defined by the theme in

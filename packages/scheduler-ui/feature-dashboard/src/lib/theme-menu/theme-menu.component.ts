@@ -7,7 +7,7 @@ import {
   THEME_PREFERENCES,
   ThemePreference,
   LocalUserState,
-} from '@org/scheduler-ui/state';
+} from '@scheduler/ui/state';
 import { Store } from '@ngxs/store';
 
 export const THEME_MENU_LABEL = 'Theme';

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { User, UserRole } from '@org/models';
+import { User, UserRole } from '@scheduler/models';
 import { Observable, of, throwError } from 'rxjs';
 import { SEED_USERS } from '../seed/seed.tokens';
 

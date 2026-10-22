@@ -4,8 +4,8 @@ import {
   provideAppInitializer,
 } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { AuthService } from '@org/scheduler-ui/data';
-import { SetCurrentUser } from '@org/scheduler-ui/state';
+import { AuthService } from '@scheduler/ui/data';
+import { SetCurrentUser } from '@scheduler/ui/state';
 import { firstValueFrom, switchMap } from 'rxjs';
 
 export function provideCurrentUserInitializer(): EnvironmentProviders {

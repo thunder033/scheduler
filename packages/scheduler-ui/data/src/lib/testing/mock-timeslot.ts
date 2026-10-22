@@ -1,4 +1,4 @@
-import { Timeslot } from '@org/models';
+import { Timeslot } from '@scheduler/models';
 import { TimeslotDraft } from '../timeslot/timeslot.service';
 import { nextMockId } from './mock-id';
 

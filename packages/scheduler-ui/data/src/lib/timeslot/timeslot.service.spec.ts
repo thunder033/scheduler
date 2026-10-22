@@ -4,7 +4,7 @@ import {
   Availability,
   AvailabilityStatus,
   Timeslot,
-} from '@org/models';
+} from '@scheduler/models';
 import { firstValueFrom } from 'rxjs';
 import { SEED_APPOINTMENTS, SEED_TIMESLOTS } from '../seed/seed.tokens';
 import { mockAppointment } from '../testing/mock-appointment';

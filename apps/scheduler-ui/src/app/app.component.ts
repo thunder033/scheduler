@@ -2,7 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { Component, effect, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { LocalUserState } from '@org/scheduler-ui/state';
+import { LocalUserState } from '@scheduler/ui/state';
 
 @Component({
   imports: [RouterModule],

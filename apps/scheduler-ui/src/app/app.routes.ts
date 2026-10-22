@@ -11,13 +11,13 @@ export const appRoutes: Route[] = [
   {
     path: LOGIN_PATH,
     loadChildren: () =>
-      import('@org/scheduler-ui/feature-auth').then((m) => m.featureAuthRoutes),
+      import('@scheduler/ui/feature-auth').then((m) => m.featureAuthRoutes),
   },
   {
     path: DASHBOARD_PATH,
     canActivate: [authGuard],
     loadChildren: () =>
-      import('@org/scheduler-ui/feature-dashboard').then(
+      import('@scheduler/ui/feature-dashboard').then(
         (m) => m.featureDashboardRoutes,
       ),
   },

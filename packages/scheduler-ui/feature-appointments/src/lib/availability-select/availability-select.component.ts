@@ -6,7 +6,7 @@ import {
   MatSelect,
   MatSelectTrigger,
 } from '@angular/material/select';
-import { AvailabilityStatus } from '@org/models';
+import { AvailabilityStatus } from '@scheduler/models';
 import { AvailabilityStatusComponent } from '../availability-status/availability-status.component';
 
 export const AVAILABILITY_LABEL = 'My availability';
@@ -32,9 +32,7 @@ export const DEFAULT_AVAILABILITY_STATUS = AvailabilityStatus.Available;
   styleUrl: './availability-select.component.scss',
   host: { class: 'block', '[class.compact]': 'compact()' },
 })
-export class AvailabilitySelectComponent
-  implements FormValueControl<AvailabilityStatus | null>
-{
+export class AvailabilitySelectComponent implements FormValueControl<AvailabilityStatus | null> {
   readonly value = model.required<AvailabilityStatus | null>();
   readonly disabled = input(false);
   /** Makes the field shorter, to fit where space is tight */

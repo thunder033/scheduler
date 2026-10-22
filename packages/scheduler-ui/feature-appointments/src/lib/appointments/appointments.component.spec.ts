@@ -2,23 +2,24 @@ import { formatDate } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
-import { AvailabilityStatus, Timeslot, User, UserRole } from '@org/models';
+import {
+  AvailabilityStatus,
+  Timeslot,
+  User,
+  UserRole,
+} from '@scheduler/models';
 import {
   AppointmentWeek,
   TimeslotDraft,
   TimeslotService,
-} from '@org/scheduler-ui/data';
+} from '@scheduler/ui/data';
 import {
   mockTimeslot,
   mockTimeslotDraft,
   mockUser,
-} from '@org/scheduler-ui/data/testing';
-import {
-  PlanningState,
-  SetCurrentUser,
-  UsersState,
-} from '@org/scheduler-ui/state';
-import { provideTestState } from '@org/scheduler-ui/test-utils';
+} from '@scheduler/ui/data/testing';
+import { PlanningState, SetCurrentUser, UsersState } from '@scheduler/ui/state';
+import { provideTestState } from '@scheduler/ui/test-utils';
 import {
   addWeeks,
   getISOWeek,

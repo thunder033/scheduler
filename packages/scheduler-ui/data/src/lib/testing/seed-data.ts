@@ -1,5 +1,5 @@
 import { Provider } from '@angular/core';
-import { Appointment, Timeslot, User } from '@org/models';
+import { Appointment, Timeslot, User } from '@scheduler/models';
 import { addWeeks, getISOWeek, getISOWeekYear } from 'date-fns';
 import { mockAppointment } from './mock-appointment';
 import { mockTimeslot } from './mock-timeslot';

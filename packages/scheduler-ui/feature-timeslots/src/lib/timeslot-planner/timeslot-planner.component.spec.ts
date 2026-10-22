@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
-import { Timeslot } from '@org/models';
-import { TimeslotDraft, TimeslotService } from '@org/scheduler-ui/data';
-import { CreateTimeslot, NEW_TIMESLOT } from '@org/scheduler-ui/state';
+import { Timeslot } from '@scheduler/models';
+import { TimeslotDraft, TimeslotService } from '@scheduler/ui/data';
+import { CreateTimeslot, NEW_TIMESLOT } from '@scheduler/ui/state';
 import { firstValueFrom } from 'rxjs';
-import { CommonTest } from '@org/scheduler-ui/test-utils';
-import { provideTestState } from '@org/scheduler-ui/test-utils';
+import { CommonTest } from '@scheduler/ui/test-utils';
+import { provideTestState } from '@scheduler/ui/test-utils';
 import {
   formatTimeRange,
   NEW_TIMESLOT_LABEL,
@@ -17,7 +17,7 @@ import {
   TimeslotPlannerComponent,
 } from './timeslot-planner.component';
 import { TimeslotPlannerHarness } from './timeslot-planner.harness';
-import { mockTimeslotDraft } from '@org/scheduler-ui/data/testing';
+import { mockTimeslotDraft } from '@scheduler/ui/data/testing';
 
 const SUNDAY = 7;
 

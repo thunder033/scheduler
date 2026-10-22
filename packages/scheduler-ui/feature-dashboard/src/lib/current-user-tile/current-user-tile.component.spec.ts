@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
-import { mockUser } from '@org/scheduler-ui/data/testing';
-import { SetCurrentUser } from '@org/scheduler-ui/state';
-import { provideTestState } from '@org/scheduler-ui/test-utils';
+import { mockUser } from '@scheduler/ui/data/testing';
+import { SetCurrentUser } from '@scheduler/ui/state';
+import { provideTestState } from '@scheduler/ui/test-utils';
 import { CurrentUserTileComponent } from './current-user-tile.component';
 import { CurrentUserTileHarness } from './current-user-tile.harness';
 

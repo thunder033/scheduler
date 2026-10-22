@@ -6,12 +6,12 @@ import {
   State,
   StateContext,
 } from '@ngxs/store';
-import { Appointment, Timeslot } from '@org/models';
+import { Appointment, Timeslot } from '@scheduler/models';
 import {
   appointmentNotFoundMessage,
   AppointmentWeek,
   TimeslotService,
-} from '@org/scheduler-ui/data';
+} from '@scheduler/ui/data';
 import { Observable, tap, throwError } from 'rxjs';
 import {
   ConfirmParticipant,

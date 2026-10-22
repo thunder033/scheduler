@@ -18,8 +18,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { Store } from '@ngxs/store';
-import { Timeslot } from '@org/models';
-import { ExpandableCard } from '@org/scheduler-ui/core-ui';
+import { Timeslot } from '@scheduler/models';
+import { ExpandableCard } from '@scheduler/ui/core-ui';
 import {
   CreateTimeslot,
   DeleteTimeslot,
@@ -29,7 +29,7 @@ import {
   StopEditingTimeslot,
   UpdateTimeslot,
   UpdateEditingTimeslot,
-} from '@org/scheduler-ui/state';
+} from '@scheduler/ui/state';
 
 import {
   DeleteTimeslotDialogComponent,

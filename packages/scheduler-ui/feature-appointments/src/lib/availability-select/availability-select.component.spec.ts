@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { form, FormField } from '@angular/forms/signals';
-import { AvailabilityStatus } from '@org/models';
+import { AvailabilityStatus } from '@scheduler/models';
 import { AVAILABILITY_STATUS_LABELS } from '../availability-status/availability-status.component';
 import {
   AVAILABILITY_LABEL,

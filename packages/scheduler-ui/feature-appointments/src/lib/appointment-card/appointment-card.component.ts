@@ -14,15 +14,15 @@ import {
   AvailabilityStatus,
   Timeslot,
   UserRole,
-} from '@org/models';
-import { ExpandableCard } from '@org/scheduler-ui/core-ui';
+} from '@scheduler/models';
+import { ExpandableCard } from '@scheduler/ui/core-ui';
 import {
   ConfirmParticipant,
   LocalUserState,
   SetAvailability,
   UnconfirmParticipant,
   UsersState,
-} from '@org/scheduler-ui/state';
+} from '@scheduler/ui/state';
 import { firstValueFrom } from 'rxjs';
 import {
   AvailabilitySelectComponent,

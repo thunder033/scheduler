@@ -14,34 +14,32 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "paths": {
-      "@org/models": ["./packages/shared/models/src/index.ts"],
-      "@org/scheduler-ui/data": ["./packages/scheduler-ui/data/src/index.ts"],
-      "@org/scheduler-ui/data/testing": [
+      "@scheduler/models": ["./packages/shared/models/src/index.ts"],
+      "@scheduler/ui/data": ["./packages/scheduler-ui/data/src/index.ts"],
+      "@scheduler/ui/data/testing": [
         "./packages/scheduler-ui/data/src/testing.ts"
       ],
-      "@org/scheduler-ui/feature-dashboard": [
+      "@scheduler/ui/feature-dashboard": [
         "./packages/scheduler-ui/feature-dashboard/src/index.ts"
       ],
-      "@org/scheduler-ui/state": ["./packages/scheduler-ui/state/src/index.ts"],
-      "@org/scheduler-ui/feature-auth": [
+      "@scheduler/ui/state": ["./packages/scheduler-ui/state/src/index.ts"],
+      "@scheduler/ui/feature-auth": [
         "./packages/scheduler-ui/feature-auth/src/index.ts"
       ],
-      "@org/scheduler-ui/feature-timeslots": [
+      "@scheduler/ui/feature-timeslots": [
         "./packages/scheduler-ui/feature-timeslots/src/index.ts"
       ],
-      "@org/scheduler-ui/feature-appointments": [
+      "@scheduler/ui/feature-appointments": [
         "./packages/scheduler-ui/feature-appointments/src/index.ts"
       ],
-      "@org/scheduler-ui/test-utils": [
+      "@scheduler/ui/test-utils": [
         "./packages/scheduler-ui/test-utils/src/index.ts"
       ],
-      "@org/scheduler-ui/core-ui": [
-        "./packages/scheduler-ui/core-ui/src/index.ts"
-      ],
-      "@org/scheduler-ui/core-ui/testing": [
+      "@scheduler/ui/core-ui": ["./packages/scheduler-ui/core-ui/src/index.ts"],
+      "@scheduler/ui/core-ui/testing": [
         "./packages/scheduler-ui/core-ui/src/testing.ts"
       ],
-      "@org/scheduler-api-data": ["./packages/scheduler-api/data/src/index.ts"]
+      "@scheduler/api/data": ["./packages/scheduler-api/data/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

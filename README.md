@@ -67,8 +67,8 @@ ESLint enforces the dependency rules from the tags (`eslint.config.mjs`):
 
 ## Working in the UI
 
-- Mock and seed data come from `@org/scheduler-ui/data/testing`, never from the main `@org/scheduler-ui/data` entry point. The app registers it with `provideSeedData()`; tests provide only the entities they need with `provideTestState(...)`.
-- Specs drive components through harnesses (`*.harness.ts` next to each component) rather than `screen` or `fireEvent`; shared helpers are in `@org/scheduler-ui/test-utils`.
+- Mock and seed data come from `@scheduler/ui/data/testing`, never from the main `@scheduler/ui/data` entry point. The app registers it with `provideSeedData()`; tests provide only the entities they need with `provideTestState(...)`.
+- Specs drive components through harnesses (`*.harness.ts` next to each component) rather than `screen` or `fireEvent`; shared helpers are in `@scheduler/ui/test-utils`.
 - Conventions for code, tests and test data are in [`CLAUDE.md`](CLAUDE.md), and the Angular-specific ones are in [`.claude/rules/ui-patterns.md`](.claude/rules/ui-patterns.md).
 
 ### E2E

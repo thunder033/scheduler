@@ -1,24 +1,24 @@
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
-import { Timeslot } from '@org/models';
-import { EXPANDABLE_CONTENT_SELECTOR } from '@org/scheduler-ui/core-ui/testing';
-import { TimeslotDraft } from '@org/scheduler-ui/data';
+import { Timeslot } from '@scheduler/models';
+import { EXPANDABLE_CONTENT_SELECTOR } from '@scheduler/ui/core-ui/testing';
+import { TimeslotDraft } from '@scheduler/ui/data';
 import {
   CreateTimeslot,
   NEW_TIMESLOT,
   PlanningState,
   StartEditingTimeslot,
-} from '@org/scheduler-ui/state';
+} from '@scheduler/ui/state';
 import { firstValueFrom } from 'rxjs';
-import { Animations, CommonTest } from '@org/scheduler-ui/test-utils';
-import { provideTestState } from '@org/scheduler-ui/test-utils';
+import { Animations, CommonTest } from '@scheduler/ui/test-utils';
+import { provideTestState } from '@scheduler/ui/test-utils';
 import {
   TimeslotCardComponent,
   formatTimeRange,
 } from './timeslot-card.component';
 import { TimeslotCardHarness } from './timeslot-card.harness';
-import { mockTimeslotDraft } from '@org/scheduler-ui/data/testing';
+import { mockTimeslotDraft } from '@scheduler/ui/data/testing';
 
 const OTHER_TIMESLOT_ID = 'other-timeslot';
 const OTHER_START = '13:00';

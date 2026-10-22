@@ -16,14 +16,14 @@ export const featureDashboardRoutes: Routes = [
       {
         path: TIMESLOTS_PATH,
         loadChildren: () =>
-          import('@org/scheduler-ui/feature-timeslots').then(
+          import('@scheduler/ui/feature-timeslots').then(
             (m) => m.featureTimeslotsRoutes,
           ),
       },
       {
         path: APPOINTMENTS_PATH,
         loadChildren: () =>
-          import('@org/scheduler-ui/feature-appointments').then(
+          import('@scheduler/ui/feature-appointments').then(
             (m) => m.featureAppointmentsRoutes,
           ),
       },

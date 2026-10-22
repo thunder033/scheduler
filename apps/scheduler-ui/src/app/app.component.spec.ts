@@ -7,8 +7,8 @@ import {
   provideSchedulerUiState,
   SetThemePreference,
   THEME_PREFERENCES,
-} from '@org/scheduler-ui/state';
-import { provideTestSeeds } from '@org/scheduler-ui/test-utils';
+} from '@scheduler/ui/state';
+import { provideTestSeeds } from '@scheduler/ui/test-utils';
 import { AppComponent } from './app.component';
 import { AppHarness } from './app.harness';
 

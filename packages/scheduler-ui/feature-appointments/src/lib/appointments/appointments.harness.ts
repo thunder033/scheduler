@@ -1,5 +1,5 @@
 import { ComponentHarness } from '@angular/cdk/testing';
-import { qaSelector } from '@org/scheduler-ui/test-utils';
+import { qaSelector } from '@scheduler/ui/test-utils';
 import {
   AppointmentCardHarness,
   AppointmentCardHarnessFilters,

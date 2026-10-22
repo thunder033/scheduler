@@ -6,7 +6,7 @@ import {
   SEED_CURRENT_USER,
   SEED_TIMESLOTS,
   SEED_USERS,
-} from '@org/scheduler-ui/data';
+} from '@scheduler/ui/data';
 import { SetSideNavCollapsed } from './local-user/local-user.actions';
 import { LocalUserState } from './local-user/local-user.state';
 import { provideSchedulerUiState } from './provide-scheduler-ui-state';

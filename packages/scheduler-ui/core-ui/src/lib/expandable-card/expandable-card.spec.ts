@@ -1,7 +1,7 @@
 import { Component, input, linkedSignal, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { CommonTest, qaSelector } from '@org/scheduler-ui/test-utils';
+import { CommonTest, qaSelector } from '@scheduler/ui/test-utils';
 import { ExpandableCard } from './expandable-card';
 import {
   EXPANDABLE_CONTENT_SELECTOR,

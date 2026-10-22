@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { LocalUserState } from '@org/scheduler-ui/state';
+import { LocalUserState } from '@scheduler/ui/state';
 import { LOGIN_PATH } from './app.paths';
 
 export const authGuard: CanActivateFn = () => {

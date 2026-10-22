@@ -4,14 +4,14 @@ import { MatIconButton } from '@angular/material/button';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatIcon } from '@angular/material/icon';
 import { Store } from '@ngxs/store';
-import { Timeslot } from '@org/models';
-import { AppointmentWeek } from '@org/scheduler-ui/data';
+import { Timeslot } from '@scheduler/models';
+import { AppointmentWeek } from '@scheduler/ui/data';
 import {
   LoadAppointmentsByWeek,
   LoadTimeslots,
   LoadUsers,
   PlanningState,
-} from '@org/scheduler-ui/state';
+} from '@scheduler/ui/state';
 import {
   addWeeks,
   eachDayOfInterval,

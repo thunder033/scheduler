@@ -5,8 +5,8 @@ import {
 } from '@angular/cdk/testing';
 import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
 import { MatTooltipHarness } from '@angular/material/tooltip/testing';
-import { AvailabilityStatus } from '@org/models';
-import { qaSelector } from '@org/scheduler-ui/test-utils';
+import { AvailabilityStatus } from '@scheduler/models';
+import { qaSelector } from '@scheduler/ui/test-utils';
 import { AvailabilityDotHarness } from '../availability-dot/availability-dot.harness';
 
 const NO_CONFIRM_CONTROL_MESSAGE = 'The participant cannot be confirmed';

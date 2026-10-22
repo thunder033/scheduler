@@ -3,14 +3,14 @@ import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
 import { of } from 'rxjs';
-import { UserRole } from '@org/models';
-import { mockUser } from '@org/scheduler-ui/data/testing';
+import { UserRole } from '@scheduler/models';
+import { mockUser } from '@scheduler/ui/data/testing';
 import {
   LocalUserState,
   SetCurrentUser,
   SetSideNavCollapsed,
-} from '@org/scheduler-ui/state';
-import { provideTestState } from '@org/scheduler-ui/test-utils';
+} from '@scheduler/ui/state';
+import { provideTestState } from '@scheduler/ui/test-utils';
 import { THEME_OPTIONS } from '../theme-menu/theme-menu.component';
 import {
   NAV_ITEMS,

@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideStore, Store } from '@ngxs/store';
-import { UserRole } from '@org/models';
-import { mockUser } from '@org/scheduler-ui/data/testing';
+import { UserRole } from '@scheduler/models';
+import { mockUser } from '@scheduler/ui/data/testing';
 import {
   SetCurrentUser,
   SetSideNavCollapsed,

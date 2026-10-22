@@ -6,8 +6,8 @@ import {
   State,
   StateContext,
 } from '@ngxs/store';
-import { User, UserRole } from '@org/models';
-import { UserService } from '@org/scheduler-ui/data';
+import { User, UserRole } from '@scheduler/models';
+import { UserService } from '@scheduler/ui/data';
 import { Observable, tap } from 'rxjs';
 import { LoadUsers } from './users.actions';
 import { USERS_STATE_NAME, UsersStateModel } from './users.model';

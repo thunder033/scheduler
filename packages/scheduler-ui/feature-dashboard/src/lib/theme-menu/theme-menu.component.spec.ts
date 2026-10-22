@@ -1,11 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Store } from '@ngxs/store';
-import {
-  DEFAULT_THEME_PREFERENCE,
-  LocalUserState,
-} from '@org/scheduler-ui/state';
-import { provideTestState } from '@org/scheduler-ui/test-utils';
+import { DEFAULT_THEME_PREFERENCE, LocalUserState } from '@scheduler/ui/state';
+import { provideTestState } from '@scheduler/ui/test-utils';
 import {
   THEME_LABELS,
   THEME_OPTIONS,

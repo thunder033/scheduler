@@ -1,4 +1,4 @@
-import { Appointment, Timeslot } from '@org/models';
+import { Appointment, Timeslot } from '@scheduler/models';
 
 export const PLANNING_STATE_NAME = 'planning';
 

@@ -1,4 +1,4 @@
-import { Timeslot } from '@org/models';
+import { Timeslot } from '@scheduler/models';
 import { resetMockIds } from './mock-id';
 import { mockTimeslot } from './mock-timeslot';
 

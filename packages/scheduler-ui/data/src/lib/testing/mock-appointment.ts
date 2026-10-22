@@ -1,4 +1,4 @@
-import { Appointment, AvailabilityStatus } from '@org/models';
+import { Appointment, AvailabilityStatus } from '@scheduler/models';
 import { nextMockId } from './mock-id';
 import { mockTimeslot } from './mock-timeslot';
 import { mockUser } from './mock-user';

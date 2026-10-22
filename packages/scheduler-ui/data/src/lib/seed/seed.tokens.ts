@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import { Appointment, Timeslot, User } from '@org/models';
+import { Appointment, Timeslot, User } from '@scheduler/models';
 
 // The entities the stubbed services start with; there are no defaults, so whoever provides the
 // services decides which entities exist

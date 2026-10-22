@@ -1,7 +1,7 @@
 import { ComponentHarness } from '@angular/cdk/testing';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
-import { AvailabilityStatus } from '@org/models';
+import { AvailabilityStatus } from '@scheduler/models';
 import { AvailabilityDotHarness } from '../availability-dot/availability-dot.harness';
 
 export class AvailabilitySelectHarness extends ComponentHarness {
@@ -10,7 +10,9 @@ export class AvailabilitySelectHarness extends ComponentHarness {
   private readonly field = this.locatorFor(MatFormFieldHarness);
   private readonly select = this.locatorFor(MatSelectHarness);
   /** The dot of the selected status, in the select, whereas the options are in an overlay */
-  private readonly selectedDot = this.locatorForOptional(AvailabilityDotHarness);
+  private readonly selectedDot = this.locatorForOptional(
+    AvailabilityDotHarness,
+  );
 
   /** The label of the field */
   async getLabel(): Promise<string | null> {

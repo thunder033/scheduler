@@ -9,8 +9,8 @@ import {
 import { provideRouter } from '@angular/router';
 import { appRoutes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
-import { provideSeedData } from '@org/scheduler-ui/data/testing';
-import { provideSchedulerUiState } from '@org/scheduler-ui/state';
+import { provideSeedData } from '@scheduler/ui/data/testing';
+import { provideSchedulerUiState } from '@scheduler/ui/state';
 import { provideCurrentUserInitializer } from './current-user.initializer';
 
 const FORM_FIELD_DEFAULT_OPTIONS: MatFormFieldDefaultOptions = {

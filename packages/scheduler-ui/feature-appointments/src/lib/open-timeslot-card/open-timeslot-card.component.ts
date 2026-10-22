@@ -2,14 +2,14 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { Store } from '@ngxs/store';
-import { Appointment, AvailabilityStatus, Timeslot } from '@org/models';
-import { AppointmentWeek } from '@org/scheduler-ui/data';
+import { Appointment, AvailabilityStatus, Timeslot } from '@scheduler/models';
+import { AppointmentWeek } from '@scheduler/ui/data';
 import {
   CreateAppointment,
   LocalUserState,
   PlanningState,
   SetAvailability,
-} from '@org/scheduler-ui/state';
+} from '@scheduler/ui/state';
 import { firstValueFrom } from 'rxjs';
 import {
   AvailabilitySelectComponent,
