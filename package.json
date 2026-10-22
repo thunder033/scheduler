@@ -2,7 +2,9 @@
   "name": "@scheduler/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "validate:docker": "tools/docker/validate-deployment.sh"
+  },
   "private": true,
   "dependencies": {
     "@angular/cdk": "22.1.4",

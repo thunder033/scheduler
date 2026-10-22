@@ -11,7 +11,7 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/apps/scheduler-ui",
+        "outputPath": "apps/scheduler-ui/dist",
         "browser": "apps/scheduler-ui/src/main.ts",
         "tsConfig": "apps/scheduler-ui/tsconfig.app.json",
         "assets": [
@@ -71,8 +71,18 @@
       "options": {
         "buildTarget": "scheduler-ui:build",
         "port": 4200,
-        "staticFilePath": "dist/apps/scheduler-ui/browser",
+        "staticFilePath": "apps/scheduler-ui/dist/browser",
         "spa": true
+      }
+    },
+    "docker:build": {
+      "options": {
+        "args": ["--tag scheduler-ui"]
+      }
+    },
+    "docker:run": {
+      "options": {
+        "command": "docker run {args} scheduler-ui"
       }
     }
   }

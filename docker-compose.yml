@@ -1,0 +1,25 @@
+# Local/deploy stack. Images are built by Nx, not by compose:
+#   npx nx run-many -t docker:build -p scheduler-api scheduler-ui
+name: scheduler
+
+services:
+  scheduler-api:
+    image: scheduler-api
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-qO', '/dev/null', 'http://localhost:3000/api']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  scheduler-ui:
+    image: scheduler-ui
+    restart: unless-stopped
+    ports:
+      - '${SCHEDULER_UI_PORT:-8080}:8080'
+    environment:
+      API_UPSTREAM: http://scheduler-api:3000
+    depends_on:
+      scheduler-api:
+        condition: service_healthy
