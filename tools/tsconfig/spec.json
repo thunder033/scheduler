@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "tsBuildInfoFile": "${configDir}/tmp/tsconfig.spec.tsbuildinfo",
     "types": ["vitest/globals", "vitest/importMeta", "vite/client", "node"]
   },
   "include": [

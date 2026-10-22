@@ -1,4 +1,7 @@
 {
+  "compilerOptions": {
+    "tsBuildInfoFile": "${configDir}/tmp/tsconfig.source.tsbuildinfo"
+  },
   "include": ["${configDir}/src/**/*.ts"],
   "exclude": [
     "${configDir}/src/**/*.spec.ts",

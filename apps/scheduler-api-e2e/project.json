@@ -17,17 +17,7 @@
       }
     },
     "typecheck": {
-      "executor": "nx:run-commands",
-      "cache": true,
-      "inputs": [
-        "default",
-        "^default",
-        { "externalDependencies": ["typescript"] }
-      ],
-      "options": {
-        "cwd": "{projectRoot}",
-        "command": "tsc -p tsconfig.spec.json --noEmit"
-      }
+      "executor": "nx:run-commands"
     }
   }
 }

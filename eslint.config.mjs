@@ -25,16 +25,8 @@ export default [
               onlyDependOnLibsWithTags: ['scope:shared'],
             },
             {
-              sourceTag: 'scope:shop',
-              onlyDependOnLibsWithTags: ['scope:shop', 'scope:shared'],
-            },
-            {
               sourceTag: 'scope:scheduler-ui',
               onlyDependOnLibsWithTags: ['scope:scheduler-ui', 'scope:shared'],
-            },
-            {
-              sourceTag: 'scope:api',
-              onlyDependOnLibsWithTags: ['scope:api', 'scope:shared'],
             },
             {
               sourceTag: 'type:data',

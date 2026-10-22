@@ -20,10 +20,17 @@
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
     },
-    "@nx/esbuild:esbuild": {
+    "typecheck": {
       "cache": true,
-      "dependsOn": ["^build"],
-      "inputs": ["production", "^production"]
+      "inputs": [
+        "default",
+        "^default",
+        { "externalDependencies": ["typescript"] }
+      ],
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "tsc --build tsconfig.json --noEmit"
+      }
     },
     "@nx/eslint:lint": {
       "cache": true,
@@ -42,13 +49,6 @@
       "options": {
         "runBuildTargetDependencies": false
       }
-    }
-  },
-  "release": {
-    "projects": ["api"],
-    "projectsRelationship": "independent",
-    "docker": {
-      "skipVersionActions": true
     }
   },
   "plugins": [
@@ -82,13 +82,6 @@
       "plugin": "@nx/playwright/plugin",
       "options": {
         "targetName": "e2e"
-      }
-    },
-    {
-      "plugin": "@nx/docker",
-      "options": {
-        "buildTarget": "docker:build",
-        "runTarget": "docker:run"
       }
     }
   ],

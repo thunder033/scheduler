@@ -57,9 +57,8 @@ describe('mockAppointment', () => {
     });
 
     it('seeds appointments only for seeded timeslots', () => {
-      const timeslotIds: string[] = Object.values<Timeslot>(mockTimeslot).map(
-        ({ timeslotId }) => timeslotId,
-      );
+      const seededTimeslots: Timeslot[] = Object.values(mockTimeslot);
+      const timeslotIds = seededTimeslots.map(({ timeslotId }) => timeslotId);
 
       for (const { timeslotId } of seeded) {
         expect(timeslotIds).toContain(timeslotId);
