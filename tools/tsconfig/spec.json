@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "types": ["vitest/globals", "vitest/importMeta", "vite/client", "node"]
+  },
+  "include": [
+    "${configDir}/vite.config.mts",
+    "${configDir}/src/**/*.spec.ts",
+    "${configDir}/src/**/*.harness.ts",
+    "${configDir}/src/test-utils/**/*.ts",
+    "${configDir}/src/**/*.d.ts"
+  ]
+}

@@ -13,7 +13,7 @@ describe('AppService', () => {
   });
 
   describe('getData', () => {
-    it('should return "Hello API"', () => {
+    it('returns the greeting message', () => {
       expect(service.getData()).toEqual({ message: 'Hello API' });
     });
   });

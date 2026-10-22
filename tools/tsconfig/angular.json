@@ -1,0 +1,15 @@
+{
+  "extends": "./strict.json",
+  "compilerOptions": {
+    "lib": ["es2022", "dom"],
+    "emitDecoratorMetadata": false,
+    "module": "preserve",
+    "types": []
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  }
+}

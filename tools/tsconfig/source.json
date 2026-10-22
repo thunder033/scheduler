@@ -1,0 +1,9 @@
+{
+  "include": ["${configDir}/src/**/*.ts"],
+  "exclude": [
+    "${configDir}/src/**/*.spec.ts",
+    "${configDir}/src/**/*.harness.ts",
+    "${configDir}/src/test-utils/**/*.ts",
+    "${configDir}/src/test-setup.ts"
+  ]
+}

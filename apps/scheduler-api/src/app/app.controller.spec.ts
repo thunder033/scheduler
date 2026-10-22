@@ -13,7 +13,7 @@ describe('AppController', () => {
   });
 
   describe('getData', () => {
-    it('should return "Hello API"', () => {
+    it('returns the greeting provided by the service', () => {
       const appController = app.get<AppController>(AppController);
       expect(appController.getData()).toEqual({ message: 'Hello API' });
     });
