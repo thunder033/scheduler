@@ -32,7 +32,7 @@ export function formatTimeRange({
 
 /** A timeslot of a week, which the current user can add their availability for */
 @Component({
-  selector: 'lib-open-timeslot-card',
+  selector: 'sch-open-timeslot-card',
   imports: [AvailabilitySelectComponent, FormField, MatButton],
   templateUrl: './open-timeslot-card.component.html',
   styleUrl: './open-timeslot-card.component.scss',

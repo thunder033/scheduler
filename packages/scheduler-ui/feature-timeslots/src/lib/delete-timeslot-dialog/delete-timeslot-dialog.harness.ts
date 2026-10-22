@@ -3,7 +3,7 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 import { qaSelector } from '@scheduler/ui/test-utils';
 
 export class DeleteTimeslotDialogHarness extends ComponentHarness {
-  static hostSelector = 'lib-delete-timeslot-dialog';
+  static hostSelector = 'sch-delete-timeslot-dialog';
 
   private readonly confirmControl = this.locatorFor(
     MatButtonHarness.with({ selector: qaSelector('confirm-delete') }),

@@ -1,7 +1,7 @@
 import { ComponentHarness } from '@angular/cdk/testing';
 
 export class LoginHarness extends ComponentHarness {
-  static hostSelector = 'lib-login';
+  static hostSelector = 'sch-login';
 
   async getText(): Promise<string> {
     const host = await this.host();

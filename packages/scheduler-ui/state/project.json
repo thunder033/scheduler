@@ -2,7 +2,7 @@
   "name": "scheduler-ui-state",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/scheduler-ui/state/src",
-  "prefix": "lib",
+  "prefix": "sch",
   "projectType": "library",
   "tags": ["scope:scheduler-ui", "type:state"],
   "targets": {

@@ -70,7 +70,7 @@ function groupByDay(
 }
 
 @Component({
-  selector: 'lib-timeslot-planner',
+  selector: 'sch-timeslot-planner',
   imports: [
     CdkDrag,
     CdkDropList,

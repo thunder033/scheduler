@@ -27,7 +27,7 @@
       <p qa-confirmed-notice class="m-0">{{ confirmedNotice }}</p>
     </div>
   } @else {
-    <lib-availability-select
+    <sch-availability-select
       class="w-full"
       [compact]="true"
       [value]="chosen()"
@@ -61,7 +61,7 @@
           track participant.participantId
         ) {
           <li>
-            <lib-participant-availability
+            <sch-participant-availability
               [name]="participant.name"
               [status]="participant.status"
               [confirmed]="participant.confirmed"

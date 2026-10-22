@@ -70,7 +70,7 @@ export class TimeslotPlannerDayHarness extends ComponentHarness {
 }
 
 export class TimeslotPlannerHarness extends ComponentHarness {
-  static hostSelector = 'lib-timeslot-planner';
+  static hostSelector = 'sch-timeslot-planner';
 
   private readonly newTimeslotControl = this.locatorFor(
     MatButtonHarness.with({ selector: qaSelector('new-timeslot') }),

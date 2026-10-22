@@ -17,7 +17,7 @@ export interface DeleteTimeslotDialogData {
 
 /** Closes with `true` when the deletion is confirmed, and `false` when it is cancelled */
 @Component({
-  selector: 'lib-delete-timeslot-dialog',
+  selector: 'sch-delete-timeslot-dialog',
   imports: [
     MatButton,
     MatDialogActions,

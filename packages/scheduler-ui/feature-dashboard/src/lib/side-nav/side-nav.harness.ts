@@ -12,7 +12,7 @@ const MISSING_TOGGLE_MESSAGE =
   'The navigation toggle is only there on narrow screens';
 
 export class SideNavHarness extends ComponentHarness {
-  static hostSelector = 'lib-side-nav';
+  static hostSelector = 'sch-side-nav';
 
   currentUserTile = this.locatorFor(CurrentUserTileHarness);
   themeMenu = this.locatorFor(ThemeMenuHarness);

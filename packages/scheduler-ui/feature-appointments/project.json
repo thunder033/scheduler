@@ -2,7 +2,7 @@
   "name": "scheduler-ui-feature-appointments",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/scheduler-ui/feature-appointments/src",
-  "prefix": "lib",
+  "prefix": "sch",
   "projectType": "library",
   "tags": ["scope:scheduler-ui", "type:feature"],
   "targets": {

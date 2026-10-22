@@ -21,7 +21,7 @@ export interface OpenTimeslotCardHarnessFilters extends BaseHarnessFilters {
 }
 
 export class OpenTimeslotCardHarness extends ComponentHarness {
-  static hostSelector = 'lib-open-timeslot-card';
+  static hostSelector = 'sch-open-timeslot-card';
 
   static with(
     options: OpenTimeslotCardHarnessFilters = {},

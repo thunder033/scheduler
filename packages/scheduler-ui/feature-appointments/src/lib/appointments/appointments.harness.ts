@@ -60,7 +60,7 @@ export class AppointmentsDayHarness extends ComponentHarness {
 }
 
 export class AppointmentsHarness extends ComponentHarness {
-  static hostSelector = 'lib-appointments';
+  static hostSelector = 'sch-appointments';
 
   private readonly weekTitle = this.locatorFor(qaSelector('week-title'));
   private readonly previousWeekControl = this.locatorFor(

@@ -10,7 +10,7 @@ export const AVAILABILITY_STATUS_LABELS: Record<AvailabilityStatus, string> = {
 
 /** An availability status as its label with the dot in its color, which is how it is shown everywhere */
 @Component({
-  selector: 'lib-availability-status',
+  selector: 'sch-availability-status',
   imports: [AvailabilityDotComponent],
   templateUrl: './availability-status.component.html',
   host: { class: 'inline-flex items-center gap-2' },

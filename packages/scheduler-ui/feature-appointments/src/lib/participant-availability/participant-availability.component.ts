@@ -14,7 +14,7 @@ export const CONFIRM_PARTICIPANT_LABEL = 'Confirm';
  * marked with a check, or while the participant can be confirmed, has a checkbox in front that is checked.
  */
 @Component({
-  selector: 'lib-participant-availability',
+  selector: 'sch-participant-availability',
   imports: [AvailabilityDotComponent, MatCheckbox, MatIcon, MatTooltip],
   templateUrl: './participant-availability.component.html',
   host: { class: 'flex items-center gap-2' },

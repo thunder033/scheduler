@@ -59,7 +59,7 @@ const CONFIRMABLE_STATUSES: readonly AvailabilityStatus[] = [
  * card to edit the appointment.
  */
 @Component({
-  selector: 'lib-appointment-card',
+  selector: 'sch-appointment-card',
   imports: [
     AvailabilitySelectComponent,
     MatIcon,

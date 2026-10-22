@@ -19,7 +19,7 @@ export interface ParticipantAvailabilityHarnessFilters extends BaseHarnessFilter
 }
 
 export class ParticipantAvailabilityHarness extends ComponentHarness {
-  static hostSelector = 'lib-participant-availability';
+  static hostSelector = 'sch-participant-availability';
 
   static with(
     options: ParticipantAvailabilityHarnessFilters = {},

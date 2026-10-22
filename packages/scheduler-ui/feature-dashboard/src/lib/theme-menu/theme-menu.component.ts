@@ -24,7 +24,7 @@ export const THEME_OPTIONS = THEME_PREFERENCES.map((value) => ({
 }));
 
 @Component({
-  selector: 'lib-theme-menu',
+  selector: 'sch-theme-menu',
   imports: [MatIconButton, MatIcon, MatMenu, MatMenuItem, MatMenuTrigger],
   templateUrl: './theme-menu.component.html',
   styleUrl: './theme-menu.component.scss',

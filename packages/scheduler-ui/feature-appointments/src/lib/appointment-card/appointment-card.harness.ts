@@ -50,7 +50,7 @@ export class ParticipantSectionHarness extends ComponentHarness {
 }
 
 export class AppointmentCardHarness extends ExpandableCardHarness {
-  static hostSelector = 'lib-appointment-card';
+  static hostSelector = 'sch-appointment-card';
 
   static with(
     options: AppointmentCardHarnessFilters = {},

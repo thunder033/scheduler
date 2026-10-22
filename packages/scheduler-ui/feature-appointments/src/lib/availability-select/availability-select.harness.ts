@@ -5,7 +5,7 @@ import { AvailabilityStatus } from '@scheduler/models';
 import { AvailabilityDotHarness } from '../availability-dot/availability-dot.harness';
 
 export class AvailabilitySelectHarness extends ComponentHarness {
-  static hostSelector = 'lib-availability-select';
+  static hostSelector = 'sch-availability-select';
 
   private readonly field = this.locatorFor(MatFormFieldHarness);
   private readonly select = this.locatorFor(MatSelectHarness);

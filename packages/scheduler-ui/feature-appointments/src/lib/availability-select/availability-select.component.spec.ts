@@ -15,9 +15,9 @@ const PLACEHOLDER = 'Choose one';
 
 /** Binds the select to a signal form, as the components that use it do */
 @Component({
-  selector: 'lib-test-form',
+  selector: 'sch-test-form',
   imports: [AvailabilitySelectComponent, FormField],
-  template: `<lib-availability-select
+  template: `<sch-availability-select
     [formField]="availabilityForm.status"
     [placeholder]="placeholder"
   />`,

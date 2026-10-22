@@ -19,7 +19,7 @@ export const DEFAULT_AVAILABILITY_STATUS = AvailabilityStatus.Available;
  * no choice until one is made when the value is null, which shows the placeholder.
  */
 @Component({
-  selector: 'lib-availability-select',
+  selector: 'sch-availability-select',
   imports: [
     AvailabilityStatusComponent,
     MatFormField,

@@ -54,7 +54,7 @@ function timeslotsOnDay(timeslots: Timeslot[], dayOfWeek: number): Timeslot[] {
 }
 
 @Component({
-  selector: 'lib-appointments',
+  selector: 'sch-appointments',
   imports: [
     AppointmentCardComponent,
     DatePipe,

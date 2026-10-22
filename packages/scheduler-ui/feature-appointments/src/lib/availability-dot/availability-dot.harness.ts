@@ -5,7 +5,7 @@ const STATUS_ATTRIBUTE = 'data-status';
 const UNKNOWN_STATUS_MESSAGE = 'The dot is not for a known availability status';
 
 export class AvailabilityDotHarness extends ComponentHarness {
-  static hostSelector = 'lib-availability-dot';
+  static hostSelector = 'sch-availability-dot';
 
   /** The availability status the dot stands for */
   async getStatus(): Promise<AvailabilityStatus> {

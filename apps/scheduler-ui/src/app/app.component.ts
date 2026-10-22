@@ -6,7 +6,7 @@ import { LocalUserState } from '@scheduler/ui/state';
 
 @Component({
   imports: [RouterModule],
-  selector: 'app-root',
+  selector: 'sch-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

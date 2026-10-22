@@ -16,7 +16,7 @@
         [cdkDropListSortingDisabled]="true"
         [cdkDropListEnterPredicate]="neverEnter"
       >
-        <lib-timeslot-card
+        <sch-timeslot-card
           class="block"
           cdkDrag
           [cdkDragData]="timeslot"
@@ -39,7 +39,7 @@
       >
         <h3 qa-day-label class="day-column-label">{{ day.label }}</h3>
         @for (timeslot of day.timeslots; track timeslot.timeslotId) {
-          <lib-timeslot-card
+          <sch-timeslot-card
             class="block"
             cdkDrag
             [cdkDragDisabled]="editingTimeslotId() !== timeslot.timeslotId"

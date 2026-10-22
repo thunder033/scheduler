@@ -4,7 +4,7 @@ import { qaSelector } from '@scheduler/ui/test-utils';
 import { AvailabilityDotHarness } from '../availability-dot/availability-dot.harness';
 
 export class AvailabilityStatusHarness extends ComponentHarness {
-  static hostSelector = 'lib-availability-status';
+  static hostSelector = 'sch-availability-status';
 
   private readonly label = this.locatorFor(qaSelector('label'));
   private readonly dot = this.locatorFor(AvailabilityDotHarness);

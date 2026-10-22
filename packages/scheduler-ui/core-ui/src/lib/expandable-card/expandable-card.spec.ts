@@ -11,7 +11,7 @@ import {
 const INNER_SELECTOR = qaSelector('inner');
 
 @Component({
-  selector: 'lib-test-card',
+  selector: 'sch-test-card',
   template: `
     <button qa-toggle (click)="expanded.set(!expanded())">Toggle</button>
     @if (expanded()) {
@@ -31,11 +31,11 @@ class TestCardComponent extends ExpandableCard {
 }
 
 @Component({
-  selector: 'lib-test-host',
+  selector: 'sch-test-host',
   imports: [TestCardComponent],
   template: `
     @if (present()) {
-      <lib-test-card [startExpanded]="startExpanded" />
+      <sch-test-card [startExpanded]="startExpanded" />
     }
   `,
 })
@@ -45,7 +45,7 @@ class TestHostComponent {
 }
 
 class TestCardHarness extends ExpandableCardHarness {
-  static hostSelector = 'lib-test-card';
+  static hostSelector = 'sch-test-card';
 
   private readonly toggleControl = this.locatorFor(qaSelector('toggle'));
 

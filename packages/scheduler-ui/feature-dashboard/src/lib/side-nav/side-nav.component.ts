@@ -73,7 +73,7 @@ const SIDENAV_MODE_DESKTOP = 'side';
 const SIDENAV_MODE_MOBILE = 'over';
 
 @Component({
-  selector: 'lib-side-nav',
+  selector: 'sch-side-nav',
   imports: [
     MatSidenavContainer,
     MatSidenav,

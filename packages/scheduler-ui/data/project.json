@@ -2,7 +2,7 @@
   "name": "scheduler-ui-data",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/scheduler-ui/data/src",
-  "prefix": "lib",
+  "prefix": "sch",
   "projectType": "library",
   "tags": ["scope:scheduler-ui", "type:data"],
   "targets": {

@@ -63,7 +63,7 @@ export function formatTimeRange({
 }
 
 @Component({
-  selector: 'lib-timeslot-card',
+  selector: 'sch-timeslot-card',
   imports: [
     CdkDragHandle,
     FormField,

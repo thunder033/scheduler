@@ -7,7 +7,7 @@ import {
 const SELECTED_THEME_CLASS = 'selected';
 
 export class ThemeMenuHarness extends ComponentHarness {
-  static hostSelector = 'lib-theme-menu';
+  static hostSelector = 'sch-theme-menu';
 
   private readonly menu = this.locatorFor(MatMenuHarness);
 

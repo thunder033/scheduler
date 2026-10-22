@@ -4,7 +4,7 @@ import { qaSelector } from '@scheduler/ui/test-utils';
 const DISPLAY_NAME_SELECTOR = qaSelector('display-name');
 
 export class CurrentUserTileHarness extends ComponentHarness {
-  static hostSelector = 'lib-current-user-tile';
+  static hostSelector = 'sch-current-user-tile';
 
   private readonly displayName = this.locatorForOptional(DISPLAY_NAME_SELECTOR);
 

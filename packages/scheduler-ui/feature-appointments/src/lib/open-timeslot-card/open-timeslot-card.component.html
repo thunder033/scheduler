@@ -1,7 +1,7 @@
 <div class="flex flex-col items-center gap-2">
   <span qa-time-range class="font-bold">{{ timeRange() }}</span>
   @if (adding()) {
-    <lib-availability-select
+    <sch-availability-select
       class="w-full"
       [formField]="availabilityForm.status"
     />

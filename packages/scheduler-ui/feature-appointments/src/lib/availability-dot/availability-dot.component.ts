@@ -16,7 +16,7 @@ export const AVAILABILITY_STATUS_COLOR_CLASSES: Record<
 
 /** A dot in the color of an availability status, which is always shown next to the status' label */
 @Component({
-  selector: 'lib-availability-dot',
+  selector: 'sch-availability-dot',
   template: '',
   host: {
     class: 'inline-block size-3 shrink-0 rounded-full',

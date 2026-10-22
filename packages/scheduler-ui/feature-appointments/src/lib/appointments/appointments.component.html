@@ -35,12 +35,12 @@
       </h3>
       @for (slot of day.slots; track slot.timeslot.timeslotId) {
         @if (slot.appointment; as appointment) {
-          <lib-appointment-card
+          <sch-appointment-card
             [timeslot]="slot.timeslot"
             [appointment]="appointment"
           />
         } @else {
-          <lib-open-timeslot-card [timeslot]="slot.timeslot" [week]="week()" />
+          <sch-open-timeslot-card [timeslot]="slot.timeslot" [week]="week()" />
         }
       }
     </section>
